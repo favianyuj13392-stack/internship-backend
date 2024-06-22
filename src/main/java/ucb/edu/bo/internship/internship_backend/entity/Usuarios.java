@@ -54,9 +54,6 @@ public class Usuarios implements Serializable {
     @Column(name = "correo")
     private String correo;
     @Basic(optional = false)
-    @Column(name = "contrasenia")
-    private String contrasenia;
-    @Basic(optional = false)
     @Column(name = "fecharegistro")
     @Temporal(TemporalType.DATE)
     private Date fecharegistro;
@@ -92,11 +89,10 @@ public class Usuarios implements Serializable {
         this.idusuarios = idusuarios;
     }
 
-    public Usuarios(Integer idusuarios, String kcUuid, String correo, String contrasenia, Date fecharegistro, Date horaregistro, boolean activo) {
+    public Usuarios(Integer idusuarios, String kcUuid, String correo, Date fecharegistro, Date horaregistro, boolean activo) {
         this.idusuarios = idusuarios;
         this.kcUuid = kcUuid;
         this.correo = correo;
-        this.contrasenia = contrasenia;
         this.fecharegistro = fecharegistro;
         this.horaregistro = horaregistro;
         this.activo = activo;
@@ -126,13 +122,7 @@ public class Usuarios implements Serializable {
         this.correo = correo;
     }
 
-    public String getContrasenia() {
-        return contrasenia;
-    }
-
-    public void setContrasenia(String contrasenia) {
-        this.contrasenia = contrasenia;
-    }
+   
 
     public Date getFecharegistro() {
         return fecharegistro;

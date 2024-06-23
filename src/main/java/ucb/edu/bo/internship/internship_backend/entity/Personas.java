@@ -23,6 +23,9 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 /**
  *
  * @author danielaldazosa
@@ -71,19 +74,19 @@ public class Personas implements Serializable {
     private Integer anioingresouniversidad;
     @Column(name = "descripcion")
     private String descripcion;
-    @Lob
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "habilidades")
     private Object habilidades;
-    @Lob
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "habilidadesseleccionadas")
     private Object habilidadesseleccionadas;
-    @Lob
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "experiencia")
     private Object experiencia;
     @Column(name = "fechadenacimiento")
     @Temporal(TemporalType.DATE)
     private Date fechadenacimiento;
-    @Lob
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "redessociales")
     private Object redessociales;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "personasIdpersonas", fetch = FetchType.LAZY)

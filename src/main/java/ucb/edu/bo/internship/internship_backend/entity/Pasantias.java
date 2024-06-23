@@ -25,6 +25,9 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 /**
  *
  * @author danielaldazosa
@@ -48,7 +51,7 @@ public class Pasantias implements Serializable {
     @Column(name = "idpasantias")
     private Integer idpasantias;
     @Basic(optional = false)
-    @Lob
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "areas")
     private Object areas;
     @Basic(optional = false)
@@ -58,15 +61,15 @@ public class Pasantias implements Serializable {
     @Column(name = "descripcion")
     private String descripcion;
     @Basic(optional = false)
-    @Lob
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "requisitos")
     private Object requisitos;
     @Basic(optional = false)
-    @Lob
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "funciones")
     private Object funciones;
     @Basic(optional = false)
-    @Lob
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "beneficios")
     private Object beneficios;
     @Basic(optional = false)

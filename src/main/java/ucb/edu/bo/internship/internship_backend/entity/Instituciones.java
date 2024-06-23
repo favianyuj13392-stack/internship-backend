@@ -20,6 +20,9 @@ import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.util.List;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 /**
  *
  * @author danielaldazosa
@@ -59,18 +62,18 @@ public class Instituciones implements Serializable {
     @Column(name = "correo")
     private String correo;
     @Basic(optional = false)
-    @Lob
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "sectores")
     private Object sectores;
     @Basic(optional = false)
     @Column(name = "logoempresa")
     private String logoempresa;
     @Basic(optional = false)
-    @Lob
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "fotos")
     private Object fotos;
     @Basic(optional = false)
-    @Lob
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "redessociales")
     private Object redessociales;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "institucionesIdinstituciones", fetch = FetchType.LAZY)

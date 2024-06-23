@@ -35,7 +35,6 @@ import java.util.List;
     @NamedQuery(name = "Usuarios.findByIdusuarios", query = "SELECT u FROM Usuarios u WHERE u.idusuarios = :idusuarios"),
     @NamedQuery(name = "Usuarios.findByKcUuid", query = "SELECT u FROM Usuarios u WHERE u.kcUuid = :kcUuid"),
     @NamedQuery(name = "Usuarios.findByCorreo", query = "SELECT u FROM Usuarios u WHERE u.correo = :correo"),
-    @NamedQuery(name = "Usuarios.findByContrasenia", query = "SELECT u FROM Usuarios u WHERE u.contrasenia = :contrasenia"),
     @NamedQuery(name = "Usuarios.findByFecharegistro", query = "SELECT u FROM Usuarios u WHERE u.fecharegistro = :fecharegistro"),
     @NamedQuery(name = "Usuarios.findByHoraregistro", query = "SELECT u FROM Usuarios u WHERE u.horaregistro = :horaregistro"),
     @NamedQuery(name = "Usuarios.findByActivo", query = "SELECT u FROM Usuarios u WHERE u.activo = :activo")})

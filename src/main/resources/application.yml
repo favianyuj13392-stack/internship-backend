@@ -47,12 +47,17 @@ security-constraints:
   constraints:
     #Example of security constraints
     - auth-roles:
+        #list of roles that can access this endpoint
         - ESTUDIANTE
       security-collections:
         - name: student
           patterns:
+            # list of endpoints that require the roles specified above
             - /test/student
+            - /test/student/*
+            - /test/student/**
           methods:
+            # list of methods that can access the endpoint
             - GET
 
     - auth-roles:

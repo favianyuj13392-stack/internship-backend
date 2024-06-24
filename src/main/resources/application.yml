@@ -31,8 +31,8 @@ spring:
     oauth2:
       resource-server:
         jwt:
-          issuer-uri: http://localhost:8081/auth/realms/internshipUCB
-          jwk-set-uri: http://localhost:8081/auth/realms/internshipUCB/protocol/openid-connect/certs
+          issuer-uri: http://localhost:8081/realms/InternshipUCB
+          jwk-set-uri: http://localhost:8081/realms/InternshipUCB/protocol/openid-connect/certs
 keycloak:
   url: http://localhost:8081/
 token:
@@ -43,6 +43,32 @@ token:
 #Configuraciones de seguridad
 security-constraints:
   constraints:
+    - auth-roles:
+        - ESTUDIANTE
+      security-collections:
+        - name: student
+          patterns:
+            - /test/student
+          methods:
+            - GET
+
+    - auth-roles:
+        - EMPRESA
+      security-collections:
+        - name: business
+          patterns:
+            - /test/business
+          methods:
+            - GET
+
+    - auth-roles:
+        - ADMIN
+      security-collections:
+        - name: admin
+          patterns:
+            - /test/admin
+          methods:
+            - GET
 
 debug: true
 

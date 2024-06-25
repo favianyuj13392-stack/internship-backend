@@ -1,6 +1,5 @@
 package ucb.edu.bo.internship.internship_backend.dto;
 
-import jakarta.persistence.criteria.CriteriaBuilder.In;
 
 public class UsuariosInstitucionesDto {
     private Integer idUsuariosInstituciones;

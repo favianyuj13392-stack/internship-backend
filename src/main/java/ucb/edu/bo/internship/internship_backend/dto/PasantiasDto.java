@@ -1,5 +1,7 @@
 package ucb.edu.bo.internship.internship_backend.dto;
 
+import ucb.edu.bo.internship.internship_backend.entity.Pasantias;
+
 import java.sql.Date;
 
 public class PasantiasDto {
@@ -126,4 +128,18 @@ public class PasantiasDto {
             "}";
     }
 
+    public static PasantiasDto fromEntity(Pasantias pasantias) {
+        return new PasantiasDto(
+            pasantias.getIdpasantias(),
+            pasantias.getInstitucionesIdinstituciones().getIdinstituciones(),
+            pasantias.getAreas(),
+            pasantias.getTitulo(),
+            pasantias.getDescripcion(),
+            pasantias.getRequisitos(),
+            pasantias.getFunciones(),
+            pasantias.getBeneficios(),
+            new Date (pasantias.getFechacierre().getTime()),
+            new Date (pasantias.getFechaingreso().getTime())
+        );
+    }
 }

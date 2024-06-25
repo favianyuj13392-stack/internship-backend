@@ -6,13 +6,8 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UsersResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 
 public class KeycloakProvider {
-
-    private static Logger logger = LoggerFactory.getLogger(KeycloakProvider.class);
 
     static Dotenv dotenv = Dotenv.load();
 
@@ -29,7 +24,6 @@ public class KeycloakProvider {
     private static final String USER_PASSWORD = dotenv.get("KEYCLOAK_ADMIN_PASSWORD");
 
     public static RealmResource getRealmResource(){
-        logger.info("variables " + SERVER_URL + " " + REALM_NAME + " " + REALM_MASTER + " " + USER_CONSOLE + " " + USER_PASSWORD);
         Keycloak keycloak = KeycloakBuilder.builder()
                 .serverUrl(SERVER_URL)
                 .realm(REALM_MASTER)

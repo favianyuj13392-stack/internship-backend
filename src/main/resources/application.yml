@@ -42,6 +42,9 @@ token:
     principal-attribute: preferred_username
     resource-id: ${KEYCLOAK_CLIENT_ID:internship_cliente}
 
+environment:
+  frontend_url: ${FRONTEND_URL:http://localhost:5173}
+
 #Configuraciones de seguridad
 security-constraints:
   constraints:

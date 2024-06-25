@@ -5,5 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import ucb.edu.bo.internship.internship_backend.entity.Usuarios;
 
 public interface UsuariosDao extends JpaRepository<Usuarios, Integer>{
-    
+
+    Usuarios findByKcUuid(String kcUuid);
+
 }

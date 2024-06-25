@@ -1,5 +1,7 @@
 package ucb.edu.bo.internship.internship_backend.dto;
 
+import ucb.edu.bo.internship.internship_backend.entity.Usuarios;
+
 import java.sql.Date;
 import java.sql.Time;
 
@@ -90,6 +92,22 @@ public class UsuariosDto {
 
     public void setIdCarreras(Integer idCarreras) {
         this.idCarreras = idCarreras;
+    }
+
+    public static UsuariosDto fromEntity(Usuarios usuario){
+        UsuariosDto usuarioDto = new UsuariosDto();
+        if(usuario == null){
+            return null;
+        }
+        usuarioDto.setIdUsuarios(usuario.getIdusuarios());
+        usuarioDto.setKc_UUID(usuario.getKcUuid());
+        usuarioDto.setCorreo(usuario.getCorreo());
+        usuarioDto.setFechaRegistro(new Date(usuario.getFecharegistro().getTime()));
+        usuarioDto.setHoraRegistro(new Time(usuario.getHoraregistro().getTime()));
+        usuarioDto.setIdRoles(usuario.getRolesIdroles().getIdroles());
+        usuarioDto.setIdPersonas(usuario.getPersonasIdpersonas().getIdpersonas());
+        usuarioDto.setIdCarreras(usuario.getCarrerasIdcarreras().getIdcarreras());
+        return usuarioDto;
     }
 
     @Override

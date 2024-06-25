@@ -2,14 +2,18 @@ package ucb.edu.bo.internship.internship_backend.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import ucb.edu.bo.internship.internship_backend.bl.UsuariosBL;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +26,11 @@ public class GlobalSecurityConfiguration {
     private final Logger logger = LoggerFactory.getLogger(GlobalSecurityConfiguration.class);
 
     private final SecurityConstraintsProperties securityConstraintsProperties;
+    private final UsuariosBL usuariosBL;
 
-    public GlobalSecurityConfiguration(TokenConverterProperties properties, SecurityConstraintsProperties securityConstraintsProperties) {
+    @Value("${FRONTEND_URL}")
+    private String clientUrl;
+    public GlobalSecurityConfiguration(TokenConverterProperties properties, SecurityConstraintsProperties securityConstraintsProperties, UsuariosBL usuariosBL) {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter
                 = new JwtGrantedAuthoritiesConverter();
         this.keycloakJwtTokenConverter
@@ -31,6 +38,7 @@ public class GlobalSecurityConfiguration {
                 jwtGrantedAuthoritiesConverter,
                 properties);
         this.securityConstraintsProperties = securityConstraintsProperties;
+        this.usuariosBL = usuariosBL;
     }
 
     @Bean
@@ -142,6 +150,7 @@ public class GlobalSecurityConfiguration {
                 })
                 .oauth2ResourceServer( (oauth2) -> {oauth2.jwt( (jwt) -> jwt.jwtAuthenticationConverter(keycloakJwtTokenConverter));})
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(new RegistrationCompletionFilter(keycloakJwtTokenConverter, usuariosBL, clientUrl), BasicAuthenticationFilter.class)
                 .build();
     }
 }

@@ -16,5 +16,11 @@ public interface PasantiasDao extends JpaRepository<Pasantias, Integer>{
             Pageable pageable
     );
 
+    Page<Pasantias> findAllByActivoIsTrueAndFechacierreAfterAndTituloContainingIgnoreCase(
+            Date fechacierre,
+            String titulo,
+            Pageable pageable
+    );
+
     Page<Pasantias> findAllByActivoIsTrue(Pageable pageable);
 }

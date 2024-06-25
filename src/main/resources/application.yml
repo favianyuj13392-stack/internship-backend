@@ -52,6 +52,7 @@ security-constraints:
     - auth-roles:
         #list of roles that can access this endpoint
         - ESTUDIANTE
+        - ADMIN
       security-collections:
         - name: student
           patterns:

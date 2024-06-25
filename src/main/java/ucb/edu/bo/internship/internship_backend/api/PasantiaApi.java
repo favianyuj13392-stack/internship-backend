@@ -51,7 +51,24 @@ public class PasantiaApi {
             response.setErrorMessage(e.getMessage());
             return response;
         }
+    }
 
+    @GetMapping("/{id}")
+    public ResponseDto<PasantiasDto> obtenerPasantiaPorId(@RequestParam Integer id){
+        ResponseDto<PasantiasDto> response = new ResponseDto<>();
+        PasantiasDto pasantia;
+        try {
+            pasantia = pasantiaBl.obtenerPasantiaPorId(id);
+            response.setCode("200");
+            response.setResponse(pasantia);
+            response.setErrorMessage(null);
+            return response;
+        }catch (Exception e){
+            response.setCode("500");
+            response.setResponse(null);
+            response.setErrorMessage(e.getMessage());
+            return response;
+        }
     }
 
 }

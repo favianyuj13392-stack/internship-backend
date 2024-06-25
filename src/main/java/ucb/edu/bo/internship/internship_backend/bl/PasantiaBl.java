@@ -20,8 +20,9 @@ public class PasantiaBl {
 
     public Page<PasantiasDto> obtenerPasantiasPorTerminoDeBusqueda(String terminoDeBusqueda, Pageable pageable){
         Date fechaActual = new Date();
-        return pasantiasDao.findAllByActivoIsTrueAndFechacierreAfter(
+        return pasantiasDao.findAllByActivoIsTrueAndFechacierreAfterAndTituloContainingIgnoreCase(
                 fechaActual,
+                terminoDeBusqueda,
                 pageable
         ).map(PasantiasDto::fromEntity);
     }
@@ -32,5 +33,9 @@ public class PasantiaBl {
                 fechaActual,
                 pageable
         ).map(PasantiasDto::fromEntity);
+    }
+
+    public PasantiasDto obtenerPasantiaPorId(Integer id){
+        return PasantiasDto.fromEntity(pasantiasDao.findById(id).get());
     }
 }

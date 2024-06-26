@@ -5,10 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ucb.edu.bo.internship.internship_backend.bl.PasantiaBl;
 import ucb.edu.bo.internship.internship_backend.dto.PasantiasDto;
 import ucb.edu.bo.internship.internship_backend.dto.ResponseDto;
@@ -54,7 +51,9 @@ public class PasantiaApi {
     }
 
     @GetMapping("/{id}")
-    public ResponseDto<PasantiasDto> obtenerPasantiaPorId(@RequestParam Integer id){
+    public ResponseDto<PasantiasDto> obtenerPasantiaPorId(
+            @PathVariable Integer id
+    ){
         ResponseDto<PasantiasDto> response = new ResponseDto<>();
         PasantiasDto pasantia;
         try {
@@ -70,5 +69,26 @@ public class PasantiaApi {
             return response;
         }
     }
+
+    @GetMapping("/{id}/relacionadas")
+    public ResponseDto<List<PasantiasDto>> obtenerPasantiasRelacionadas(
+            @PathVariable Integer id
+    ){
+        ResponseDto<List<PasantiasDto>> response = new ResponseDto<>();
+        List<PasantiasDto> pasantias;
+        try {
+            pasantias = pasantiaBl.obtenerPasantiasRelacionadas(id);
+            response.setCode("200");
+            response.setResponse(pasantias);
+            response.setErrorMessage(null);
+            return response;
+        }catch (Exception e){
+            response.setCode("500");
+            response.setResponse(null);
+            response.setErrorMessage(e.getMessage());
+            return response;
+        }
+    }
+
 
 }

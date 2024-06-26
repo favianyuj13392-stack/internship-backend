@@ -9,6 +9,7 @@ import ucb.edu.bo.internship.internship_backend.dao.PasantiasDao;
 import ucb.edu.bo.internship.internship_backend.dto.PasantiasDto;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class PasantiaBl {
@@ -37,5 +38,9 @@ public class PasantiaBl {
 
     public PasantiasDto obtenerPasantiaPorId(Integer id){
         return PasantiasDto.fromEntity(pasantiasDao.findById(id).get());
+    }
+
+    public List<PasantiasDto> obtenerPasantiasRelacionadas(Integer id){
+        return pasantiasDao.findTop3RelatedPasantias(id).stream().map(PasantiasDto::fromEntity).toList();
     }
 }

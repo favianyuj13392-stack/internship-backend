@@ -81,5 +81,13 @@ security-constraints:
           methods:
             - GET
 
-debug: true
+    - auth-roles:
+        - permitAll
+      security-collections:
+        - name: public
+          patterns:
+            - /api/v1/usuario
+          methods:
+            - POST
+
 

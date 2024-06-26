@@ -17,6 +17,7 @@ import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -66,18 +67,18 @@ public class Instituciones implements Serializable {
     @Basic(optional = false)
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "sectores")
-    private Object sectores;
+    private List<String> sectores;
     @Basic(optional = false)
     @Column(name = "logoempresa")
     private String logoempresa;
     @Basic(optional = false)
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "fotos")
-    private Object fotos;
+    private List<String> fotos;
     @Basic(optional = false)
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "redessociales")
-    private Object redessociales;
+    private LinkedHashMap<String,String> redessociales;
     @Basic(optional = false)
     @Column(name = "activo")
     private Boolean activo;
@@ -93,7 +94,7 @@ public class Instituciones implements Serializable {
         this.idinstituciones = idinstituciones;
     }
 
-    public Instituciones(Integer idinstituciones, String nombre, String descripcion, String direccion, String fotoinstitucion, String correo, Object sectores, String logoempresa, Object fotos, Object redessociales,Boolean activo) {
+    public Instituciones(Integer idinstituciones, String nombre, String descripcion, String direccion, String fotoinstitucion, String correo, List<String> sectores, String logoempresa, List<String> fotos, LinkedHashMap<String,String> redessociales, Boolean activo) {
         this.idinstituciones = idinstituciones;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -117,6 +118,7 @@ public class Instituciones implements Serializable {
         this.logoempresa = institucionesDto.getLogoEmpresa();
         this.fotos = institucionesDto.getFotos();
         this.redessociales = institucionesDto.getRedesSociales();
+        this.activo = institucionesDto.getActivo();
     }
 
     public Integer getIdinstituciones() {
@@ -167,11 +169,11 @@ public class Instituciones implements Serializable {
         this.correo = correo;
     }
 
-    public Object getSectores() {
+    public List<String> getSectores() {
         return sectores;
     }
 
-    public void setSectores(Object sectores) {
+    public void setSectores(List<String> sectores) {
         this.sectores = sectores;
     }
 
@@ -183,19 +185,19 @@ public class Instituciones implements Serializable {
         this.logoempresa = logoempresa;
     }
 
-    public Object getFotos() {
+    public List<String> getFotos() {
         return fotos;
     }
 
-    public void setFotos(Object fotos) {
+    public void setFotos(List<String> fotos) {
         this.fotos = fotos;
     }
 
-    public Object getRedessociales() {
+    public LinkedHashMap<String,String> getRedessociales() {
         return redessociales;
     }
 
-    public void setRedessociales(Object redessociales) {
+    public void setRedessociales(LinkedHashMap<String,String> redessociales) {
         this.redessociales = redessociales;
     }
 

@@ -2,11 +2,14 @@ package ucb.edu.bo.internship.internship_backend.bl;
 
 import jakarta.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ucb.edu.bo.internship.internship_backend.config.GlobalSecurityConfiguration;
 import ucb.edu.bo.internship.internship_backend.dao.InstitucionesDao;
 import ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto;
 import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
@@ -22,10 +25,15 @@ public class InstitucionBl {
     }
     //Agregar una institucion
     public InstitucionesDto agregarInstitucion(@NotNull InstitucionesDto institucionesDto){
-        institucionesDto.setActivo(false);
-        Instituciones instituciones = new Instituciones(institucionesDto);
-        institucionesDao.save(instituciones);
-        return new InstitucionesDto(instituciones);
+        try {
+            institucionesDto.setActivo(false);
+            Instituciones instituciones = new Instituciones(institucionesDto);
+            institucionesDao.save(instituciones);
+            return new InstitucionesDto(instituciones);
+        }catch (Exception e){
+            System.out.println(e);
+            return null;
+        }
     }
     //Obtener todas las instituciones
     public Page<InstitucionesDto> obtenerInstituciones(Integer page, Integer size, String search,String sort){

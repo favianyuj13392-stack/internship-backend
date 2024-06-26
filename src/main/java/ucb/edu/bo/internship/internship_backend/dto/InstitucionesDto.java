@@ -1,5 +1,7 @@
 package ucb.edu.bo.internship.internship_backend.dto;
 
+import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
+
 public class InstitucionesDto {
     private Integer idInstituciones;
     private String nombre;
@@ -11,11 +13,12 @@ public class InstitucionesDto {
     private String logoEmpresa;
     private Object fotos;
     private Object redesSociales;
+    private Boolean activo;
 
     public InstitucionesDto() {
     }
 
-    public InstitucionesDto(Integer idInstituciones, String nombre, String descripcion, String direccion, String fotoInstitucion, String correo, Object sectores, String logoEmpresa, Object fotos, Object redesSociales) {
+    public InstitucionesDto(Integer idInstituciones, String nombre, String descripcion, String direccion, String fotoInstitucion, String correo, Object sectores, String logoEmpresa, Object fotos, Object redesSociales,Boolean activo) {
         this.idInstituciones = idInstituciones;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -26,6 +29,19 @@ public class InstitucionesDto {
         this.logoEmpresa = logoEmpresa;
         this.fotos = fotos;
         this.redesSociales = redesSociales;
+        this.activo = activo;
+    }
+    public InstitucionesDto(Instituciones instituciones) {
+        this.idInstituciones = instituciones.getIdinstituciones();
+        this.nombre = instituciones.getNombre();
+        this.descripcion = instituciones.getDescripcion();
+        this.direccion = instituciones.getDireccion();
+        this.fotoInstitucion = instituciones.getFotoinstitucion();
+        this.correo = instituciones.getCorreo();
+        this.sectores = instituciones.getSectores();
+        this.logoEmpresa = instituciones.getLogoempresa();
+        this.fotos = instituciones.getFotos();
+        this.redesSociales = instituciones.getRedessociales();
     }
 
 
@@ -107,6 +123,14 @@ public class InstitucionesDto {
 
     public void setRedesSociales(Object redesSociales) {
         this.redesSociales = redesSociales;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 
     @Override

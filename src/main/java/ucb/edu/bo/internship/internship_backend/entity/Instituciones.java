@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto;
 
 /**
  *
@@ -36,7 +37,9 @@ import org.hibernate.type.SqlTypes;
     @NamedQuery(name = "Instituciones.findByDireccion", query = "SELECT i FROM Instituciones i WHERE i.direccion = :direccion"),
     @NamedQuery(name = "Instituciones.findByFotoinstitucion", query = "SELECT i FROM Instituciones i WHERE i.fotoinstitucion = :fotoinstitucion"),
     @NamedQuery(name = "Instituciones.findByCorreo", query = "SELECT i FROM Instituciones i WHERE i.correo = :correo"),
-    @NamedQuery(name = "Instituciones.findByLogoempresa", query = "SELECT i FROM Instituciones i WHERE i.logoempresa = :logoempresa")})
+    @NamedQuery(name = "Instituciones.findByLogoempresa", query = "SELECT i FROM Instituciones i WHERE i.logoempresa = :logoempresa"),
+    @NamedQuery(name = "Instituciones.findByActivo", query = "SELECT i FROM Instituciones i WHERE i.activo = :activo")
+})
 public class Instituciones implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -75,6 +78,9 @@ public class Instituciones implements Serializable {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "redessociales")
     private Object redessociales;
+    @Basic(optional = false)
+    @Column(name = "activo")
+    private Boolean activo;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "institucionesIdinstituciones", fetch = FetchType.LAZY)
     private List<Usuariosinstituciones> usuariosinstitucionesList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "institucionesIdinstituciones", fetch = FetchType.LAZY)
@@ -87,7 +93,7 @@ public class Instituciones implements Serializable {
         this.idinstituciones = idinstituciones;
     }
 
-    public Instituciones(Integer idinstituciones, String nombre, String descripcion, String direccion, String fotoinstitucion, String correo, Object sectores, String logoempresa, Object fotos, Object redessociales) {
+    public Instituciones(Integer idinstituciones, String nombre, String descripcion, String direccion, String fotoinstitucion, String correo, Object sectores, String logoempresa, Object fotos, Object redessociales,Boolean activo) {
         this.idinstituciones = idinstituciones;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -98,6 +104,19 @@ public class Instituciones implements Serializable {
         this.logoempresa = logoempresa;
         this.fotos = fotos;
         this.redessociales = redessociales;
+        this.activo = activo;
+    }
+    public Instituciones(InstitucionesDto institucionesDto){
+        this.idinstituciones = institucionesDto.getIdInstituciones();
+        this.nombre = institucionesDto.getNombre();
+        this.descripcion = institucionesDto.getDescripcion();
+        this.direccion = institucionesDto.getDireccion();
+        this.fotoinstitucion = institucionesDto.getFotoInstitucion();
+        this.correo = institucionesDto.getCorreo();
+        this.sectores = institucionesDto.getSectores();
+        this.logoempresa = institucionesDto.getLogoEmpresa();
+        this.fotos = institucionesDto.getFotos();
+        this.redessociales = institucionesDto.getRedesSociales();
     }
 
     public Integer getIdinstituciones() {
@@ -178,6 +197,14 @@ public class Instituciones implements Serializable {
 
     public void setRedessociales(Object redessociales) {
         this.redessociales = redessociales;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 
     public List<Usuariosinstituciones> getUsuariosinstitucionesList() {

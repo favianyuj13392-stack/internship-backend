@@ -48,6 +48,6 @@ public interface PasantiasDao extends JpaRepository<Pasantias, Integer>{
             @Param("pasantiaId") Integer pasantiaId
     );
 
+    Pasantias findByIdpasantiasAndActivoIsTrue(Integer idpasantias);
 
-    Page<Pasantias> findAllByActivoIsTrue(Pageable pageable);
 }

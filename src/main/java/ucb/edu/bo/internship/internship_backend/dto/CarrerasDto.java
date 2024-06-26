@@ -1,5 +1,7 @@
 package ucb.edu.bo.internship.internship_backend.dto;
 
+import ucb.edu.bo.internship.internship_backend.entity.Carreras;
+
 public class CarrerasDto {
     private Integer idCarreras;
     private String nombre;
@@ -45,5 +47,13 @@ public class CarrerasDto {
             ", nombre='" + getNombre() + "'" +
             ", descripcion='" + getDescripcion() + "'" +
             "}";
+    }
+
+    public static CarrerasDto fromEntity(Carreras carreras) {
+        CarrerasDto carrerasDto = new CarrerasDto();
+        carrerasDto.setIdCarreras(carreras.getIdcarreras());
+        carrerasDto.setNombre(carreras.getNombre());
+        carrerasDto.setDescripcion(carreras.getDescripcion());
+        return carrerasDto;
     }
 }

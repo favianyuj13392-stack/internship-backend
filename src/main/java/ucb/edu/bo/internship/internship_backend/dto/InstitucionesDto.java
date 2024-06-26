@@ -1,5 +1,7 @@
 package ucb.edu.bo.internship.internship_backend.dto;
 
+import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
+
 public class InstitucionesDto {
     private Integer idInstituciones;
     private String nombre;
@@ -123,6 +125,20 @@ public class InstitucionesDto {
             ", fotos='" + getFotos() + "'" +
             ", redesSociales='" + getRedesSociales() + "'" +
             "}";
+    }
+
+    public static InstitucionesDto fromEntity(Instituciones institucion){
+        return new InstitucionesDto(
+                institucion.getIdinstituciones(),
+                institucion.getNombre(),
+                institucion.getDescripcion(),
+                institucion.getDireccion(),
+                institucion.getFotoinstitucion(),
+                institucion.getCorreo(),
+                institucion.getSectores(),
+                institucion.getLogoempresa(),
+                institucion.getFotos(),
+                institucion.getRedessociales());
     }
     
     

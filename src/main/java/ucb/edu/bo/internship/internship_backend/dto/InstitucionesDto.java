@@ -48,6 +48,19 @@ public class InstitucionesDto {
         this.activo = instituciones.getActivo();
     }
 
+    public InstitucionesDto(Integer idinstituciones, String nombre, String descripcion, String direccion, String fotoinstitucion, String correo, List<String> sectores, String logoempresa, List<String> fotos, LinkedHashMap<String, String> redessociales) {
+        this.idInstituciones = idinstituciones;
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.direccion = direccion;
+        this.fotoInstitucion = fotoinstitucion;
+        this.correo = correo;
+        this.sectores = sectores;
+        this.logoEmpresa = logoempresa;
+        this.fotos = fotos;
+        this.redesSociales = redessociales;
+    }
+
 
     public Integer getIdInstituciones() {
         return this.idInstituciones;

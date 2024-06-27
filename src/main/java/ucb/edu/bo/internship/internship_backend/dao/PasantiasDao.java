@@ -6,14 +6,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.jpa.repository.Query;
 import ucb.edu.bo.internship.internship_backend.dto.PasantiaNombreDto;
 import ucb.edu.bo.internship.internship_backend.entity.Pasantias;
 
 import java.util.Date;
 import java.util.List;
 
-import java.util.List;
 
 public interface PasantiasDao extends JpaRepository<Pasantias, Integer>{
 

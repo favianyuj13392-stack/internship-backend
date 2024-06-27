@@ -66,4 +66,18 @@ public class InstitucionApi {
         }
         return responseDto;
     }
+    @GetMapping("/{id}/relacionadas")
+    public ResponseDto<List<InstitucionConPasantiasDto>> getCuatroInstitucionesRelacionadas(@PathVariable Integer id){
+        ResponseDto<List<InstitucionConPasantiasDto>> responseDto = new ResponseDto<>();
+        try {
+            List<InstitucionConPasantiasDto> institucionesDto = institucionBl.obtenerCuatroInstitucionesRelacionadas(id);
+            responseDto.setResponse(institucionesDto);
+            responseDto.setCode("200");
+            responseDto.setErrorMessage("");
+        }catch (Exception e){
+            responseDto.setCode("500");
+            responseDto.setErrorMessage("Error al obtener las instituciones relacionadas");
+        }
+        return responseDto;
+    }
 }

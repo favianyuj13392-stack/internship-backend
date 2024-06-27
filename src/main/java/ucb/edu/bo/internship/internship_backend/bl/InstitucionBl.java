@@ -14,6 +14,8 @@ import ucb.edu.bo.internship.internship_backend.dao.InstitucionesDao;
 import ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto;
 import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,6 +62,22 @@ public class InstitucionBl {
             Instituciones instituciones = institucionesDao.findByIdinstitucionesAndActivo(id, true);
             return new InstitucionesDto(instituciones);
         } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<HashMap<Integer, String>> obtenerInstitucionesNombre() {
+        try {
+            List<Object[]> results = institucionesDao.getAllIdAndNameByActivo(true);
+            List<HashMap<Integer, String>> instituciones = new ArrayList<>();
+            for (Object[] result : results) {
+                HashMap<Integer, String> map = new HashMap<>();
+                map.put((Integer) result[0], (String) result[1]);
+                instituciones.add(map);
+            }
+            return instituciones;
+        } catch (Exception e) {
+            System.out.println(e);
             return null;
         }
     }

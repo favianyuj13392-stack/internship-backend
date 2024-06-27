@@ -15,7 +15,7 @@ public class UsuarioApi {
         this.usuariosBL = usuariosBL;
     }
 
-    @GetMapping("/{uuid}")
+    @GetMapping("/{uuid}/existencia")
     public ResponseDto<Boolean> usuarioExiste(@PathVariable String uuid){
         ResponseDto<Boolean> response = new ResponseDto<>();
         try{

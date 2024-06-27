@@ -152,6 +152,20 @@ public class InstitucionesDto {
             ", redesSociales='" + getRedesSociales() + "'" +
             "}";
     }
+
+    public static InstitucionesDto fromEntity(Instituciones institucion){
+        return new InstitucionesDto(
+                institucion.getIdinstituciones(),
+                institucion.getNombre(),
+                institucion.getDescripcion(),
+                institucion.getDireccion(),
+                institucion.getFotoinstitucion(),
+                institucion.getCorreo(),
+                institucion.getSectores(),
+                institucion.getLogoempresa(),
+                institucion.getFotos(),
+                institucion.getRedessociales());
+    }
     
     
 }

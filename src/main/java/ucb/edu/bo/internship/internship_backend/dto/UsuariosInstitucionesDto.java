@@ -1,6 +1,8 @@
 package ucb.edu.bo.internship.internship_backend.dto;
 
 
+import ucb.edu.bo.internship.internship_backend.entity.Usuariosinstituciones;
+
 public class UsuariosInstitucionesDto {
     private Integer idUsuariosInstituciones;
     private Integer idUsuarios;
@@ -49,6 +51,14 @@ public class UsuariosInstitucionesDto {
         this.cargo = cargo;
     }
 
+    public static UsuariosInstitucionesDto fromEntity(Usuariosinstituciones usuariosinstituciones){
+        UsuariosInstitucionesDto usuariosInstitucionesDto = new UsuariosInstitucionesDto();
+        usuariosInstitucionesDto.setIdUsuariosInstituciones(usuariosinstituciones.getIdusuariosinstituciones());
+        usuariosInstitucionesDto.setIdUsuarios(usuariosinstituciones.getUsuariosIdusuarios().getIdusuarios());
+        usuariosInstitucionesDto.setIdInstituciones(usuariosinstituciones.getInstitucionesIdinstituciones().getIdinstituciones());
+        usuariosInstitucionesDto.setCargo(usuariosinstituciones.getCargo());
+        return usuariosInstitucionesDto;
+    }
     
     @Override
     public String toString() {

@@ -93,14 +93,24 @@ public class UsuariosBL {
         UsuariosDto usuarioAgregado = agregarUsuario(usuarioRegistroCompletoDto);
         InstitucionesDto institucion = usuarioRegistroCompletoDto.getInstitucion();
 
+        if(institucion == null){
+            usuarioRegistroCompletoDto.setIdRoles(
+                    rolesDao.findByRol("ESTUDIANTE").getIdroles()
+            );
+            return new UsuarioRegistroCompletoDto(usuarioAgregado, personaAgregada, null, null);
+        }else{
+            usuarioRegistroCompletoDto.setIdRoles(
+                    rolesDao.findByRol("EMPRESA").getIdroles()
+            );
+            Instituciones instituciones = institucionesDao.findByNombre(institucion.getNombre());
+            if(instituciones == null){
+                instituciones = institucionesDao.save(institucion.toEntity());
+            }
+            UsuariosInstitucionesDto usuarioInstitucionAgregado = agregarUsuarioInstitucion(usuarioRegistroCompletoDto.getKc_UUID(), instituciones.getIdinstituciones(), usuarioRegistroCompletoDto.getCargo());
+            return new UsuarioRegistroCompletoDto(usuarioAgregado, personaAgregada, institucion, usuarioInstitucionAgregado.getCargo());
+        }
 
 
-        Instituciones instituciones = institucionesDao.findByNombre(institucion.getNombre());
-           if(instituciones == null){
-               instituciones = institucionesDao.save(institucion.toEntity());
-           }
-        UsuariosInstitucionesDto usuarioInstitucionAgregado = agregarUsuarioInstitucion(usuarioRegistroCompletoDto.getKc_UUID(), instituciones.getIdinstituciones(), usuarioRegistroCompletoDto.getCargo());
-        return new UsuarioRegistroCompletoDto(usuarioAgregado, personaAgregada, institucion, usuarioInstitucionAgregado.getCargo());
     }
 
 }

@@ -52,6 +52,7 @@ security-constraints:
     - auth-roles:
         #list of roles that can access this endpoint
         - ESTUDIANTE
+        - ADMIN
       security-collections:
         - name: student
           patterns:
@@ -81,5 +82,13 @@ security-constraints:
           methods:
             - GET
 
-debug: true
+    - auth-roles:
+        - permitAll
+      security-collections:
+        - name: public
+          patterns:
+            - /api/v1/usuario
+          methods:
+            - POST
+
 

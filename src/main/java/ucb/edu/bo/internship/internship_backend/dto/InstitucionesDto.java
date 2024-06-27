@@ -1,5 +1,9 @@
 package ucb.edu.bo.internship.internship_backend.dto;
 
+import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
+import java.util.LinkedHashMap;
+import java.util.List;
+
 public class InstitucionesDto {
     private Integer idInstituciones;
     private String nombre;
@@ -7,15 +11,16 @@ public class InstitucionesDto {
     private String direccion;
     private String fotoInstitucion;
     private String correo;
-    private Object sectores;
+    private List<String> sectores;
     private String logoEmpresa;
-    private Object fotos;
-    private Object redesSociales;
+    private List<String> fotos;
+    private LinkedHashMap<String,String> redesSociales;
+    private Boolean activo;
 
     public InstitucionesDto() {
     }
 
-    public InstitucionesDto(Integer idInstituciones, String nombre, String descripcion, String direccion, String fotoInstitucion, String correo, Object sectores, String logoEmpresa, Object fotos, Object redesSociales) {
+    public InstitucionesDto(Integer idInstituciones, String nombre, String descripcion, String direccion, String fotoInstitucion, String correo, List<String> sectores, String logoEmpresa, List<String> fotos, LinkedHashMap<String,String> redesSociales, Boolean activo) {
         this.idInstituciones = idInstituciones;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -26,6 +31,20 @@ public class InstitucionesDto {
         this.logoEmpresa = logoEmpresa;
         this.fotos = fotos;
         this.redesSociales = redesSociales;
+        this.activo = activo;
+    }
+    public InstitucionesDto(Instituciones instituciones) {
+        this.idInstituciones = instituciones.getIdinstituciones();
+        this.nombre = instituciones.getNombre();
+        this.descripcion = instituciones.getDescripcion();
+        this.direccion = instituciones.getDireccion();
+        this.fotoInstitucion = instituciones.getFotoinstitucion();
+        this.correo = instituciones.getCorreo();
+        this.sectores = instituciones.getSectores();
+        this.logoEmpresa = instituciones.getLogoempresa();
+        this.fotos = instituciones.getFotos();
+        this.redesSociales = instituciones.getRedessociales();
+        this.activo = instituciones.getActivo();
     }
 
 
@@ -77,11 +96,11 @@ public class InstitucionesDto {
         this.correo = correo;
     }
 
-    public Object getSectores() {
+    public List<String> getSectores() {
         return this.sectores;
     }
 
-    public void setSectores(Object sectores) {
+    public void setSectores(List<String> sectores) {
         this.sectores = sectores;
     }
 
@@ -93,20 +112,28 @@ public class InstitucionesDto {
         this.logoEmpresa = logoEmpresa;
     }
 
-    public Object getFotos() {
+    public List<String> getFotos() {
         return this.fotos;
     }
 
-    public void setFotos(Object fotos) {
+    public void setFotos(List<String> fotos) {
         this.fotos = fotos;
     }
 
-    public Object getRedesSociales() {
+    public LinkedHashMap<String,String> getRedesSociales() {
         return this.redesSociales;
     }
 
-    public void setRedesSociales(Object redesSociales) {
+    public void setRedesSociales(LinkedHashMap<String,String> redesSociales) {
         this.redesSociales = redesSociales;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 
     @Override
@@ -123,6 +150,21 @@ public class InstitucionesDto {
             ", fotos='" + getFotos() + "'" +
             ", redesSociales='" + getRedesSociales() + "'" +
             "}";
+    }
+
+    public static InstitucionesDto fromEntity(Instituciones institucion){
+        return new InstitucionesDto(
+                institucion.getIdinstituciones(),
+                institucion.getNombre(),
+                institucion.getDescripcion(),
+                institucion.getDireccion(),
+                institucion.getFotoinstitucion(),
+                institucion.getCorreo(),
+                institucion.getSectores(),
+                institucion.getLogoempresa(),
+                institucion.getFotos(),
+                institucion.getRedessociales(),
+                institucion.getActivo());
     }
     
     

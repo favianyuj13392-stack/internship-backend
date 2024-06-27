@@ -1,10 +1,11 @@
 package ucb.edu.bo.internship.internship_backend.dto;
 
+import ucb.edu.bo.internship.internship_backend.entity.Pasantias;
+
 import java.sql.Date;
 
 public class PasantiasDto {
     private Integer idPasantias;
-    private Integer idInstituciones;
     private Object areas;
     private String titulo;
     private String descripcion;
@@ -17,9 +18,8 @@ public class PasantiasDto {
     public PasantiasDto() {
     }
 
-    public PasantiasDto(Integer idPasantias, Integer idInstituciones, Object areas, String titulo, String descripcion, Object requisitos, Object funciones, Object beneficios, Date fechaCierre, Date fechaIngreso) {
+    public PasantiasDto(Integer idPasantias, Object areas, String titulo, String descripcion, Object requisitos, Object funciones, Object beneficios, Date fechaCierre, Date fechaIngreso) {
         this.idPasantias = idPasantias;
-        this.idInstituciones = idInstituciones;
         this.areas = areas;
         this.titulo = titulo;
         this.descripcion = descripcion;
@@ -38,13 +38,6 @@ public class PasantiasDto {
         this.idPasantias = idPasantias;
     }
 
-    public Integer getIdInstituciones() {
-        return this.idInstituciones;
-    }
-
-    public void setIdInstituciones(Integer idInstituciones) {
-        this.idInstituciones = idInstituciones;
-    }
 
     public Object getAreas() {
         return this.areas;
@@ -114,7 +107,6 @@ public class PasantiasDto {
     public String toString() {
         return "{" +
             " idPasantias='" + getIdPasantias() + "'" +
-            ", idInstituciones='" + getIdInstituciones() + "'" +
             ", areas='" + getAreas() + "'" +
             ", titulo='" + getTitulo() + "'" +
             ", descripcion='" + getDescripcion() + "'" +
@@ -126,4 +118,17 @@ public class PasantiasDto {
             "}";
     }
 
+    public static PasantiasDto fromEntity(Pasantias pasantias) {
+        return new PasantiasDto(
+            pasantias.getIdpasantias(),
+            pasantias.getAreas(),
+            pasantias.getTitulo(),
+            pasantias.getDescripcion(),
+            pasantias.getRequisitos(),
+            pasantias.getFunciones(),
+            pasantias.getBeneficios(),
+            new Date (pasantias.getFechacierre().getTime()),
+            new Date (pasantias.getFechaingreso().getTime())
+        );
+    }
 }

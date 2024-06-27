@@ -4,9 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ucb.edu.bo.internship.internship_backend.dao.*;
-import ucb.edu.bo.internship.internship_backend.dto.PersonasDto;
-import ucb.edu.bo.internship.internship_backend.dto.UsuariosDto;
-import ucb.edu.bo.internship.internship_backend.dto.UsuariosInstitucionesDto;
+import ucb.edu.bo.internship.internship_backend.dto.*;
 import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
 import ucb.edu.bo.internship.internship_backend.entity.Roles;
 import ucb.edu.bo.internship.internship_backend.entity.Usuarios;
@@ -88,6 +86,21 @@ public class UsuariosBL {
             return UsuariosInstitucionesDto.fromEntity(usuariosinstituciones);
         }
         return null;
+    }
+
+    public UsuarioRegistroCompletoDto agregarUsuarioCompleto(UsuarioRegistroCompletoDto usuarioRegistroCompletoDto){
+        PersonasDto personaAgregada = agregarPersona(usuarioRegistroCompletoDto.getPersona());
+        UsuariosDto usuarioAgregado = agregarUsuario(usuarioRegistroCompletoDto);
+        InstitucionesDto institucion = usuarioRegistroCompletoDto.getInstitucion();
+
+
+
+        Instituciones instituciones = institucionesDao.findByNombre(institucion.getNombre());
+           if(instituciones == null){
+               instituciones = institucionesDao.save(institucion.toEntity());
+           }
+        UsuariosInstitucionesDto usuarioInstitucionAgregado = agregarUsuarioInstitucion(usuarioRegistroCompletoDto.getKc_UUID(), instituciones.getIdinstituciones(), usuarioRegistroCompletoDto.getCargo());
+        return new UsuarioRegistroCompletoDto(usuarioAgregado, personaAgregada, institucion, usuarioInstitucionAgregado.getCargo());
     }
 
 }

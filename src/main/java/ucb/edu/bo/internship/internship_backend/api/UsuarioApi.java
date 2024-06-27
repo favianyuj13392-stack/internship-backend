@@ -58,21 +58,21 @@ public class UsuarioApi {
         return response;
     }
 
-    @PostMapping()
-    public ResponseDto<UsuariosDto> agregarUsuario(
-            @RequestBody UsuariosDto usuariosDto
-    ){
-        ResponseDto<UsuariosDto> response = new ResponseDto<>();
-        try{
-            response.setResponse(usuariosBL.agregarUsuario(usuariosDto));
-            response.setCode("200");
-            response.setErrorMessage("");
-        }catch (Exception e){
-            response.setCode("500");
-            response.setErrorMessage(e.getMessage());
-        }
-        return response;
-    }
+//    @PostMapping()
+//    public ResponseDto<UsuariosDto> agregarUsuario(
+//            @RequestBody UsuariosDto usuariosDto
+//    ){
+//        ResponseDto<UsuariosDto> response = new ResponseDto<>();
+//        try{
+//            response.setResponse(usuariosBL.agregarUsuario(usuariosDto));
+//            response.setCode("200");
+//            response.setErrorMessage("");
+//        }catch (Exception e){
+//            response.setCode("500");
+//            response.setErrorMessage(e.getMessage());
+//        }
+//        return response;
+//    }
 
     @PostMapping("/{uuid}/institucion/{institucionId}")
     public ResponseDto<UsuariosInstitucionesDto> agregarUsuarioInstitucion(

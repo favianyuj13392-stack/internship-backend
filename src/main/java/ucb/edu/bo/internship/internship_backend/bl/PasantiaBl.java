@@ -13,6 +13,7 @@ import ucb.edu.bo.internship.internship_backend.dto.PasantiasConInstitucionYCarr
 import ucb.edu.bo.internship.internship_backend.dto.PasantiasDto;
 import ucb.edu.bo.internship.internship_backend.entity.Pasantias;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -26,21 +27,22 @@ public class PasantiaBl {
         this.pasantiasCarrerasDao = pasantiasCarrerasDao;
     }
 
-    public Page<PasantiasDto> obtenerPasantiasPorTerminoDeBusqueda(String terminoDeBusqueda, Pageable pageable){
+    public Page<PasantiasConInstitucionYCarrerasDto> obtenerPasantiasPorTerminoDeBusqueda(String terminoDeBusqueda, Pageable pageable){
         Date fechaActual = new Date();
         return pasantiasDao.findAllByActivoIsTrueAndFechacierreAfterAndTituloContainingIgnoreCase(
                 fechaActual,
                 terminoDeBusqueda,
                 pageable
-        ).map(PasantiasDto::fromEntity);
+        ).map(this::toPasantiasConInstitucionYCarrerasDto);
     }
 
-    public Page<PasantiasDto> obtenerTodasPasantias(Pageable pageable){
+
+    public Page<PasantiasConInstitucionYCarrerasDto> obtenerTodasPasantias(Pageable pageable){
         Date fechaActual = new Date();
         return pasantiasDao.findAllByActivoIsTrueAndFechacierreAfter(
                 fechaActual,
                 pageable
-        ).map(PasantiasDto::fromEntity);
+        ).map(this::toPasantiasConInstitucionYCarrerasDto);
     }
 
     public PasantiasDto obtenerPasantiaPorId(Integer id){
@@ -51,7 +53,14 @@ public class PasantiaBl {
         return new PasantiasConInstitucionYCarrerasDto(pasantiasDto, institucionesDto, carrerasDto);
     }
 
-    public List<PasantiasDto> obtenerPasantiasRelacionadas(Integer id){
-        return pasantiasDao.findTop3RelatedPasantias(id).stream().map(PasantiasDto::fromEntity).toList();
+    public List<PasantiasConInstitucionYCarrerasDto> obtenerPasantiasRelacionadas(Integer id){
+        return pasantiasDao.findTop3RelatedPasantias(id).stream().map(this::toPasantiasConInstitucionYCarrerasDto).toList();
+    }
+
+    private PasantiasConInstitucionYCarrerasDto toPasantiasConInstitucionYCarrerasDto(Pasantias pasantias1) {
+        PasantiasDto pasantiasDto = PasantiasDto.fromEntity(pasantias1);
+        InstitucionesDto institucionesDto = InstitucionesDto.fromEntity(pasantias1.getInstitucionesIdinstituciones());
+        List<CarrerasDto> carrerasDto = pasantiasCarrerasDao.findAllByPasantiasIdpasantias(pasantias1).stream().map(pasantiasCarreras -> CarrerasDto.fromEntity(pasantiasCarreras.getCarrerasIdcarreras())).toList();
+        return new PasantiasConInstitucionYCarrerasDto(pasantiasDto, institucionesDto, carrerasDto);
     }
 }

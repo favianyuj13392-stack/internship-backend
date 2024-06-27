@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ucb.edu.bo.internship.internship_backend.bl.PasantiaBl;
+import ucb.edu.bo.internship.internship_backend.dto.PasantiasConInstitucionYCarrerasDto;
 import ucb.edu.bo.internship.internship_backend.dto.PasantiasDto;
 import ucb.edu.bo.internship.internship_backend.dto.ResponseDto;
 
@@ -24,14 +25,14 @@ public class PasantiaApi {
 
     //Endpoint to get all internships
     @GetMapping()
-    public ResponseDto<Page<PasantiasDto>> obtenerTodasPasantias(
+    public ResponseDto<Page<PasantiasConInstitucionYCarrerasDto>> obtenerTodasPasantias(
         @RequestParam(defaultValue = "0") Integer pagina,
         @RequestParam(defaultValue = "10") Integer tamanio,
         @RequestParam(required = false) String terminoDeBusqueda
     ) {
-        ResponseDto<Page<PasantiasDto>> response = new ResponseDto<>();
+        ResponseDto<Page<PasantiasConInstitucionYCarrerasDto>> response = new ResponseDto<>();
         Pageable pageable = PageRequest.of(pagina, tamanio);
-        Page<PasantiasDto> pasantias;
+        Page<PasantiasConInstitucionYCarrerasDto> pasantias;
         try {
             if(terminoDeBusqueda != null){
                 pasantias = pasantiaBl.obtenerPasantiasPorTerminoDeBusqueda(terminoDeBusqueda, pageable);
@@ -71,11 +72,11 @@ public class PasantiaApi {
     }
 
     @GetMapping("/{id}/relacionadas")
-    public ResponseDto<List<PasantiasDto>> obtenerPasantiasRelacionadas(
+    public ResponseDto<List<PasantiasConInstitucionYCarrerasDto>> obtenerPasantiasRelacionadas(
             @PathVariable Integer id
     ){
-        ResponseDto<List<PasantiasDto>> response = new ResponseDto<>();
-        List<PasantiasDto> pasantias;
+        ResponseDto<List<PasantiasConInstitucionYCarrerasDto>> response = new ResponseDto<>();
+        List<PasantiasConInstitucionYCarrerasDto> pasantias;
         try {
             pasantias = pasantiaBl.obtenerPasantiasRelacionadas(id);
             response.setCode("200");

@@ -166,6 +166,22 @@ public class InstitucionesDto {
                 institucion.getRedessociales(),
                 institucion.getActivo());
     }
+
+    public Instituciones toEntity(){
+        Instituciones institucion = new Instituciones();
+        institucion.setIdinstituciones(this.idInstituciones);
+        institucion.setNombre(this.nombre);
+        institucion.setDescripcion(this.descripcion);
+        institucion.setDireccion(this.direccion);
+        institucion.setFotoinstitucion(this.fotoInstitucion);
+        institucion.setCorreo(this.correo);
+        institucion.setSectores(this.sectores);
+        institucion.setLogoempresa(this.logoEmpresa);
+        institucion.setFotos(this.fotos);
+        institucion.setRedessociales(this.redesSociales);
+        institucion.setActivo(this.activo);
+        return institucion;
+    }
     
     
 }

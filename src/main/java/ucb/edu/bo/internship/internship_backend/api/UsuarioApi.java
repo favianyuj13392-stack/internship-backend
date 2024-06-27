@@ -14,6 +14,20 @@ public class UsuarioApi {
         this.institucionBl = institucionBl;
         this.usuariosBL = usuariosBL;
     }
+
+    @GetMapping("/{uuid}")
+    public ResponseDto<Boolean> usuarioExiste(@PathVariable String uuid){
+        ResponseDto<Boolean> response = new ResponseDto<>();
+        try{
+            response.setResponse(usuariosBL.obtenerUsuario(uuid) != null);
+            response.setCode("200");
+            response.setErrorMessage("");
+        }catch (Exception e){
+            response.setCode("500");
+            response.setErrorMessage(e.getMessage());
+        }
+        return response;
+    }
     @PostMapping("/{uuid}/institucion")
     public ResponseDto<InstitucionesDto> agregarInstitucion(@RequestBody InstitucionesDto institucionesDto, @PathVariable String uuid){
         ResponseDto<InstitucionesDto> responseDto = new ResponseDto<>();
@@ -69,6 +83,22 @@ public class UsuarioApi {
         ResponseDto<UsuariosInstitucionesDto> response = new ResponseDto<>();
         try{
             response.setResponse(usuariosBL.agregarUsuarioInstitucion(uuid, institucionId, cargo));
+            response.setCode("200");
+            response.setErrorMessage("");
+        }catch (Exception e){
+            response.setCode("500");
+            response.setErrorMessage(e.getMessage());
+        }
+        return response;
+    }
+
+    @PostMapping()
+    public ResponseDto<UsuarioRegistroCompletoDto> agregarUsuarioCompleto(
+            @RequestBody UsuarioRegistroCompletoDto usuarioRegistroCompletoDto
+    ){
+        ResponseDto<UsuarioRegistroCompletoDto> response = new ResponseDto<>();
+        try{
+            response.setResponse(usuariosBL.agregarUsuarioCompleto(usuarioRegistroCompletoDto));
             response.setCode("200");
             response.setErrorMessage("");
         }catch (Exception e){

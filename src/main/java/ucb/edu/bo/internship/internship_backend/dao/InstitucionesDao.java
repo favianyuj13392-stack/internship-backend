@@ -19,4 +19,6 @@ public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
     Page<Instituciones> findAllByNombreContainingAndActivo(String search, Boolean activo, Pageable pageable);
     @Query("SELECT i.idinstituciones,i.nombre FROM Instituciones i WHERE i.activo = ?1")
     List<Object[]> getAllIdAndNameByActivo(Boolean activo);
+
+    Instituciones findByNombre(String nombre);
 }

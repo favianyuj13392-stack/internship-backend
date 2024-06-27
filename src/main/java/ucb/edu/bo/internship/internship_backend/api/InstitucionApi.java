@@ -3,6 +3,8 @@ package ucb.edu.bo.internship.internship_backend.api;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import ucb.edu.bo.internship.internship_backend.bl.InstitucionBl;
+import ucb.edu.bo.internship.internship_backend.dto.InstitucionConPasantiasDto;
+import ucb.edu.bo.internship.internship_backend.dto.InstitucionNombreDto;
 import ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto;
 import ucb.edu.bo.internship.internship_backend.dto.ResponseDto;
 
@@ -35,15 +37,15 @@ public class InstitucionApi {
         }
         return responseDto;
     }
-    //Obtener un hashmap con todos los id y nombre de las instituciones activas
+    //Obtener todos los id y nombre de las instituciones activas
     @GetMapping("/nombre")
-    public ResponseDto<List<HashMap<Integer, String>>> getInstitucionesNombre(){
-        ResponseDto<List<HashMap<Integer, String>>> responseDto = new ResponseDto<>();
+    public ResponseDto<List<InstitucionNombreDto>> getInstitucionesNombre() {
+        ResponseDto<List<InstitucionNombreDto>> responseDto = new ResponseDto<>();
         try {
             responseDto.setResponse(institucionBl.obtenerInstitucionesNombre());
             responseDto.setCode("200");
             responseDto.setErrorMessage("");
-        }catch (Exception e){
+        } catch (Exception e) {
             responseDto.setCode("500");
             responseDto.setErrorMessage("Error al obtener las instituciones");
         }
@@ -51,10 +53,10 @@ public class InstitucionApi {
     }
     //Obtener una institucion por id
     @GetMapping("/{id}")
-    public ResponseDto<InstitucionesDto> getInstitucionById(@PathVariable Integer id){
-        ResponseDto<InstitucionesDto> responseDto = new ResponseDto<>();
+    public ResponseDto<InstitucionConPasantiasDto> getInstitucionById(@PathVariable Integer id){
+        ResponseDto<InstitucionConPasantiasDto> responseDto = new ResponseDto<>();
         try {
-            InstitucionesDto institucionesDto = institucionBl.obtenerInstitucionById(id);
+            InstitucionConPasantiasDto institucionesDto = institucionBl.obtenerInstitucionById(id);
             responseDto.setResponse(institucionesDto);
             responseDto.setCode("200");
             responseDto.setErrorMessage("");

@@ -11,6 +11,7 @@ import ucb.edu.bo.internship.internship_backend.dao.InstitucionesDao;
 import ucb.edu.bo.internship.internship_backend.dao.PasantiasDao;
 import ucb.edu.bo.internship.internship_backend.dto.InstitucionConPasantiasDto;
 import ucb.edu.bo.internship.internship_backend.dto.InstitucionNombreDto;
+import ucb.edu.bo.internship.internship_backend.dto.InstitucionesConCOUNTPasantiasDto;
 import ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto;
 import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
 
@@ -86,6 +87,15 @@ public class InstitucionBl {
                 institucionConPasantiasDtos.add(new InstitucionConPasantiasDto(institucion, pasantiasDao.findPasantiasByInstitucionesIdinstituciones(institucion.getIdinstituciones())));
             }
             return institucionConPasantiasDtos;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Page<InstitucionesConCOUNTPasantiasDto> obtenerInstitucionesDestacadas(Integer page, Integer size) {
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            return institucionesDao.getAllNameAndCountPasantiasByActivo(true, pageable);
         } catch (Exception e) {
             return null;
         }

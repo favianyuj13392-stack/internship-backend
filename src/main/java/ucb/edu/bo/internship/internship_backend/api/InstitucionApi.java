@@ -3,10 +3,7 @@ package ucb.edu.bo.internship.internship_backend.api;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import ucb.edu.bo.internship.internship_backend.bl.InstitucionBl;
-import ucb.edu.bo.internship.internship_backend.dto.InstitucionConPasantiasDto;
-import ucb.edu.bo.internship.internship_backend.dto.InstitucionNombreDto;
-import ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto;
-import ucb.edu.bo.internship.internship_backend.dto.ResponseDto;
+import ucb.edu.bo.internship.internship_backend.dto.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -77,6 +74,22 @@ public class InstitucionApi {
         }catch (Exception e){
             responseDto.setCode("500");
             responseDto.setErrorMessage("Error al obtener las instituciones relacionadas");
+        }
+        return responseDto;
+    }
+    @GetMapping("/destacadas")
+    public ResponseDto<Page<InstitucionesConCOUNTPasantiasDto>> getInstitucionesDestacadas(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "6") Integer size
+    ){
+        ResponseDto<Page<InstitucionesConCOUNTPasantiasDto>> responseDto = new ResponseDto<>();
+        try {
+            responseDto.setResponse(institucionBl.obtenerInstitucionesDestacadas(page, size));
+            responseDto.setCode("200");
+            responseDto.setErrorMessage("");
+        }catch (Exception e){
+            responseDto.setCode("500");
+            responseDto.setErrorMessage("Error al obtener las instituciones destacadas");
         }
         return responseDto;
     }

@@ -60,4 +60,7 @@ public interface PasantiasDao extends JpaRepository<Pasantias, Integer>{
 
     @Query("SELECT new ucb.edu.bo.internship.internship_backend.dto.PasantiaNombreDto(p.idpasantias, p.titulo) FROM Pasantias p WHERE p.institucionesIdinstituciones.idinstituciones = ?1")
     List<PasantiaNombreDto> findPasantiasByInstitucionesIdinstituciones(Integer idInstituciones);
+    @Query("select count (*) from Pasantias p where p.activo = true")
+    Long countAllByActivo();
+
 }

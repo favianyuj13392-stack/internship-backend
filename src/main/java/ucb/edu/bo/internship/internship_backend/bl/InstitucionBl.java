@@ -39,8 +39,13 @@ public class InstitucionBl {
     public Page<InstitucionesDto> obtenerInstituciones(Integer page, Integer size, String search,String sort){
         try{
             Pageable pageable = buildPageable(page, size, sort);
-            Page<Instituciones> instituciones = institucionesDao.findAllByActivo(true,pageable);
-            return instituciones.map(InstitucionesDto::new);
+            if(search != null && !search.isEmpty()){
+                Page<Instituciones> instituciones = institucionesDao.findAllByNombreContainingAndActivo(search,true,pageable);
+                return instituciones.map(InstitucionesDto::new);
+            }else {
+                Page<Instituciones> instituciones = institucionesDao.findAllByActivo(true,pageable);
+                return instituciones.map(InstitucionesDto::new);
+            }
         }catch (Exception e){
             return null;
         }

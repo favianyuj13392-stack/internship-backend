@@ -12,4 +12,6 @@ public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
     Page<Instituciones> findAllByActivo(Boolean activo, Pageable pageable);
     @Query("SELECT i FROM Instituciones i WHERE i.idinstituciones = ?1 AND i.activo = ?2")
     Instituciones findByIdinstitucionesAndActivo(Integer idinstituciones, Boolean activo);
+    @Query("SELECT i FROM Instituciones i WHERE i.nombre ILIKE CONCAT('%', ?1, '%') AND i.activo = ?2")
+    Page<Instituciones> findAllByNombreContainingAndActivo(String search, Boolean activo, Pageable pageable);
 }

@@ -1,13 +1,17 @@
 package ucb.edu.bo.internship.internship_backend.api;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ucb.edu.bo.internship.internship_backend.bl.InstitucionBl;
-import ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto;
-import ucb.edu.bo.internship.internship_backend.dto.ResponseDto;
+import ucb.edu.bo.internship.internship_backend.dto.*;
+import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionNotFoundException;
+import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionServiceExcepcion;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Supplier;
 
 @RequestMapping("/api/v1/institucion")
 @RestController
@@ -16,52 +20,57 @@ public class InstitucionApi {
     public InstitucionApi(InstitucionBl institucionBl) {
         this.institucionBl = institucionBl;
     }
-    //Obtener todas las instituciones
+    // Obtener todas las instituciones
     @GetMapping
-    public ResponseDto<Page<InstitucionesDto>> getInstituciones(
+    public ResponseEntity<ResponseDto<Page<InstitucionesDto>>> getInstituciones(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "12") Integer size,
             @RequestParam(defaultValue = "", required = false) String search,
-            @RequestParam(defaultValue = "idinstituciones", required = false) String sort
-    ){
-        ResponseDto<Page<InstitucionesDto>> responseDto = new ResponseDto<>();
-        try {
-            responseDto.setResponse(institucionBl.obtenerInstituciones(page, size, search,sort));
-            responseDto.setCode("200");
-            responseDto.setErrorMessage("");
-        }catch (Exception e){
-            responseDto.setCode("500");
-            responseDto.setErrorMessage("Error al obtener las instituciones");
-        }
-        return responseDto;
+            @RequestParam(defaultValue = "idinstituciones", required = false) String sort) {
+        return handleRequest(() -> institucionBl.obtenerInstituciones(page, size, search, sort));
     }
-    //Obtener un hashmap con todos los id y nombre de las instituciones activas
+
+    // Obtener todos los id y nombre de las instituciones activas
     @GetMapping("/nombre")
-    public ResponseDto<List<HashMap<Integer, String>>> getInstitucionesNombre(){
-        ResponseDto<List<HashMap<Integer, String>>> responseDto = new ResponseDto<>();
-        try {
-            responseDto.setResponse(institucionBl.obtenerInstitucionesNombre());
-            responseDto.setCode("200");
-            responseDto.setErrorMessage("");
-        }catch (Exception e){
-            responseDto.setCode("500");
-            responseDto.setErrorMessage("Error al obtener las instituciones");
-        }
-        return responseDto;
+    public ResponseEntity<ResponseDto<List<InstitucionNombreDto>>> getInstitucionesNombre() {
+        return handleRequest(institucionBl::obtenerInstitucionesNombre);
     }
-    //Obtener una institucion por id
+
+    // Obtener una institución por id
     @GetMapping("/{id}")
-    public ResponseDto<InstitucionesDto> getInstitucionById(@PathVariable Integer id){
-        ResponseDto<InstitucionesDto> responseDto = new ResponseDto<>();
+    public ResponseEntity<ResponseDto<InstitucionConPasantiasDto>> getInstitucionById(@PathVariable Integer id) {
+        return handleRequest(() -> institucionBl.obtenerInstitucionById(id));
+    }
+
+    // Obtener cuatro instituciones relacionadas
+    @GetMapping("/{id}/relacionadas")
+    public ResponseEntity<ResponseDto<List<InstitucionConPasantiasDto>>> getCuatroInstitucionesRelacionadas(@PathVariable Integer id) {
+        return handleRequest(() -> institucionBl.obtenerCuatroInstitucionesRelacionadas(id));
+    }
+
+    // Obtener instituciones destacadas
+    @GetMapping("/destacadas")
+    public ResponseEntity<ResponseDto<Page<InstitucionesConCOUNTPasantiasDto>>> getInstitucionesDestacadas(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "6") Integer size) {
+        return handleRequest(() -> institucionBl.obtenerInstitucionesDestacadas(page, size));
+    }
+    private <T> ResponseEntity<ResponseDto<T>> handleRequest(Supplier<T> supplier) {
+        ResponseDto<T> responseDto = new ResponseDto<>();
         try {
-            InstitucionesDto institucionesDto = institucionBl.obtenerInstitucionById(id);
-            responseDto.setResponse(institucionesDto);
+            T result = supplier.get();
+            responseDto.setResponse(result);
             responseDto.setCode("200");
             responseDto.setErrorMessage("");
-        }catch (Exception e){
+            return new ResponseEntity<>(responseDto, HttpStatus.OK);
+        } catch (InstitucionNotFoundException e) {
+            responseDto.setCode("404");
+            responseDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseDto, HttpStatus.NOT_FOUND);
+        } catch (InstitucionServiceExcepcion e) {
             responseDto.setCode("500");
-            responseDto.setErrorMessage("Error al obtener la institucion");
+            responseDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return responseDto;
     }
 }

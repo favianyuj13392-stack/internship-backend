@@ -42,6 +42,9 @@ public class Usuariosinstituciones implements Serializable {
     @Basic(optional = false)
     @Column(name = "cargo")
     private String cargo;
+    @Basic(optional = false)
+    @Column(name = "activo")
+    private Boolean activo;
     @JoinColumn(name = "instituciones_idinstituciones", referencedColumnName = "idinstituciones")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Instituciones institucionesIdinstituciones;
@@ -58,9 +61,10 @@ public class Usuariosinstituciones implements Serializable {
         this.idusuariosinstituciones = idusuariosinstituciones;
     }
 
-    public Usuariosinstituciones(Integer idusuariosinstituciones, String cargo) {
+    public Usuariosinstituciones(Integer idusuariosinstituciones, String cargo,Boolean activo) {
         this.idusuariosinstituciones = idusuariosinstituciones;
         this.cargo = cargo;
+        this.activo = activo;
     }
 
     public Integer getIdusuariosinstituciones() {
@@ -77,6 +81,14 @@ public class Usuariosinstituciones implements Serializable {
 
     public void setCargo(String cargo) {
         this.cargo = cargo;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 
     public Instituciones getInstitucionesIdinstituciones() {

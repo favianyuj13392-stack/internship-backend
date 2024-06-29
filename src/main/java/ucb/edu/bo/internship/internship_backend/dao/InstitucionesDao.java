@@ -48,4 +48,5 @@ public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
     @Query("select count (*) from Instituciones i where i.activo = true")
     Long countAllByActivo();
 
+    Boolean existsByIdinstitucionesAndActivoIsTrue(Integer idInstitucion);
 }

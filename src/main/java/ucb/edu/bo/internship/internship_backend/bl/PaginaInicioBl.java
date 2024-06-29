@@ -5,6 +5,7 @@ import ucb.edu.bo.internship.internship_backend.dao.InstitucionesDao;
 import ucb.edu.bo.internship.internship_backend.dao.PasantiasDao;
 import ucb.edu.bo.internship.internship_backend.dao.UsuariosDao;
 import ucb.edu.bo.internship.internship_backend.dto.RecuentoPaginaInicioDto;
+import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionServiceExcepcion;
 
 import java.util.Arrays;
 
@@ -23,7 +24,7 @@ public class PaginaInicioBl {
         try{
             return new RecuentoPaginaInicioDto(institucionesDao.countAllByActivo(), usuariosDao.countAllByActivoAndRolesIdrolesRolEqualsESTUDIANTE(), pasantiasDao.countAllByActivo());
         }catch (Exception e){
-            return null;
+            throw new InstitucionServiceExcepcion("Error al obtener el recuento",e);
         }
     }
 

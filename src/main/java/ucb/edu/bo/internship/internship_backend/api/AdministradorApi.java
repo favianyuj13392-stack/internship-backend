@@ -9,10 +9,12 @@ import ucb.edu.bo.internship.internship_backend.bl.InstitucionBl;
 import ucb.edu.bo.internship.internship_backend.dto.ChangeEstadoDto;
 import ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto;
 import ucb.edu.bo.internship.internship_backend.dto.ResponseDto;
+import ucb.edu.bo.internship.internship_backend.dto.UsuarioConCorreoYNombreCompletoYFotoDto;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionNotFoundException;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionServiceExcepcion;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.UsuarioYaRelacionadoException;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 @RequestMapping("/api/v1/admin/{uuid}")
@@ -39,6 +41,13 @@ public class AdministradorApi {
     @PutMapping("/instituciones/{idInstituciones}/estado")
     public ResponseEntity<ResponseDto<InstitucionesDto>> cambiarEstadoInstitucion(@PathVariable Integer idInstituciones, @RequestBody ChangeEstadoDto estado, @PathVariable String uuid){
         return handleRequest(() -> administradorBl.cambiarEstadoInstitucion(idInstituciones, estado.getEstado()));
+    }
+    @GetMapping("/instituciones/{idInstituciones}/usuarios")
+    public ResponseEntity<ResponseDto<List<UsuarioConCorreoYNombreCompletoYFotoDto>>> getUsuariosInstitucion(
+            @PathVariable String uuid,
+            @PathVariable Integer idInstituciones
+    ) {
+        return handleRequest(() -> administradorBl.obtenerUsuariosInstitucion(idInstituciones));
     }
 
     private <T> ResponseEntity<ResponseDto<T>> handleRequest(Supplier<T> supplier) {

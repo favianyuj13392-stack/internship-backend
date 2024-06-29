@@ -3,8 +3,12 @@ package ucb.edu.bo.internship.internship_backend.bl;
 import org.springframework.stereotype.Service;
 import ucb.edu.bo.internship.internship_backend.dao.InstitucionesDao;
 import ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto;
+import ucb.edu.bo.internship.internship_backend.dto.UsuarioConCorreoYNombreCompletoYFotoDto;
 import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionNotFoundException;
+import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionServiceExcepcion;
+
+import java.util.List;
 
 @Service
 public class AdministradorBl {
@@ -30,5 +34,18 @@ public class AdministradorBl {
         }
     }
 
-
+    public List<UsuarioConCorreoYNombreCompletoYFotoDto> obtenerUsuariosInstitucion(Integer idInstituciones) {
+        try {
+            return institucionesDao.findById(idInstituciones)
+                    .orElseThrow(() -> new InstitucionNotFoundException("Institucion no encontrada"))
+                    .getUsuariosinstitucionesList()
+                    .stream()
+                    .map(UsuarioConCorreoYNombreCompletoYFotoDto::new)
+                    .toList();
+        }catch (InstitucionNotFoundException e) {
+            throw new InstitucionNotFoundException("Institucion no encontrada");
+        } catch (Exception e) {
+            throw new InstitucionServiceExcepcion("Error al obtener los usuarios de la institucion", e);
+        }
+    }
 }

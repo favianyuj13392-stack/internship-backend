@@ -49,6 +49,22 @@ public class AdministradorApi {
     ) {
         return handleRequest(() -> administradorBl.obtenerUsuariosInstitucion(idInstituciones));
     }
+    @PutMapping("/instituciones/{idInstituciones}/usuarios/{idUsuarios}/aceptar")
+    public ResponseEntity<ResponseDto<UsuarioConCorreoYNombreCompletoYFotoDto>> relacionarUsuarioInstitucion(
+            @PathVariable String uuid,
+            @PathVariable Integer idInstituciones,
+            @PathVariable Integer idUsuarios
+    ) {
+        return handleRequest(() -> administradorBl.relacionarUsuarioInstitucion(idInstituciones, idUsuarios, true));
+    }
+    @DeleteMapping("/instituciones/{idInstituciones}/usuarios/{idUsuarios}/aceptar")
+    public ResponseEntity<ResponseDto<UsuarioConCorreoYNombreCompletoYFotoDto>> desrelacionarUsuarioInstitucion(
+            @PathVariable String uuid,
+            @PathVariable Integer idInstituciones,
+            @PathVariable Integer idUsuarios
+    ) {
+        return handleRequest(() -> administradorBl.relacionarUsuarioInstitucion(idInstituciones, idUsuarios, false));
+    }
 
     private <T> ResponseEntity<ResponseDto<T>> handleRequest(Supplier<T> supplier) {
         ResponseDto<T> responseDto = new ResponseDto<>();

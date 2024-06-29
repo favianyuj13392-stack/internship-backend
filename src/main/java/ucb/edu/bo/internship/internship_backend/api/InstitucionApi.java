@@ -8,6 +8,7 @@ import ucb.edu.bo.internship.internship_backend.bl.InstitucionBl;
 import ucb.edu.bo.internship.internship_backend.dto.*;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionNotFoundException;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionServiceExcepcion;
+import ucb.edu.bo.internship.internship_backend.exception.institucion.UsuarioYaRelacionadoException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +28,7 @@ public class InstitucionApi {
             @RequestParam(defaultValue = "12") Integer size,
             @RequestParam(defaultValue = "", required = false) String search,
             @RequestParam(defaultValue = "idinstituciones", required = false) String sort) {
-        return handleRequest(() -> institucionBl.obtenerInstituciones(page, size, search, sort));
+        return handleRequest(() -> institucionBl.obtenerInstituciones(page, size, search, sort,"true"));
     }
 
     // Obtener todos los id y nombre de las instituciones activas
@@ -67,7 +68,12 @@ public class InstitucionApi {
             responseDto.setCode("404");
             responseDto.setErrorMessage(e.getMessage());
             return new ResponseEntity<>(responseDto, HttpStatus.NOT_FOUND);
-        } catch (InstitucionServiceExcepcion e) {
+        } catch (UsuarioYaRelacionadoException | InstitucionServiceExcepcion e) {
+            responseDto.setCode("500");
+            responseDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            responseDto.setResponse(null);
             responseDto.setCode("500");
             responseDto.setErrorMessage(e.getMessage());
             return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);

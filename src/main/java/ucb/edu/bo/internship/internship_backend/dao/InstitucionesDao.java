@@ -54,5 +54,4 @@ public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
 
     Boolean existsByIdinstitucionesAndActivoIsTrue(Integer idInstitucion);
 
-    void cambiarEstadoInstitucion(Integer idInstitucion, Boolean estado);
 }

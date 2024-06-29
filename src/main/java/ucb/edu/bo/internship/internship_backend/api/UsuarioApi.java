@@ -1,5 +1,6 @@
 package ucb.edu.bo.internship.internship_backend.api;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,8 +59,77 @@ public class UsuarioApi {
         return handleRequest(() -> institucionBl.actualizarInstitucion(uuid, institucionesDto, id));
     }
 
+    @GetMapping("/{uuid}/institucion/{institucionId}/pasantias")
+    public ResponseEntity<ResponseDto<Page<PasantiasDto>>> obtenerPasantiasPorInstitucion(
+            @PathVariable String uuid,
+            @PathVariable Integer institucionId,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "12") Integer size,
+            @RequestParam(defaultValue = "", required = false) String search,
+            @RequestParam(defaultValue = "idpasantias", required = false) String sort
+    ){
+        return handleRequest(() -> institucionBl.obtenerPasantiasPorInstitucion(uuid, institucionId, page, size, search, sort));
+    }
 
+    @DeleteMapping("/{uuid}/institucion/{institucionId}/pasantias/{pasantiaId}")
+    public ResponseEntity<ResponseDto<Boolean>> eliminarPasantia(
+            @PathVariable String uuid,
+            @PathVariable Integer institucionId,
+            @PathVariable Integer pasantiaId
+    ){
+        return handleRequest(() -> institucionBl.eliminarPasantia(uuid, institucionId, pasantiaId));
+    }
 
+    @PostMapping("/{uuid}/institucion/{institucionId}/pasantia")
+    public ResponseEntity<ResponseDto<PasantiasDto>> agregarPasantia(
+            @PathVariable String uuid,
+            @PathVariable Integer institucionId,
+            @RequestBody PasantiasDto pasantiasDto
+    ){
+        return handleRequest(() -> institucionBl.agregarPasantia(uuid, institucionId, pasantiasDto));
+    }
+
+    @PutMapping("/{uuid}/institucion/{institucionId}/pasantia/{pasantiaId}")
+    public ResponseEntity<ResponseDto<PasantiasDto>> actualizarPasantia(
+            @PathVariable String uuid,
+            @PathVariable Integer institucionId,
+            @PathVariable Integer pasantiaId,
+            @RequestBody PasantiasDto pasantiasDto
+    ){
+        return handleRequest(() -> institucionBl.actualizarPasantia(uuid, institucionId, pasantiaId, pasantiasDto));
+    }
+
+    @GetMapping("/{uuid}/institucion/{institucionId}/pasantia/{pasantiaId}/aplicantes")
+    public ResponseEntity<ResponseDto<Page<UsuariosConPersonaYCarreraDto>>> obtenerAplicantes(
+            @PathVariable String uuid,
+            @PathVariable Integer institucionId,
+            @PathVariable Integer pasantiaId,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "12") Integer size,
+            @RequestParam(defaultValue = "", required = false) String search,
+            @RequestParam(defaultValue = "idaplicantes", required = false) String sort
+    ){
+        return handleRequest(() -> institucionBl.obtenerAplicantes(uuid, institucionId, pasantiaId, page, size, search, sort));
+    }
+
+    @PostMapping("/{uuid}/institucion/{institucionId}/pasantia/{pasantiaId}/aplicantes/{aplicanteId}")
+    public ResponseEntity<ResponseDto<Boolean>> aceptarAplicante(
+            @PathVariable String uuid,
+            @PathVariable Integer institucionId,
+            @PathVariable Integer pasantiaId,
+            @PathVariable Integer aplicanteId
+    ){
+        return handleRequest(() -> institucionBl.aceptarAplicante(uuid, institucionId, pasantiaId, aplicanteId));
+    }
+
+    @PostMapping("/{uuid}/institucion/{institucionId}/pasantia/{pasantiaId}/noaplicante")
+    public ResponseEntity<ResponseDto<Boolean>> pasantiaSinAplicante(
+            @PathVariable String uuid,
+            @PathVariable Integer institucionId,
+            @PathVariable Integer pasantiaId
+    ){
+        return handleRequest(() -> institucionBl.pasantiaSinAplicante(uuid, institucionId, pasantiaId));
+    }
 
     //Metodo para manejar las respuestas
     private <T> ResponseEntity<ResponseDto<T>> handleRequest(Supplier<T> supplier) {

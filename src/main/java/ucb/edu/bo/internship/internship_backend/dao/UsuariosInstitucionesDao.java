@@ -3,6 +3,8 @@ package ucb.edu.bo.internship.internship_backend.dao;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.jpa.repository.Query;
+import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
+import ucb.edu.bo.internship.internship_backend.entity.Usuarios;
 import ucb.edu.bo.internship.internship_backend.entity.Usuariosinstituciones;
 
 public interface UsuariosInstitucionesDao extends JpaRepository<Usuariosinstituciones, Integer>{
@@ -11,4 +13,6 @@ public interface UsuariosInstitucionesDao extends JpaRepository<Usuariosinstituc
 
     @Query("SELECT COUNT(u) > 0 FROM Usuariosinstituciones u WHERE u.usuariosIdusuarios.kcUuid = ?1 and u.usuariosIdusuarios.activo = true")
     Boolean existsByUsuariosUuid(String uuid);
+
+    Usuariosinstituciones findByUsuariosIdusuariosAndInstitucionesIdinstituciones(Usuarios idUsuario, Instituciones idInstitucion);
 }

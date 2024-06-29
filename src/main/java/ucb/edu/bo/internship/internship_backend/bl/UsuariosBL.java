@@ -2,6 +2,8 @@ package ucb.edu.bo.internship.internship_backend.bl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ucb.edu.bo.internship.internship_backend.dao.*;
 import ucb.edu.bo.internship.internship_backend.dto.*;
@@ -21,6 +23,7 @@ public class UsuariosBL {
 
     private final Logger logger = LoggerFactory.getLogger(UsuariosBL.class);
 
+    private final PasantiaBl pasantiasBl;
     private final UsuariosDao usuariosDao;
     private final PersonasDao personasDao;
     private final UsuariosInstitucionesDao usuariosInstitucionesDao;
@@ -31,7 +34,8 @@ public class UsuariosBL {
 
     public UsuariosBL(UsuariosDao usuariosDao,
                       PersonasDao personasDao, UsuariosInstitucionesDao usuariosInstitucionesDao,
-                      InstitucionesDao institucionesDao, RolesDao rolesDao, IKeycloakService keycloakService, CarrerasDao carreasDao) {
+                      InstitucionesDao institucionesDao, RolesDao rolesDao, IKeycloakService keycloakService, CarrerasDao carreasDao,
+                      PasantiaBl pasantiasBl) {
         this.usuariosDao = usuariosDao;
         this.personasDao = personasDao;
         this.usuariosInstitucionesDao = usuariosInstitucionesDao;
@@ -39,6 +43,7 @@ public class UsuariosBL {
         this.rolesDao = rolesDao;
         this.keycloakService = keycloakService;
         this.carreasDao = carreasDao;
+        this.pasantiasBl = pasantiasBl;
     }
 
     public UsuariosDto obtenerUsuario(String kcUuid){

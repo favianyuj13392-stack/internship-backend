@@ -30,6 +30,18 @@ public class PasantiasDto {
         this.fechaIngreso = fechaIngreso;
     }
 
+    public PasantiasDto(Pasantias pasantias) {
+        this.idPasantias = pasantias.getIdpasantias();
+        this.areas = pasantias.getAreas();
+        this.titulo = pasantias.getTitulo();
+        this.descripcion = pasantias.getDescripcion();
+        this.requisitos = pasantias.getRequisitos();
+        this.funciones = pasantias.getFunciones();
+        this.beneficios = pasantias.getBeneficios();
+        this.fechaCierre = new Date(pasantias.getFechacierre().getTime());
+        this.fechaIngreso = new Date(pasantias.getFechaingreso().getTime());
+    }
+
     public Integer getIdPasantias() {
         return this.idPasantias;
     }

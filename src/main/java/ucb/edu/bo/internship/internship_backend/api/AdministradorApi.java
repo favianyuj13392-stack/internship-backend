@@ -38,7 +38,7 @@ public class AdministradorApi {
             ) {
         return handleRequest(() -> institucionBl.obtenerInstituciones(page, size, search, sort,active));
     }
-    @GetMapping("/pasantias")
+    @GetMapping("/pasantia")
     public ResponseEntity<ResponseDto<Page<PasantiasDto>>> getPasantias(
             @PathVariable String uuid,
             @RequestParam(defaultValue = "0") Integer page,
@@ -75,6 +75,20 @@ public class AdministradorApi {
             @PathVariable Integer idUsuarios
     ) {
         return handleRequest(() -> administradorBl.relacionarUsuarioInstitucion(idInstituciones, idUsuarios, false));
+    }
+    @PutMapping("/pasantia/{idPasantias}/aceptar")
+    public ResponseEntity<ResponseDto<PasantiasDto>> aceptarPasantia(
+            @PathVariable String uuid,
+            @PathVariable Integer idPasantias
+    ) {
+        return handleRequest(() -> administradorBl.aceptarPasantia(idPasantias));
+    }
+    @DeleteMapping("/pasantia/{idPasantias}/aceptar")
+    public ResponseEntity<ResponseDto<PasantiasDto>> rechazarPasantia(
+            @PathVariable String uuid,
+            @PathVariable Integer idPasantias
+    ) {
+        return handleRequest(() -> administradorBl.rechazarPasantia(idPasantias));
     }
 
     private <T> ResponseEntity<ResponseDto<T>> handleRequest(Supplier<T> supplier) {

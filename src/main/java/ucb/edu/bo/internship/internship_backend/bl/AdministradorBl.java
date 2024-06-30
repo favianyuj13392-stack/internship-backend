@@ -2,10 +2,13 @@ package ucb.edu.bo.internship.internship_backend.bl;
 
 import org.springframework.stereotype.Service;
 import ucb.edu.bo.internship.internship_backend.dao.InstitucionesDao;
+import ucb.edu.bo.internship.internship_backend.dao.PasantiasDao;
 import ucb.edu.bo.internship.internship_backend.dao.UsuariosInstitucionesDao;
 import ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto;
+import ucb.edu.bo.internship.internship_backend.dto.PasantiasDto;
 import ucb.edu.bo.internship.internship_backend.dto.UsuarioConCorreoYNombreCompletoYFotoDto;
 import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
+import ucb.edu.bo.internship.internship_backend.entity.Pasantias;
 import ucb.edu.bo.internship.internship_backend.entity.Usuariosinstituciones;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionNotFoundException;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionServiceExcepcion;
@@ -17,9 +20,11 @@ import java.util.List;
 public class AdministradorBl {
     private final InstitucionesDao institucionesDao;
     private final UsuariosInstitucionesDao usuariosInstitucionesDao;
-    public AdministradorBl(InstitucionesDao institucionesDao, UsuariosInstitucionesDao usuariosInstitucionesDao) {
+    private final PasantiasDao pasantiasDao;
+    public AdministradorBl(InstitucionesDao institucionesDao, UsuariosInstitucionesDao usuariosInstitucionesDao, PasantiasDao pasantiasDao) {
         this.institucionesDao = institucionesDao;
         this.usuariosInstitucionesDao = usuariosInstitucionesDao;
+        this.pasantiasDao = pasantiasDao;
     }
 
     public InstitucionesDto cambiarEstadoInstitucion(Integer idInstituciones, Boolean estado) {
@@ -80,6 +85,37 @@ public class AdministradorBl {
             throw e;
         }catch (Exception e){
             throw new RuntimeException("Error al relacionar el usuario con la institucion",e);
+        }
+    }
+
+    public PasantiasDto aceptarPasantia(Integer idPasantias) {
+        try {
+            Pasantias pasantias = pasantiasDao.findById(idPasantias).orElseThrow(() -> new InstitucionNotFoundException("Pasantia no encontrada"));
+            if(pasantias.getActivo()){
+                throw new UsuarioYaRelacionadoException("No se puede aceptar una pasantia activa");
+            }
+            pasantias.setActivo(true);
+            pasantias = pasantiasDao.save(pasantias);
+            return new PasantiasDto(pasantias);
+        }catch (InstitucionNotFoundException | UsuarioYaRelacionadoException e ){
+            throw e;
+        }catch (Exception e){
+            throw new RuntimeException("Error al aceptar la pasantia",e);
+        }
+    }
+
+    public PasantiasDto rechazarPasantia(Integer idPasantias) {
+        try {
+            Pasantias pasantias = pasantiasDao.findById(idPasantias).orElseThrow(() -> new InstitucionNotFoundException("Pasantia no encontrada"));
+            if(pasantias.getActivo()){
+                throw new UsuarioYaRelacionadoException("No se puede eliminar una pasantia activa");
+            }
+            pasantiasDao.delete(pasantias);
+            return new PasantiasDto();
+        }catch (InstitucionNotFoundException | UsuarioYaRelacionadoException e ){
+            throw e;
+        }catch (Exception e){
+            throw new RuntimeException("Error al rechazar la pasantia",e);
         }
     }
 }

@@ -6,10 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ucb.edu.bo.internship.internship_backend.bl.AdministradorBl;
 import ucb.edu.bo.internship.internship_backend.bl.InstitucionBl;
-import ucb.edu.bo.internship.internship_backend.dto.ChangeEstadoDto;
-import ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto;
-import ucb.edu.bo.internship.internship_backend.dto.ResponseDto;
-import ucb.edu.bo.internship.internship_backend.dto.UsuarioConCorreoYNombreCompletoYFotoDto;
+import ucb.edu.bo.internship.internship_backend.bl.PasantiaBl;
+import ucb.edu.bo.internship.internship_backend.dto.*;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionNotFoundException;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionServiceExcepcion;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.UsuarioYaRelacionadoException;
@@ -22,8 +20,10 @@ import java.util.function.Supplier;
 public class AdministradorApi {
     private final AdministradorBl administradorBl;
     private final InstitucionBl institucionBl;
-    public AdministradorApi(AdministradorBl administradorBl, InstitucionBl institucionBl) {
+    private final PasantiaBl pasantiaBl;
+    public AdministradorApi(AdministradorBl administradorBl, InstitucionBl institucionBl, PasantiaBl pasantiaBl) {
         this.administradorBl = administradorBl;
+        this.pasantiaBl = pasantiaBl;
         this.institucionBl = institucionBl;
     }
     //Obtener todas las instituciones
@@ -37,6 +37,17 @@ public class AdministradorApi {
             @RequestParam(defaultValue = "", required = false) String active
             ) {
         return handleRequest(() -> institucionBl.obtenerInstituciones(page, size, search, sort,active));
+    }
+    @GetMapping("/pasantias")
+    public ResponseEntity<ResponseDto<Page<PasantiasDto>>> getPasantias(
+            @PathVariable String uuid,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "12") Integer size,
+            @RequestParam(defaultValue = "", required = false) String search,
+            @RequestParam(defaultValue = "idpasantias", required = false) String sort,
+            @RequestParam(defaultValue = "", required = false) String active
+    ) {
+        return handleRequest(() -> pasantiaBl.obtenerPasantias(page, size, search, sort,active));
     }
     @PutMapping("/instituciones/{idInstituciones}/estado")
     public ResponseEntity<ResponseDto<InstitucionesDto>> cambiarEstadoInstitucion(@PathVariable Integer idInstituciones, @RequestBody ChangeEstadoDto estado, @PathVariable String uuid){

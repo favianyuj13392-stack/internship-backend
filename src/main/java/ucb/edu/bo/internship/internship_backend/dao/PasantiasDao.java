@@ -1,5 +1,6 @@
 package ucb.edu.bo.internship.internship_backend.dao;
 
+import aj.org.objectweb.asm.commons.Remapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -63,4 +64,7 @@ public interface PasantiasDao extends JpaRepository<Pasantias, Integer>{
     @Query("select count (*) from Pasantias p where p.activo = true")
     Long countAllByActivo();
 
+    Page<Pasantias> findAllByActivoIsFalseAndTituloContainingIgnoreCase(String search, Pageable pageable);
+
+    Page<Pasantias> findAllByTituloContainingIgnoreCase(String search, Pageable pageable);
 }

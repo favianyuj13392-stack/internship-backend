@@ -32,7 +32,7 @@ public class FileController {
         }
     }
 
-    @GetMapping("/public/files/download/{idFile}")
+    @GetMapping("/files/download/{idFile}")
     public ResponseEntity<byte[]> downloadFile(@PathVariable String idFile) {
         try {
             return minioService.downloadFile(idFile);

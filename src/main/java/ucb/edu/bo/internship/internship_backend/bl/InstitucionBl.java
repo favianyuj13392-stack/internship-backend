@@ -7,6 +7,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ucb.edu.bo.internship.internship_backend.dao.InstitucionesDao;
+import ucb.edu.bo.internship.internship_backend.dao.PasantiasDao;
+import ucb.edu.bo.internship.internship_backend.dao.UsuariosDao;
+import ucb.edu.bo.internship.internship_backend.dao.UsuariosInstitucionesDao;
+import ucb.edu.bo.internship.internship_backend.dto.*;
+import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
+import ucb.edu.bo.internship.internship_backend.entity.Usuariosinstituciones;
 import ucb.edu.bo.internship.internship_backend.dao.*;
 import ucb.edu.bo.internship.internship_backend.dto.*;
 import ucb.edu.bo.internship.internship_backend.entity.*;
@@ -16,6 +23,8 @@ import ucb.edu.bo.internship.internship_backend.exception.institucion.UsuarioYaR
 
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Date;
 import java.util.List;
 
@@ -50,23 +59,45 @@ public class InstitucionBl {
         }
     }
     //Obtener todas las instituciones
-    public Page<InstitucionesDto> obtenerInstituciones(Integer page, Integer size, String search,String sort){
+    public Page<InstitucionesDto> obtenerInstituciones(Integer page, Integer size, String search,String sort,String active){
         try{
             Pageable pageable = buildPageable(page, size, sort);
-            Page<Instituciones> instituciones;
-            if(search != null && !search.isEmpty()){
-                instituciones = institucionesDao.findAllByNombreContainingAndActivo(search, true, pageable);
-            }else {
-                instituciones = institucionesDao.findAllByActivo(true, pageable);
+            if(Objects.equals(active, ""))
+            {
+                //Obtener todas las instituciones sin diferenciar si estan activas o no
+                if(search != null && !search.isEmpty()) {
+                    return institucionesDao.findAllByNombreContaining(search, pageable).map(InstitucionesDto::new);
+                } else {
+                    return institucionesDao.findAll(pageable).map(InstitucionesDto::new);
+                }
+            }else{
+                if(!active.equals("true") && !active.equals("false")){
+                    throw new UsuarioYaRelacionadoException("El parametro active debe ser true o false");
+                }else{
+                    Boolean activeBoolean = Boolean.parseBoolean(active);
+                    Page<Instituciones> instituciones;
+                    if(search != null && !search.isEmpty()){
+                        instituciones = institucionesDao.findAllByNombreContainingAndActivo(search, activeBoolean, pageable);
+                    }else {
+                        instituciones = institucionesDao.findAllByActivo(activeBoolean, pageable);
+                    }
+                    return instituciones.map(InstitucionesDto::new);
+                }
             }
-            return instituciones.map(InstitucionesDto::new);
+
+        }catch (UsuarioYaRelacionadoException e){
+            throw e;
         }catch (Exception e){
             throw new InstitucionServiceExcepcion("Error al obtener las instituciones",e);
         }
     }
     @NotNull
     private Pageable buildPageable(Integer page, Integer size, String sort){
-        return PageRequest.of(page, size, Sort.by(Sort.Order.asc(sort)));
+        Sort.Order order = Sort.Order.desc("idinstituciones");
+        if(Objects.equals(sort, "nombre")){
+             order = Sort.Order.asc("nombre");
+        }
+        return PageRequest.of(page, size, Sort.by(order));
     }
     @Transactional
     public InstitucionConPasantiasDto obtenerInstitucionById(Integer id) {

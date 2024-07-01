@@ -44,17 +44,17 @@ public class UsuarioApi {
     }
 
     //Agregar una institucion
-    @PostMapping("/institucion")
+    @PostMapping("/{uuid}/institucion")
     public ResponseEntity<ResponseDto<InstitucionesDto>> agregarInstitucion(@RequestBody InstitucionesDto institucionesDto, @PathVariable String uuid) {
         return handleRequest(() -> institucionBl.agregarInstitucion(institucionesDto));
     }
     //Suscribirse a una institucion
-    @PostMapping("/institucion/{id}")
+    @PostMapping("/{uuid}/institucion/{id}")
     public ResponseEntity<ResponseDto<InstitucionesDto>> suscribirseEmpresa(@PathVariable Integer id, @PathVariable String uuid, @RequestBody SuscribirseInstitucionDto suscribirseInstitucionDto) {
         return handleRequest(() -> institucionBl.suscribirseEmpresa(id, uuid, suscribirseInstitucionDto));
     }
     //Actualizar una institucion
-    @PutMapping("/institucion/{id}")
+    @PutMapping("/{uuid}/institucion/{id}")
     public ResponseEntity<ResponseDto<InstitucionesDto>> actualizarInstitucion(@RequestBody InstitucionesDto institucionesDto, @PathVariable Integer id, @PathVariable String uuid) {
         return handleRequest(() -> institucionBl.actualizarInstitucion(uuid, institucionesDto, id));
     }

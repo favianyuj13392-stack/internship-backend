@@ -1,5 +1,6 @@
 package ucb.edu.bo.internship.internship_backend.dao;
 
+import aj.org.objectweb.asm.commons.Remapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,11 +22,9 @@ public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
     Instituciones findByIdinstitucionesAndActivo(Integer idinstituciones, Boolean activo);
     @Query("SELECT i FROM Instituciones i WHERE i.nombre ILIKE CONCAT('%', ?1, '%') AND i.activo = ?2")
     Page<Instituciones> findAllByNombreContainingAndActivo(String search, Boolean activo, Pageable pageable);
+    @Query("SELECT i FROM Instituciones i WHERE i.nombre ILIKE CONCAT('%', ?1, '%')")
+    Page<Instituciones> findAllByNombreContaining(String search, Pageable pageable);
 
-//    @Query("SELECT i.idinstituciones,i.nombre FROM Instituciones i WHERE i.activo = ?1")
-//    List<Object[]> getAllIdAndNameByActivo(Boolean activo);
-
-    Instituciones findByNombre(String nombre);
     @Query("SELECT new ucb.edu.bo.internship.internship_backend.dto.InstitucionNombreDto(i.idinstituciones, i.nombre) FROM Instituciones i WHERE i.activo = ?1")
     List<InstitucionNombreDto> getAllIdAndNameByActivo(Boolean activo);
     @Query(value = """
@@ -54,5 +53,10 @@ public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
     Long countAllByActivo();
 
     Boolean existsByIdinstitucionesAndActivoIsTrue(Integer idInstitucion);
+
+//    @Query("SELECT i.idinstituciones,i.nombre FROM Instituciones i WHERE i.activo = ?1")
+//    List<Object[]> getAllIdAndNameByActivo(Boolean activo);
+
+    Instituciones findByNombre(String nombre);
 
 }

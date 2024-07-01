@@ -1,9 +1,23 @@
 package ucb.edu.bo.internship.internship_backend.api;
 
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ucb.edu.bo.internship.internship_backend.bl.InstitucionBl;
+
 import ucb.edu.bo.internship.internship_backend.bl.UsuariosBL;
 import ucb.edu.bo.internship.internship_backend.dto.*;
+
+import ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto;
+import ucb.edu.bo.internship.internship_backend.dto.ResponseDto;
+import ucb.edu.bo.internship.internship_backend.dto.SuscribirseInstitucionDto;
+import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionNotFoundException;
+import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionServiceExcepcion;
+import ucb.edu.bo.internship.internship_backend.exception.institucion.UsuarioYaRelacionadoException;
+
+import java.util.function.Supplier;
+
 
 @RequestMapping("/api/v1/usuario")
 @RestController
@@ -28,18 +42,117 @@ public class UsuarioApi {
         }
         return response;
     }
-    @PostMapping("/{uuid}/institucion")
-    public ResponseDto<InstitucionesDto> agregarInstitucion(@RequestBody InstitucionesDto institucionesDto, @PathVariable String uuid){
-        ResponseDto<InstitucionesDto> responseDto = new ResponseDto<>();
+
+    //Agregar una institucion
+    @PostMapping("/institucion")
+    public ResponseEntity<ResponseDto<InstitucionesDto>> agregarInstitucion(@RequestBody InstitucionesDto institucionesDto, @PathVariable String uuid) {
+        return handleRequest(() -> institucionBl.agregarInstitucion(institucionesDto));
+    }
+    //Suscribirse a una institucion
+    @PostMapping("/institucion/{id}")
+    public ResponseEntity<ResponseDto<InstitucionesDto>> suscribirseEmpresa(@PathVariable Integer id, @PathVariable String uuid, @RequestBody SuscribirseInstitucionDto suscribirseInstitucionDto) {
+        return handleRequest(() -> institucionBl.suscribirseEmpresa(id, uuid, suscribirseInstitucionDto));
+    }
+    //Actualizar una institucion
+    @PutMapping("/institucion/{id}")
+    public ResponseEntity<ResponseDto<InstitucionesDto>> actualizarInstitucion(@RequestBody InstitucionesDto institucionesDto, @PathVariable Integer id, @PathVariable String uuid) {
+        return handleRequest(() -> institucionBl.actualizarInstitucion(uuid, institucionesDto, id));
+    }
+
+    @GetMapping("/{uuid}/institucion/{institucionId}/pasantias")
+    public ResponseEntity<ResponseDto<Page<PasantiasDto>>> obtenerPasantiasPorInstitucion(
+            @PathVariable String uuid,
+            @PathVariable Integer institucionId,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "12") Integer size,
+            @RequestParam(defaultValue = "", required = false) String search,
+            @RequestParam(defaultValue = "idpasantias", required = false) String sort
+    ){
+        return handleRequest(() -> institucionBl.obtenerPasantiasPorInstitucion(uuid, institucionId, page, size, search, sort));
+    }
+
+    @DeleteMapping("/{uuid}/institucion/{institucionId}/pasantias/{pasantiaId}")
+    public ResponseEntity<ResponseDto<Boolean>> eliminarPasantia(
+            @PathVariable String uuid,
+            @PathVariable Integer institucionId,
+            @PathVariable Integer pasantiaId
+    ){
+        return handleRequest(() -> institucionBl.eliminarPasantia(uuid, institucionId, pasantiaId));
+    }
+
+    @PostMapping("/{uuid}/institucion/{institucionId}/pasantia")
+    public ResponseEntity<ResponseDto<PasantiasDto>> agregarPasantia(
+            @PathVariable String uuid,
+            @PathVariable Integer institucionId,
+            @RequestBody PasantiasDto pasantiasDto
+    ){
+        return handleRequest(() -> institucionBl.agregarPasantia(uuid, institucionId, pasantiasDto));
+    }
+
+    @PutMapping("/{uuid}/institucion/{institucionId}/pasantia/{pasantiaId}")
+    public ResponseEntity<ResponseDto<PasantiasDto>> actualizarPasantia(
+            @PathVariable String uuid,
+            @PathVariable Integer institucionId,
+            @PathVariable Integer pasantiaId,
+            @RequestBody PasantiasDto pasantiasDto
+    ){
+        return handleRequest(() -> institucionBl.actualizarPasantia(uuid, institucionId, pasantiaId, pasantiasDto));
+    }
+
+    @GetMapping("/{uuid}/institucion/{institucionId}/pasantia/{pasantiaId}/aplicantes")
+    public ResponseEntity<ResponseDto<Page<UsuariosConPersonaYCarreraDto>>> obtenerAplicantes(
+            @PathVariable String uuid,
+            @PathVariable Integer institucionId,
+            @PathVariable Integer pasantiaId,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "12") Integer size,
+            @RequestParam(defaultValue = "", required = false) String search,
+            @RequestParam(defaultValue = "idaplicantes", required = false) String sort
+    ){
+        return handleRequest(() -> institucionBl.obtenerAplicantes(uuid, institucionId, pasantiaId, page, size, search, sort));
+    }
+
+    @PostMapping("/{uuid}/institucion/{institucionId}/pasantia/{pasantiaId}/aplicantes/{aplicanteId}")
+    public ResponseEntity<ResponseDto<Boolean>> aceptarAplicante(
+            @PathVariable String uuid,
+            @PathVariable Integer institucionId,
+            @PathVariable Integer pasantiaId,
+            @PathVariable Integer aplicanteId
+    ){
+        return handleRequest(() -> institucionBl.aceptarAplicante(uuid, institucionId, pasantiaId, aplicanteId));
+    }
+
+    @PostMapping("/{uuid}/institucion/{institucionId}/pasantia/{pasantiaId}/noaplicante")
+    public ResponseEntity<ResponseDto<Boolean>> pasantiaSinAplicante(
+            @PathVariable String uuid,
+            @PathVariable Integer institucionId,
+            @PathVariable Integer pasantiaId
+    ){
+        return handleRequest(() -> institucionBl.pasantiaSinAplicante(uuid, institucionId, pasantiaId));
+    }
+
+    //Metodo para manejar las respuestas
+    private <T> ResponseEntity<ResponseDto<T>> handleRequest(Supplier<T> supplier) {
+        ResponseDto<T> responseDto = new ResponseDto<>();
         try {
-            responseDto.setResponse(institucionBl.agregarInstitucion(institucionesDto));
+            T result = supplier.get();
+            responseDto.setResponse(result);
             responseDto.setCode("200");
             responseDto.setErrorMessage("");
-        }catch (Exception e){
+            return new ResponseEntity<>(responseDto, HttpStatus.OK);
+        } catch (UsuarioYaRelacionadoException | InstitucionServiceExcepcion e) {
             responseDto.setCode("500");
-            responseDto.setErrorMessage("Error al agregar el usuario");
+            responseDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (InstitucionNotFoundException e) {
+            responseDto.setCode("404");
+            responseDto.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseDto, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            responseDto.setCode("500");
+            responseDto.setErrorMessage("Error interno del servidor");
+            return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return responseDto;
     }
 
     @PostMapping("/persona")

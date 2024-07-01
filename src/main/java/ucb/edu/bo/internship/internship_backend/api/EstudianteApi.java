@@ -84,6 +84,23 @@ public class EstudianteApi {
         return response;
     }
 
+    @PostMapping("/{uuid}/curriculum/{curriculumId}/pasantia/{pasantiaId}")
+    public ResponseDto<Boolean> postularPasantia(
+            @PathVariable String uuid,
+            @PathVariable Integer curriculumId,
+            @PathVariable Integer pasantiaId
+    ) {
+        ResponseDto<Boolean> response = new ResponseDto<>();
+        try {
+            response.setResponse(estudianteBl.postularPasantia(uuid, curriculumId, pasantiaId));
+            response.setCode("200");
+            response.setErrorMessage("");
+        }catch (Exception e) {
+            response.setCode("500");
+            response.setErrorMessage(e.getMessage());
+        }
+        return response;
+    }
 
 
 

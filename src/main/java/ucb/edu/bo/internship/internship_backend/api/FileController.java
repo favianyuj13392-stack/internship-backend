@@ -19,7 +19,7 @@ public class FileController {
         this.fileBl = fileBl;
         this.minioService = minioService;
     }
-    @PostMapping("/files/upload") // cambiar a private
+    @PostMapping("/private/files/upload") // cambiar a private
     public ResponseDto<ImagenResponseDto> handleFileUpload(@RequestParam("file") MultipartFile file) {
         ResponseDto<ImagenResponseDto> responseDto = new ResponseDto<>();
         try {
@@ -32,7 +32,7 @@ public class FileController {
         }
     }
 
-    @GetMapping("/files/download/{idFile}")
+    @GetMapping("/public/files/download/{idFile}")
     public ResponseEntity<byte[]> downloadFile(@PathVariable String idFile) {
         try {
             return minioService.downloadFile(idFile);

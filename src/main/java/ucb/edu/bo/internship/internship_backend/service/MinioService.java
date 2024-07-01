@@ -81,7 +81,7 @@ public class MinioService {
             uniqueFilename = uniqueFilename.replace(" ", "_");
             minioClient.putObject(
                     PutObjectArgs.builder()
-                            .bucket("sitio-sistemas")
+                            .bucket("internship-images")
                             .object(uniqueFilename)
                             .stream(file.getInputStream(), file.getSize(), -1)
                             .build()
@@ -112,13 +112,13 @@ public class MinioService {
         try {
             StatObjectResponse stat = minioClient.statObject(
                     StatObjectArgs.builder()
-                            .bucket("sitio-sistemas")
+                            .bucket("internship-images")
                             .object(idFile)
                             .build()
             );
             GetObjectResponse fileContent = minioClient.getObject(
                     GetObjectArgs.builder()
-                            .bucket("sitio-sistemas")
+                            .bucket("internship-images")
                             .object(idFile)
                             .build()
             );

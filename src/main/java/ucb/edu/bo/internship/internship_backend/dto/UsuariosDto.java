@@ -110,6 +110,19 @@ public class UsuariosDto {
         return usuarioDto;
     }
 
+    public Usuarios toEntity(){
+        Usuarios usuario = new Usuarios();
+        usuario.setIdusuarios(this.idUsuarios);
+        usuario.setKcUuid(this.kc_UUID);
+        usuario.setCorreo(this.correo);
+        usuario.setFecharegistro(this.fechaRegistro);
+        usuario.setHoraregistro(this.horaRegistro);
+        usuario.setRolesIdroles(null);
+        usuario.setPersonasIdpersonas(null);
+        usuario.setCarrerasIdcarreras(null);
+        return usuario;
+    }
+
     @Override
     public String toString() {
         return "{" +

@@ -54,4 +54,9 @@ public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
 
     Boolean existsByIdinstitucionesAndActivoIsTrue(Integer idInstitucion);
 
+//    @Query("SELECT i.idinstituciones,i.nombre FROM Instituciones i WHERE i.activo = ?1")
+//    List<Object[]> getAllIdAndNameByActivo(Boolean activo);
+
+    Instituciones findByNombre(String nombre);
+
 }

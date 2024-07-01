@@ -143,4 +143,18 @@ public class PasantiasDto {
             new Date (pasantias.getFechaingreso().getTime())
         );
     }
+
+    public Pasantias toEntity() {
+        Pasantias pasantias = new Pasantias();
+        pasantias.setIdpasantias(this.idPasantias);
+        pasantias.setAreas(this.areas);
+        pasantias.setTitulo(this.titulo);
+        pasantias.setDescripcion(this.descripcion);
+        pasantias.setRequisitos(this.requisitos);
+        pasantias.setFunciones(this.funciones);
+        pasantias.setBeneficios(this.beneficios);
+        pasantias.setFechacierre(this.fechaCierre);
+        pasantias.setFechaingreso(this.fechaIngreso);
+        return pasantias;
+    }
 }

@@ -1,5 +1,7 @@
 package ucb.edu.bo.internship.internship_backend.dto;
 
+import ucb.edu.bo.internship.internship_backend.entity.Personas;
+
 import java.sql.Date;
 
 public class PersonasDto {
@@ -173,6 +175,42 @@ public class PersonasDto {
             "}";
     }
     
+    public  Personas toEntity (){
+        Personas personas = new Personas();
+        personas.setIdpersonas(this.getIdPersona());
+        personas.setNombres(this.getNombre());
+        personas.setApellidopaterno(this.getApellidoPaterno());
+        personas.setApellidomaterno(this.getApellidoMaterno());
+        personas.setTelefono(this.getTelefono());
+        personas.setCi(this.getCi());
+        personas.setFotoperfil(this.getFotoPerfil());
+        personas.setAnioingresouniversidad(this.getAnioIngresoUniversidad());
+        personas.setDescripcion(this.getDescripcion());
+        personas.setHabilidades(this.getHabilidades());
+        personas.setHabilidadesseleccionadas(this.getHabilidadesSeleccionada());
+        personas.setExperiencia(this.getExperiencia());
+        personas.setFechadenacimiento(this.getFechaDeNacimiento());
+        personas.setRedessociales(this.getRedesSociales());
+        return personas;
+    }
 
+    public static PersonasDto fromEntity(Personas personas){
+        PersonasDto personasDto = new PersonasDto();
+        personasDto.setIdPersona(personas.getIdpersonas());
+        personasDto.setNombre(personas.getNombres());
+        personasDto.setApellidoPaterno(personas.getApellidopaterno());
+        personasDto.setApellidoMaterno(personas.getApellidomaterno());
+        personasDto.setTelefono(personas.getTelefono());
+        personasDto.setCi(personas.getCi());
+        personasDto.setFotoPerfil(personas.getFotoperfil());
+        personasDto.setAnioIngresoUniversidad(personas.getAnioingresouniversidad());
+        personasDto.setDescripcion(personas.getDescripcion());
+        personasDto.setHabilidades(personas.getHabilidades());
+        personasDto.setHabilidadesSeleccionada(personas.getHabilidadesseleccionadas());
+        personasDto.setExperiencia(personas.getExperiencia());
+        personasDto.setFechaDeNacimiento(new Date(personas.getFechadenacimiento().getTime()));
+        personasDto.setRedesSociales(personas.getRedessociales());
+        return personasDto;
+    }
     
 }

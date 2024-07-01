@@ -14,13 +14,19 @@ import ucb.edu.bo.internship.internship_backend.dao.UsuariosInstitucionesDao;
 import ucb.edu.bo.internship.internship_backend.dto.*;
 import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
 import ucb.edu.bo.internship.internship_backend.entity.Usuariosinstituciones;
+import ucb.edu.bo.internship.internship_backend.dao.*;
+import ucb.edu.bo.internship.internship_backend.dto.*;
+import ucb.edu.bo.internship.internship_backend.entity.*;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionNotFoundException;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionServiceExcepcion;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.UsuarioYaRelacionadoException;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class InstitucionBl {
@@ -29,12 +35,16 @@ public class InstitucionBl {
     private final UsuariosInstitucionesDao usuariosInstitucionesDao;
     private final UsuariosDao usuariosDao;
     private final UsuariosBL usuariosBL;
-    public InstitucionBl(InstitucionesDao institucionesDao, PasantiasDao pasantiasDao, UsuariosInstitucionesDao usuariosInstitucionesDao,UsuariosDao usuariosDao, UsuariosBL usuariosBL) {
+    private final AplicacionPasantiasDao aplicacionPasantiasDao;
+    private final SeleccionAplicanteDao seleccionAplicanteDao;
+    public InstitucionBl(InstitucionesDao institucionesDao, PasantiasDao pasantiasDao, UsuariosInstitucionesDao usuariosInstitucionesDao,UsuariosDao usuariosDao, UsuariosBL usuariosBL, AplicacionPasantiasDao aplicacionPasantiasDao, SeleccionAplicanteDao seleccionAplicanteDao) {
         this.institucionesDao = institucionesDao;
         this.pasantiasDao = pasantiasDao;
         this.usuariosInstitucionesDao = usuariosInstitucionesDao;
         this.usuariosDao = usuariosDao;
         this.usuariosBL = usuariosBL;
+        this.aplicacionPasantiasDao = aplicacionPasantiasDao;
+        this.seleccionAplicanteDao = seleccionAplicanteDao;
     }
     //Agregar una institucion
     @Transactional
@@ -192,6 +202,203 @@ public class InstitucionBl {
             throw new InstitucionServiceExcepcion("Error al suscribirse a la institucion", e);
         }
     }
+
+    public Page<PasantiasDto> obtenerPasantiasPorInstitucion(String uuid, Integer institucionId, Integer page, Integer size, String search, String sort) {
+        try {
+            if (validarRelacionUsuarioInstitucion(uuid, institucionId)) {
+                Pageable pageable = buildPageable(page, size, sort);
+                Page<PasantiasDto> pasantias;
+                Instituciones instituciones = institucionesDao.findByIdinstitucionesAndActivo(institucionId, true);
+                if (search != null && !search.isEmpty()) {
+                    pasantias = pasantiasDao.findAllByInstitucionesIdinstitucionesAndTituloContainingIgnoreCase(
+                            instituciones, search, pageable
+                    ).map(PasantiasDto::fromEntity);
+                } else {
+                    pasantias = pasantiasDao.findAllByInstitucionesIdinstituciones(instituciones, pageable).map(PasantiasDto::fromEntity);
+                }
+                return pasantias;
+            } else {
+                throw new UsuarioYaRelacionadoException("El usuario no esta relacionado con la institucion");
+            }
+        } catch (UsuarioYaRelacionadoException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new InstitucionServiceExcepcion("Error al obtener las pasantias de la institucion", e);
+        }
+    }
+
+    public Boolean eliminarPasantia(String uuid, Integer institucionId, Integer pasantiaId) {
+        try {
+            if (validarRelacionUsuarioInstitucion(uuid, institucionId)) {
+                Pasantias pasantias = pasantiasDao.findById(pasantiaId).orElse(null);
+                if(pasantias != null){
+                    if(pasantias.getInstitucionesIdinstituciones().getIdinstituciones() != institucionId){
+                        throw new InstitucionNotFoundException("Pasantia no encontrada");
+                    }
+                    pasantias.setActivo(false);
+                    pasantiasDao.save(pasantias);
+                    return true;
+                } else {
+                    throw new InstitucionNotFoundException("Pasantia no encontrada");
+                }
+            } else {
+                throw new UsuarioYaRelacionadoException("El usuario no esta relacionado con la institucion");
+            }
+        } catch (InstitucionNotFoundException | UsuarioYaRelacionadoException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new InstitucionServiceExcepcion("Error al eliminar la pasantia", e);
+        }
+    }
+
+    public PasantiasDto agregarPasantia(String uuid, Integer institucionId, PasantiasDto pasantiasDto) {
+        try {
+            if (validarRelacionUsuarioInstitucion(uuid, institucionId)) {
+                Pasantias pasantias = pasantiasDto.toEntity();
+                pasantias.setActivo(false);
+                pasantias.setInstitucionesIdinstituciones(institucionesDao.findByIdinstitucionesAndActivo(institucionId, true));
+                pasantias = pasantiasDao.save(pasantias);
+                return PasantiasDto.fromEntity(pasantias);
+            } else {
+                throw new UsuarioYaRelacionadoException("El usuario no esta relacionado con la institucion");
+            }
+        } catch (UsuarioYaRelacionadoException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new InstitucionServiceExcepcion("Error al agregar la pasantia", e);
+        }
+    }
+
+    public PasantiasDto actualizarPasantia(String uuid, Integer institucionId, Integer pasantiaId, PasantiasDto pasantiasDto) {
+        try {
+            if (validarRelacionUsuarioInstitucion(uuid, institucionId)) {
+                Pasantias pasantias = pasantiasDao.findById(pasantiaId).orElse(null);
+                if(pasantias != null){
+                    if(pasantias.getInstitucionesIdinstituciones().getIdinstituciones() != institucionId){
+                        throw new InstitucionNotFoundException("Pasantia no encontrada");
+                    }
+                    pasantias.setTitulo(pasantiasDto.getTitulo());
+                    pasantias.setDescripcion(pasantiasDto.getDescripcion());
+                    pasantias.setFechaingreso(pasantiasDto.getFechaIngreso());
+                    pasantias.setFechacierre(pasantiasDto.getFechaCierre());
+                    pasantias.setRequisitos(pasantiasDto.getRequisitos());
+                    pasantias.setAreas(pasantiasDto.getAreas());
+                    pasantias.setFunciones(pasantiasDto.getFunciones());
+                    pasantias.setBeneficios(pasantiasDto.getBeneficios());
+                    pasantias = pasantiasDao.save(pasantias);
+                    return PasantiasDto.fromEntity(pasantias);
+                } else {
+                    throw new InstitucionNotFoundException("Pasantia no encontrada");
+                }
+            } else {
+                throw new UsuarioYaRelacionadoException("El usuario no esta relacionado con la institucion");
+            }
+        } catch (InstitucionNotFoundException | UsuarioYaRelacionadoException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new InstitucionServiceExcepcion("Error al actualizar la pasantia", e);
+        }
+    }
+
+    public Page<UsuariosConPersonaYCarreraDto> obtenerAplicantes(String uuid, Integer institucionId, Integer pasantiaId, Integer page, Integer size, String search, String sort) {
+        try {
+            if (validarRelacionUsuarioInstitucion(uuid, institucionId)) {
+                Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+                Pasantias pasantias = pasantiasDao.findById(pasantiaId).orElse(null);
+                if(pasantias != null){
+                    if(pasantias.getInstitucionesIdinstituciones().getIdinstituciones() != institucionId){
+                        throw new InstitucionNotFoundException("Pasantia no encontrada");
+                    }
+                    return aplicacionPasantiasDao.findAllByPasantiasIdpasantias(pasantias, pageable).
+                            map(
+                            aplicacion -> new UsuariosConPersonaYCarreraDto(
+                                    UsuariosDto.fromEntity(aplicacion.getUsuariosIdusuarios()),
+                                    PersonasDto.fromEntity(aplicacion.getUsuariosIdusuarios().getPersonasIdpersonas()),
+                                    CarrerasDto.fromEntity(aplicacion.getUsuariosIdusuarios().getCarrerasIdcarreras())));
+                } else {
+                    throw new InstitucionNotFoundException("Pasantia no encontrada");
+                }
+            } else {
+                throw new UsuarioYaRelacionadoException("El usuario no esta relacionado con la institucion");
+            }
+        } catch (InstitucionNotFoundException | UsuarioYaRelacionadoException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new InstitucionServiceExcepcion("Error al obtener los aplicantes", e);
+        }
+    }
+
+    public Boolean aceptarAplicante(String uuid, Integer institucionId, Integer pasantiaId, Integer aplicanteId) {
+        try {
+            if (validarRelacionUsuarioInstitucion(uuid, institucionId)) {
+                Pasantias pasantias = pasantiasDao.findById(pasantiaId).orElse(null);
+                if(pasantias != null){
+                    if(pasantias.getInstitucionesIdinstituciones().getIdinstituciones() != institucionId){
+                        throw new InstitucionNotFoundException("Pasantia no encontrada");
+                    }
+                    Usuarios usuarios = usuariosDao.findById(aplicanteId).orElse(null);
+                    if(usuarios != null){
+                        Aplicacionespasantias aplicacionpasantias = aplicacionPasantiasDao.findByPasantiasIdpasantiasAndUsuariosIdusuarios(pasantias, usuarios);
+                        if(aplicacionpasantias != null){
+                            Seleccionaplicante seleccionaplicante = new Seleccionaplicante();
+                            seleccionaplicante.setAplicacionespasantiasIdaplicacionpasantias(aplicacionpasantias);
+                            seleccionaplicante.setUsuariosinstitucionesIdusuariosinstituciones(usuariosInstitucionesDao.findByUsuariosIdusuariosAndInstitucionesIdinstituciones(usuarios, pasantias.getInstitucionesIdinstituciones()));
+                            seleccionaplicante.setFechaseleccion(new Date());
+                            seleccionaplicante.setHoraseleccion(new Time(new Date().getTime()));
+                            seleccionaplicante.setComentarios("");
+                            seleccionaplicante.setActivo(false);
+                            seleccionAplicanteDao.save(seleccionaplicante);
+                            return true;
+                        } else {
+                            throw new InstitucionNotFoundException("Aplicante no encontrado");
+                        }
+                    } else {
+                        throw new InstitucionNotFoundException("Aplicante no encontrado");
+                    }
+                } else {
+                    throw new InstitucionNotFoundException("Pasantia no encontrada");
+                }
+            } else {
+                throw new UsuarioYaRelacionadoException("El usuario no esta relacionado con la institucion");
+            }
+        } catch (InstitucionNotFoundException | UsuarioYaRelacionadoException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new InstitucionServiceExcepcion("Error al aceptar el aplicante", e);
+        }
+    }
+
+    //marcar una pasantia como que no se selecciono ningun aplicante guardando un SeleccionAplicante con AplicacionesPasantiasIdAplicacionPasantias = null
+    public Boolean pasantiaSinAplicante(String uuid, Integer institucionId, Integer pasantiaId){
+        try {
+            if (validarRelacionUsuarioInstitucion(uuid, institucionId)) {
+                Pasantias pasantias = pasantiasDao.findById(pasantiaId).orElse(null);
+                if(pasantias != null){
+                    if(pasantias.getInstitucionesIdinstituciones().getIdinstituciones() != institucionId){
+                        throw new InstitucionNotFoundException("Pasantia no encontrada");
+                    }
+                    Seleccionaplicante seleccionaplicante = new Seleccionaplicante();
+                    seleccionaplicante.setAplicacionespasantiasIdaplicacionpasantias(null);
+                    seleccionaplicante.setUsuariosinstitucionesIdusuariosinstituciones(usuariosInstitucionesDao.findByUsuariosIdusuariosAndInstitucionesIdinstituciones(usuariosDao.findByKcUuid(uuid), pasantias.getInstitucionesIdinstituciones()));
+                    seleccionaplicante.setFechaseleccion(new Date());
+                    seleccionaplicante.setHoraseleccion(new Time(new Date().getTime()));
+                    seleccionaplicante.setComentarios("");
+                    seleccionaplicante.setActivo(false);
+                    seleccionAplicanteDao.save(seleccionaplicante);
+                    return true;
+                } else {
+                    throw new InstitucionNotFoundException("Pasantia no encontrada");
+                }
+            } else {
+                throw new UsuarioYaRelacionadoException("El usuario no esta relacionado con la institucion");
+            }
+        } catch (InstitucionNotFoundException | UsuarioYaRelacionadoException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new InstitucionServiceExcepcion("Error al marcar la pasantia como sin aplicantes", e);
+        }
+    }
+
     private Boolean validarRelacionUsuarioInstitucion(String uuid, Integer idInstitucion){
         return usuariosInstitucionesDao.existsByUsuariosUuidAndInstitucionesIdinstituciones(uuid, idInstitucion);
     }

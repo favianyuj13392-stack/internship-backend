@@ -1,7 +1,6 @@
 package ucb.edu.bo.internship.internship_backend.dto;
 
 import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -177,7 +176,24 @@ public class InstitucionesDto {
                 institucion.getSectores(),
                 institucion.getLogoempresa(),
                 institucion.getFotos(),
-                institucion.getRedessociales());
+                institucion.getRedessociales(),
+                institucion.getActivo());
+    }
+
+    public Instituciones toEntity(){
+        Instituciones institucion = new Instituciones();
+        institucion.setIdinstituciones(this.idInstituciones);
+        institucion.setNombre(this.nombre);
+        institucion.setDescripcion(this.descripcion);
+        institucion.setDireccion(this.direccion);
+        institucion.setFotoinstitucion(this.fotoInstitucion);
+        institucion.setCorreo(this.correo);
+        institucion.setSectores(this.sectores);
+        institucion.setLogoempresa(this.logoEmpresa);
+        institucion.setFotos(this.fotos);
+        institucion.setRedessociales(this.redesSociales);
+        institucion.setActivo(this.activo);
+        return institucion;
     }
     
     

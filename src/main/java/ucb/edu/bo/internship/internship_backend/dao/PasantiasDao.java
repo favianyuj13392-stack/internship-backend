@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import ucb.edu.bo.internship.internship_backend.dto.PasantiaNombreDto;
+import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
 import ucb.edu.bo.internship.internship_backend.entity.Pasantias;
 
 import java.util.Date;
@@ -50,8 +52,6 @@ public interface PasantiasDao extends JpaRepository<Pasantias, Integer>{
     );
 
     Pasantias findByIdpasantiasAndActivoIsTrue(Integer idpasantias);
-    @Query("SELECT new ucb.edu.bo.internship.internship_backend.dto.PasantiaNombreDto(p.idpasantias, p.titulo) FROM Pasantias p WHERE p.institucionesIdinstituciones.idinstituciones = ?1")
-    List<PasantiaNombreDto> findPasantiasByInstitucionesIdinstituciones(Integer idInstituciones);
     @Query("select count (*) from Pasantias p where p.activo = true")
     Long countAllByActivo();
 
@@ -74,8 +74,7 @@ public interface PasantiasDao extends JpaRepository<Pasantias, Integer>{
 
     @Query("SELECT new ucb.edu.bo.internship.internship_backend.dto.PasantiaNombreDto(p.idpasantias, p.titulo) FROM Pasantias p WHERE p.institucionesIdinstituciones.idinstituciones = ?1")
     List<PasantiaNombreDto> findPasantiasByInstitucionesIdinstituciones(Integer idInstituciones);
-    @Query("select count (*) from Pasantias p where p.activo = true")
-    Long countAllByActivo();
+
 
     Page<Pasantias> findAllByActivoIsFalseAndTituloContainingIgnoreCase(String search, Pageable pageable);
 

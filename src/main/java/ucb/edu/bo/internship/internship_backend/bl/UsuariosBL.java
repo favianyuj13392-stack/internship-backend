@@ -97,13 +97,24 @@ public class UsuariosBL {
     }
 
     public UsuarioRegistroCompletoDto agregarUsuarioCompleto(UsuarioRegistroCompletoDto usuarioRegistroCompletoDto){
+        PersonasDto persona_aux = usuarioRegistroCompletoDto.getPersona();
+        persona_aux.setHabilidades(persona_aux.getHabilidades().toString());
+        persona_aux.setHabilidadesSeleccionada(persona_aux.getHabilidadesSeleccionada().toString());
+        persona_aux.setExperiencia(persona_aux.getExperiencia().toString());
+        persona_aux.setRedesSociales(persona_aux.getRedesSociales().toString());
+        usuarioRegistroCompletoDto.setPersona(persona_aux);
         PersonasDto personaAgregada = agregarPersona(usuarioRegistroCompletoDto.getPersona());
+        usuarioRegistroCompletoDto.setPersona(personaAgregada);      
+        usuarioRegistroCompletoDto.setIdPersonas(personaAgregada.getIdPersona());
+
         UsuariosDto usuarioAgregado = agregarUsuario(usuarioRegistroCompletoDto);
+
         InstitucionesDto institucion = usuarioRegistroCompletoDto.getInstitucion();
 
         if(institucion == null){
+            Roles roles = rolesDao.findByRol("ESTUDIANTE");
             usuarioRegistroCompletoDto.setIdRoles(
-                    rolesDao.findByRol("ESTUDIANTE").getIdroles()
+                    roles.getIdroles()
             );
             return new UsuarioRegistroCompletoDto(usuarioAgregado, personaAgregada, null, null);
         }else{

@@ -12,7 +12,7 @@ public class PersonasDto {
     private Integer telefono;
     private String ci;
     private String fotoPerfil;
-    private String bannerperfil;
+    private String bannerPerfil;
 
 
     private Integer anioIngresoUniversidad;
@@ -27,7 +27,7 @@ public class PersonasDto {
     }
 
     
-    public PersonasDto(Integer idPersona, String nombre, String apellidoPaterno, String apellidoMaterno, Integer telefono, String ci, String fotoPerfil, Integer anioIngresoUniversidad, String descripcion, Object habilidades, Object habilidadesSeleccionada, Object experiencia, Date fechaDeNacimiento, Object redesSociales, String bannerperfil) {
+    public PersonasDto(Integer idPersona, String nombre, String apellidoPaterno, String apellidoMaterno, Integer telefono, String ci, String fotoPerfil, Integer anioIngresoUniversidad, String descripcion, Object habilidades, Object habilidadesSeleccionada, Object experiencia, Date fechaDeNacimiento, Object redesSociales, String bannerPerfil) {
         this.idPersona = idPersona;
         this.nombre = nombre;
         this.apellidoPaterno = apellidoPaterno;
@@ -42,7 +42,7 @@ public class PersonasDto {
         this.experiencia = experiencia;
         this.fechaDeNacimiento = fechaDeNacimiento;
         this.redesSociales = redesSociales;
-        this.bannerperfil = bannerperfil;
+        this.bannerPerfil = bannerPerfil;
     }
 
     public Integer getIdPersona() {
@@ -102,11 +102,11 @@ public class PersonasDto {
     }
 
     public String getBannerPerfil() {
-        return this.bannerperfil;
+        return this.bannerPerfil;
     }
 
     public void setBannerPerfil(String bannerperfil) {
-        this.bannerperfil = bannerperfil;
+        this.bannerPerfil = bannerperfil;
     }
 
     public Integer getAnioIngresoUniversidad() {

@@ -52,12 +52,12 @@ public class MinioService {
                 .object(fileName)
                 .build());
     }
-    public ResponseDto<ImagenResponseDto> uploadFileImage(MultipartFile file)
+    public ResponseDto<ImagenResponseDto> uploadFileImage(MultipartFile file, String fullUrl)
     {
         ResponseDto<ImagenResponseDto> responseDto;
         if(checkFile(file.getContentType(), List.of("image/jpeg", "image/png", "image/jpg")))
         {
-            responseDto = saveFile(file);
+            responseDto = saveFile(file,fullUrl);
         }
         else {
             responseDto = new ResponseDto<>();
@@ -71,7 +71,7 @@ public class MinioService {
     {
         return validTypes.contains(contentType);
     }
-    private ResponseDto<ImagenResponseDto> saveFile(MultipartFile file)
+    private ResponseDto<ImagenResponseDto> saveFile(MultipartFile file, String fullUrl)
     {
         ResponseDto<ImagenResponseDto> responseDto = new ResponseDto<>();
         try {
@@ -86,8 +86,10 @@ public class MinioService {
                             .stream(file.getInputStream(), file.getSize(), -1)
                             .build()
             );
-            String response = "https://backend-sistemas.serverbb.online/api/v1/public/files/download/" + uniqueFilename;
+
+            //String response = "https://backend-sistemas.serverbb.online/api/v1/public/files/download/" + uniqueFilename;
             //String response = "http://localhost:8085/api/v1/public/files/download/" + uniqueFilename;
+            String response = fullUrl + "/api/v1/public/files/download/" + uniqueFilename;
             ImagenResponseDto imagenResponseDto = new ImagenResponseDto(response,uniqueFilename,file.getContentType(),String.valueOf(file.getSize()));
             responseDto.setCode("200");
             responseDto.setErrorMessage("");

@@ -58,6 +58,7 @@ public class EstudianteBl {
         persona.setCi(personasDto.getCi());
         persona.setTelefono(personasDto.getTelefono());
         persona.setFotoperfil(personasDto.getFotoPerfil());
+        persona.setBannerperfil(personasDto.getBannerPerfil());
         persona.setFechadenacimiento(personasDto.getFechaDeNacimiento());
         persona.setAnioingresouniversidad(personasDto.getAnioIngresoUniversidad());
         persona.setDescripcion(personasDto.getDescripcion());

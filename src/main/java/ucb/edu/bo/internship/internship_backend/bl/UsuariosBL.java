@@ -59,6 +59,10 @@ public class UsuariosBL {
             //TODO: Cambiar la foto por defecto con el url de la imagen por defecto en minio
             personasDto.setFotoPerfil("https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png");
         }
+        if(personasDto.getBannerPerfil()==null){
+            //TODO: Cambiar la foto por defecto con el url de la imagen por defecto en minio
+            personasDto.setBannerPerfil("https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png");
+        }
        return PersonasDto.fromEntity(personasDao.save(personasDto.toEntity()));
     }
 

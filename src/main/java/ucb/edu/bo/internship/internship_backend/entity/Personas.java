@@ -69,6 +69,11 @@ public class Personas implements Serializable {
     @Basic(optional = false)
     @Column(name = "fotoperfil")
     private String fotoperfil;
+
+    @Basic(optional = true)
+    @Column(name = "bannerperfil")
+    private String bannerperfil;
+
     @Column(name = "anioingresouniversidad")
     private Integer anioingresouniversidad;
     @Column(name = "descripcion")
@@ -98,7 +103,7 @@ public class Personas implements Serializable {
         this.idpersonas = idpersonas;
     }
 
-    public Personas(Integer idpersonas, String nombres, String apellidopaterno, String apellidomaterno, int telefono, String ci, String fotoperfil) {
+    public Personas(Integer idpersonas, String nombres, String apellidopaterno, String apellidomaterno, int telefono, String ci, String fotoperfil, String bannerperfil) {
         this.idpersonas = idpersonas;
         this.nombres = nombres;
         this.apellidopaterno = apellidopaterno;
@@ -106,6 +111,7 @@ public class Personas implements Serializable {
         this.telefono = telefono;
         this.ci = ci;
         this.fotoperfil = fotoperfil;
+        this.bannerperfil = bannerperfil;
     }
 
     public Integer getIdpersonas() {
@@ -162,6 +168,14 @@ public class Personas implements Serializable {
 
     public void setFotoperfil(String fotoperfil) {
         this.fotoperfil = fotoperfil;
+    }
+
+    public String getBannerperfil() {
+        return bannerperfil;
+    }
+
+    public void setBannerperfil(String bannerperfil) {
+        this.bannerperfil = bannerperfil;
     }
 
     public Integer getAnioingresouniversidad() {

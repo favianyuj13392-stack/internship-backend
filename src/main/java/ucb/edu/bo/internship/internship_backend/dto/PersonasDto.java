@@ -12,6 +12,8 @@ public class PersonasDto {
     private Integer telefono;
     private String ci;
     private String fotoPerfil;
+    private String bannerperfil;
+
 
     private Integer anioIngresoUniversidad;
     private String descripcion;
@@ -25,7 +27,7 @@ public class PersonasDto {
     }
 
     
-    public PersonasDto(Integer idPersona, String nombre, String apellidoPaterno, String apellidoMaterno, Integer telefono, String ci, String fotoPerfil, Integer anioIngresoUniversidad, String descripcion, Object habilidades, Object habilidadesSeleccionada, Object experiencia, Date fechaDeNacimiento, Object redesSociales) {
+    public PersonasDto(Integer idPersona, String nombre, String apellidoPaterno, String apellidoMaterno, Integer telefono, String ci, String fotoPerfil, Integer anioIngresoUniversidad, String descripcion, Object habilidades, Object habilidadesSeleccionada, Object experiencia, Date fechaDeNacimiento, Object redesSociales, String bannerperfil) {
         this.idPersona = idPersona;
         this.nombre = nombre;
         this.apellidoPaterno = apellidoPaterno;
@@ -40,8 +42,8 @@ public class PersonasDto {
         this.experiencia = experiencia;
         this.fechaDeNacimiento = fechaDeNacimiento;
         this.redesSociales = redesSociales;
+        this.bannerperfil = bannerperfil;
     }
-
 
     public Integer getIdPersona() {
         return this.idPersona;
@@ -97,6 +99,14 @@ public class PersonasDto {
 
     public void setFotoPerfil(String fotoPerfil) {
         this.fotoPerfil = fotoPerfil;
+    }
+
+    public String getBannerPerfil() {
+        return this.bannerperfil;
+    }
+
+    public void setBannerPerfil(String bannerperfil) {
+        this.bannerperfil = bannerperfil;
     }
 
     public Integer getAnioIngresoUniversidad() {
@@ -184,6 +194,7 @@ public class PersonasDto {
         personas.setTelefono(this.getTelefono());
         personas.setCi(this.getCi());
         personas.setFotoperfil(this.getFotoPerfil());
+        personas.setBannerperfil(this.getBannerPerfil());
         personas.setAnioingresouniversidad(this.getAnioIngresoUniversidad());
         personas.setDescripcion(this.getDescripcion());
         personas.setHabilidades(this.getHabilidades());
@@ -203,6 +214,7 @@ public class PersonasDto {
         personasDto.setTelefono(personas.getTelefono());
         personasDto.setCi(personas.getCi());
         personasDto.setFotoPerfil(personas.getFotoperfil());
+        personasDto.setBannerPerfil(personas.getBannerperfil());
         personasDto.setAnioIngresoUniversidad(personas.getAnioingresouniversidad());
         personasDto.setDescripcion(personas.getDescripcion());
         personasDto.setHabilidades(personas.getHabilidades());
@@ -212,5 +224,5 @@ public class PersonasDto {
         personasDto.setRedesSociales(personas.getRedessociales());
         return personasDto;
     }
-    
+
 }

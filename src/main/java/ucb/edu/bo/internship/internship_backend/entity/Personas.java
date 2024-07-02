@@ -70,7 +70,6 @@ public class Personas implements Serializable {
     @Column(name = "fotoperfil")
     private String fotoperfil;
 
-    @Basic(optional = true)
     @Column(name = "bannerperfil")
     private String bannerperfil;
 

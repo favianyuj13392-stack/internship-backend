@@ -1,5 +1,9 @@
 package ucb.edu.bo.internship.internship_backend.bl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +66,26 @@ public class PasantiaBl {
     }
 
     private PasantiasConInstitucionYCarrerasDto toPasantiasConInstitucionYCarrerasDto(Pasantias pasantias1) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode areas, beneficios, funciones, requisitos;
+        try{
+            Object areasJson, beneficiosJson, funcionesJson, requisitosJson;
+            areasJson = pasantias1.getAreas();
+            beneficiosJson = pasantias1.getBeneficios();
+            funcionesJson = pasantias1.getFunciones();
+            requisitosJson = pasantias1.getRequisitos();
+            areas = objectMapper.readTree(areasJson.toString());
+            beneficios = objectMapper.readTree(beneficiosJson.toString());
+            funciones = objectMapper.readTree(funcionesJson.toString());
+            requisitos = objectMapper.readTree(requisitosJson.toString());
+        } catch (Exception e) {
+            throw new RuntimeException("Error al convertir areas a objeto:" + e);
+        }
         PasantiasDto pasantiasDto = PasantiasDto.fromEntity(pasantias1);
+        pasantiasDto.setAreas(areas);
+        pasantiasDto.setBeneficios(beneficios);
+        pasantiasDto.setFunciones(funciones);
+        pasantiasDto.setRequisitos(requisitos);
         InstitucionesDto institucionesDto = InstitucionesDto.fromEntity(pasantias1.getInstitucionesIdinstituciones());
         List<CarrerasDto> carrerasDto = pasantiasCarrerasDao.findAllByPasantiasIdpasantias(pasantias1).stream().map(pasantiasCarreras -> CarrerasDto.fromEntity(pasantiasCarreras.getCarrerasIdcarreras())).toList();
         return new PasantiasConInstitucionYCarrerasDto(pasantiasDto, institucionesDto, carrerasDto);

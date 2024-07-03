@@ -106,12 +106,17 @@ public class InstitucionBl {
             if (instituciones == null) {
                 throw new InstitucionNotFoundException("Institucion no encontrada");
             } else {
-                return new InstitucionConPasantiasDto(instituciones, pasantiasDao.findPasantiasByInstitucionesIdinstituciones(id));
+                List<Pasantias> institucionPasantias = pasantiasDao.findPasantiasByInstitucionesIdinstituciones(instituciones);
+                List<PasantiasDto> pasantias = new ArrayList<>();
+                for (Pasantias pasantia : institucionPasantias) {
+                    pasantias.add(PasantiasDto.fromEntity(pasantia));
+                }
+                return new InstitucionConPasantiasDto(instituciones, pasantias);
             }
         } catch (InstitucionNotFoundException e) {
             throw e;
         } catch (Exception e) {
-            throw new InstitucionServiceExcepcion("Error al obtener la institución", e);
+            throw new RuntimeException("Error al obtener la institucion " +e.getMessage());
         }
     }
 
@@ -128,7 +133,12 @@ public class InstitucionBl {
             List<Instituciones> instituciones = institucionesDao.findTop4InstitucionesBySectoresAndPasantias(id);
             List<InstitucionConPasantiasDto> institucionConPasantiasDtos = new ArrayList<>();
             for (Instituciones institucion : instituciones) {
-                institucionConPasantiasDtos.add(new InstitucionConPasantiasDto(institucion, pasantiasDao.findPasantiasByInstitucionesIdinstituciones(institucion.getIdinstituciones())));
+                List<Pasantias> institucionPasantias = pasantiasDao.findPasantiasByInstitucionesIdinstituciones(institucion);
+                List<PasantiasDto> pasantias = new ArrayList<>();
+                for (Pasantias pasantia : institucionPasantias) {
+                    pasantias.add(PasantiasDto.fromEntity(pasantia));
+                }
+                institucionConPasantiasDtos.add(new InstitucionConPasantiasDto(institucion, pasantias));
             }
             return institucionConPasantiasDtos;
         } catch (Exception e) {

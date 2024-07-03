@@ -16,6 +16,7 @@ public class InstitucionesDto {
     private List<String> fotos;
     private LinkedHashMap<String,String> redesSociales;
     private Boolean activo;
+    private Long cantidadPasantias;
 
     public InstitucionesDto() {
     }
@@ -33,6 +34,22 @@ public class InstitucionesDto {
         this.redesSociales = redesSociales;
         this.activo = activo;
     }
+    public InstitucionesDto(Integer idInstituciones, String nombre, String descripcion, String direccion, String fotoInstitucion, String correo, List<String> sectores, String logoEmpresa, List<String> fotos, LinkedHashMap<String,String> redesSociales, Boolean activo, Long cantidadPasantias)
+    {
+        this.idInstituciones = idInstituciones;
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.direccion = direccion;
+        this.fotoInstitucion = fotoInstitucion;
+        this.correo = correo;
+        this.sectores = sectores;
+        this.logoEmpresa = logoEmpresa;
+        this.fotos = fotos;
+        this.redesSociales = redesSociales;
+        this.activo = activo;
+        this.cantidadPasantias = cantidadPasantias;
+    }
+
     public InstitucionesDto(Instituciones instituciones) {
         this.idInstituciones = instituciones.getIdinstituciones();
         this.nombre = instituciones.getNombre();
@@ -45,6 +62,20 @@ public class InstitucionesDto {
         this.fotos = instituciones.getFotos();
         this.redesSociales = instituciones.getRedessociales();
         this.activo = instituciones.getActivo();
+    }
+    public InstitucionesDto(Instituciones instituciones, Long cantidadPasantias) {
+        this.idInstituciones = instituciones.getIdinstituciones();
+        this.nombre = instituciones.getNombre();
+        this.descripcion = instituciones.getDescripcion();
+        this.direccion = instituciones.getDireccion();
+        this.fotoInstitucion = instituciones.getFotoinstitucion();
+        this.correo = instituciones.getCorreo();
+        this.sectores = instituciones.getSectores();
+        this.logoEmpresa = instituciones.getLogoempresa();
+        this.fotos = instituciones.getFotos();
+        this.redesSociales = instituciones.getRedessociales();
+        this.activo = instituciones.getActivo();
+        this.cantidadPasantias = cantidadPasantias;
     }
 
     public InstitucionesDto(Integer idinstituciones, String nombre, String descripcion, String direccion, String fotoinstitucion, String correo, List<String> sectores, String logoempresa, List<String> fotos, LinkedHashMap<String, String> redessociales) {
@@ -147,6 +178,14 @@ public class InstitucionesDto {
 
     public void setActivo(Boolean activo) {
         this.activo = activo;
+    }
+
+    public Long getCantidadPasantias() {
+        return cantidadPasantias;
+    }
+
+    public void setCantidadPasantias(Long cantidadPasantias) {
+        this.cantidadPasantias = cantidadPasantias;
     }
 
     @Override

@@ -220,5 +220,20 @@ public class UsuarioApi {
         }
         return response;
     }
+    @PostMapping("/institucion")
+    public ResponseDto<UsuarioRegistroCompletoDto> agregarUsuarioCompletoInstitucion(
+            @RequestBody UsuarioRegistroCompletoDto usuarioRegistroCompletoDto
+    ){
+        ResponseDto<UsuarioRegistroCompletoDto> response = new ResponseDto<>();
+        try{
+            response.setResponse(usuariosBL.agregarUsuarioCompletoInstitucion(usuarioRegistroCompletoDto));
+            response.setCode("200");
+            response.setErrorMessage("");
+        }catch (Exception e){
+            response.setCode("500");
+            response.setErrorMessage(e.getMessage());
+        }
+        return response;
+    }
 
 }

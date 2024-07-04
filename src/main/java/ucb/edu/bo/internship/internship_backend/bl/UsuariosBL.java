@@ -1,5 +1,6 @@
 package ucb.edu.bo.internship.internship_backend.bl;
 
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -85,8 +86,27 @@ public class UsuariosBL {
 
         return UsuariosDto.fromEntity(usuariosDao.save(usuario));
     }
+    private UsuariosDto agregarUsuarioInstitucion(UsuariosDto usuariosDto)
+    {
+        Roles roles = rolesDao.findById(usuariosDto.getIdRoles()).orElse(null);
+        if(roles != null){
+            List<String> rolesList = new ArrayList<>();
+            rolesList.add(roles.getRol());
+            keycloakService.updateUserRoles(usuariosDto.getKc_UUID(), rolesList);
+        }
+        Date date = new Date(System.currentTimeMillis());
+        usuariosDto.setFechaRegistro(date);
+        Time time = new Time(System.currentTimeMillis());
+        usuariosDto.setHoraRegistro(time);
+
+        Usuarios usuario = usuariosDto.toEntity();
+        usuario.setPersonasIdpersonas(personasDao.findById(usuariosDto.getIdPersonas()).orElse(null));
+        usuario.setRolesIdroles(roles);
+        return UsuariosDto.fromEntityInstitucion(usuariosDao.save(usuario));
+    }
 
     public UsuariosInstitucionesDto agregarUsuarioInstitucion(String kcUuid, Integer idInstitucion, String cargo){
+    try {
         Usuarios usuario = usuariosDao.findByKcUuid(kcUuid);
         Instituciones institucion = institucionesDao.findById(idInstitucion).orElse(null);
         if(usuario != null && institucion != null){
@@ -94,10 +114,16 @@ public class UsuariosBL {
             usuariosinstituciones.setUsuariosIdusuarios(usuario);
             usuariosinstituciones.setInstitucionesIdinstituciones(institucion);
             usuariosinstituciones.setCargo(cargo);
-            usuariosInstitucionesDao.save(usuariosinstituciones);
+            usuariosinstituciones.setActivo(false);
+            System.out.println(usuariosinstituciones);
+            usuariosinstituciones = usuariosInstitucionesDao.save(usuariosinstituciones);
             return UsuariosInstitucionesDto.fromEntity(usuariosinstituciones);
         }
         return null;
+    }catch (Exception e){
+        logger.error("Error al agregar usuario institucion",e);
+        return null;
+    }
     }
 
     public UsuarioRegistroCompletoDto agregarUsuarioCompleto(UsuarioRegistroCompletoDto usuarioRegistroCompletoDto){
@@ -135,5 +161,43 @@ public class UsuariosBL {
 
 
     }
-
+    @Transactional
+    public UsuarioRegistroCompletoDto agregarUsuarioCompletoInstitucion(UsuarioRegistroCompletoDto usuarioRegistroCompletoDto) {
+        try {
+            PersonasDto persona_aux = usuarioRegistroCompletoDto.getPersona();
+            persona_aux.setHabilidades(persona_aux.getHabilidades().toString());
+            persona_aux.setHabilidadesSeleccionada(persona_aux.getHabilidadesSeleccionada().toString());
+            persona_aux.setExperiencia(persona_aux.getExperiencia().toString());
+            persona_aux.setRedesSociales(persona_aux.getRedesSociales().toString());
+            usuarioRegistroCompletoDto.setPersona(persona_aux);
+            //Agregar Persona
+            usuarioRegistroCompletoDto.setPersona(agregarPersona(usuarioRegistroCompletoDto.getPersona()));
+            //Poner la persona agregada en el usuario
+            usuarioRegistroCompletoDto.setIdPersonas(usuarioRegistroCompletoDto.getPersona().getIdPersona());
+            //Agregar Usuario
+            usuarioRegistroCompletoDto.setCargo(usuarioRegistroCompletoDto.getCargo());
+            usuarioRegistroCompletoDto.setIdRoles(rolesDao.findByRol("EMPRESA").getIdroles());
+            usuarioRegistroCompletoDto = new UsuarioRegistroCompletoDto(agregarUsuarioInstitucion(usuarioRegistroCompletoDto), usuarioRegistroCompletoDto.getPersona(), usuarioRegistroCompletoDto.getInstitucion(), usuarioRegistroCompletoDto.getCargo());
+            //Agregar Institucion
+            InstitucionesDto institucionesDto = usuarioRegistroCompletoDto.getInstitucion();
+            Instituciones instituciones = institucionesDao.findByNombre(institucionesDto.getNombre());
+            if(instituciones == null){
+                Instituciones instituciones1 = institucionesDto.toEntity();
+                instituciones1.setActivo(false);
+                instituciones = institucionesDao.save(instituciones1);
+            }
+            institucionesDto = InstitucionesDto.fromEntity(instituciones);
+            usuarioRegistroCompletoDto.setInstitucion(institucionesDto);
+            //Agregar UsuarioInstitucion
+            UsuariosInstitucionesDto usuariosInstitucionesDto = agregarUsuarioInstitucion(usuarioRegistroCompletoDto.getKc_UUID(),
+                    usuarioRegistroCompletoDto.getInstitucion().getIdInstituciones(),
+                    usuarioRegistroCompletoDto.getCargo()
+            );
+            usuarioRegistroCompletoDto.setCargo(usuariosInstitucionesDto.getCargo());
+            return usuarioRegistroCompletoDto;
+        }catch (Exception e){
+            logger.error("Error al agregar usuario completo institucion",e);
+            return null;
+        }
+    }
 }

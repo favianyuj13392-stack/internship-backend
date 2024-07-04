@@ -109,6 +109,20 @@ public class UsuariosDto {
         usuarioDto.setIdCarreras(usuario.getCarrerasIdcarreras().getIdcarreras());
         return usuarioDto;
     }
+    public static UsuariosDto fromEntityInstitucion(Usuarios usuario){
+        UsuariosDto usuarioDto = new UsuariosDto();
+        if(usuario == null){
+            return null;
+        }
+        usuarioDto.setIdUsuarios(usuario.getIdusuarios());
+        usuarioDto.setKc_UUID(usuario.getKcUuid());
+        usuarioDto.setCorreo(usuario.getCorreo());
+        usuarioDto.setFechaRegistro(new Date(usuario.getFecharegistro().getTime()));
+        usuarioDto.setHoraRegistro(new Time(usuario.getHoraregistro().getTime()));
+        usuarioDto.setIdRoles(usuario.getRolesIdroles().getIdroles());
+        usuarioDto.setIdPersonas(usuario.getPersonasIdpersonas().getIdpersonas());
+        return usuarioDto;
+    }
 
     public Usuarios toEntity(){
         Usuarios usuario = new Usuarios();

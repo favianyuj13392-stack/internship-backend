@@ -51,6 +51,13 @@ public class UsuariosBL {
         Usuarios usuario = usuariosDao.findByKcUuid(kcUuid);
         return UsuariosDto.fromEntity(usuario);
     }
+
+
+    public Boolean obtenerUsuarioExistencia(String kcUuid){
+        Usuarios usuario = usuariosDao.findByKcUuid(kcUuid);
+        return usuario != null;
+    }
+
     public Boolean userIs(String kcUuid,String role){
         return usuariosDao.userIs(kcUuid,role);
     }

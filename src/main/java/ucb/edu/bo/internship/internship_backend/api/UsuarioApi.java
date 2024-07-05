@@ -8,10 +8,6 @@ import ucb.edu.bo.internship.internship_backend.bl.InstitucionBl;
 
 import ucb.edu.bo.internship.internship_backend.bl.UsuariosBL;
 import ucb.edu.bo.internship.internship_backend.dto.*;
-
-import ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto;
-import ucb.edu.bo.internship.internship_backend.dto.ResponseDto;
-import ucb.edu.bo.internship.internship_backend.dto.SuscribirseInstitucionDto;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionNotFoundException;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionServiceExcepcion;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.UsuarioYaRelacionadoException;
@@ -33,7 +29,7 @@ public class UsuarioApi {
     public ResponseDto<Boolean> usuarioExiste(@PathVariable String uuid){
         ResponseDto<Boolean> response = new ResponseDto<>();
         try{
-            response.setResponse(usuariosBL.obtenerUsuario(uuid) != null);
+            response.setResponse(usuariosBL.obtenerUsuarioExistencia(uuid) != null);
             response.setCode("200");
             response.setErrorMessage("");
         }catch (Exception e){

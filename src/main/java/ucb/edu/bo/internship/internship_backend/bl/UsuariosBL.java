@@ -180,7 +180,7 @@ public class UsuariosBL {
             usuarioRegistroCompletoDto = new UsuarioRegistroCompletoDto(agregarUsuarioInstitucion(usuarioRegistroCompletoDto), usuarioRegistroCompletoDto.getPersona(), usuarioRegistroCompletoDto.getInstitucion(), usuarioRegistroCompletoDto.getCargo());
             //Agregar Institucion
             InstitucionesDto institucionesDto = usuarioRegistroCompletoDto.getInstitucion();
-            Instituciones instituciones = institucionesDao.findByNombre(institucionesDto.getNombre());
+            Instituciones instituciones = institucionesDao.findById(institucionesDto.getIdInstituciones()).orElse(null);
             if(instituciones == null){
                 Instituciones instituciones1 = institucionesDto.toEntity();
                 instituciones1.setActivo(false);

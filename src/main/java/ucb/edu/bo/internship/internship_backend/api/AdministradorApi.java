@@ -38,8 +38,13 @@ public class AdministradorApi {
             ) {
         return handleRequest(() -> institucionBl.obtenerInstituciones(page, size, search, sort,active));
     }
+    // Obtener una institución por id
+    @GetMapping("/instituciones/{id}")
+    public ResponseEntity<ResponseDto<InstitucionConPasantiasDto>> getInstitucionById(@PathVariable String uuid,@PathVariable Integer id) {
+        return handleRequest(() -> institucionBl.obtenerInstitucionById(id));
+    }
     @GetMapping("/pasantia")
-    public ResponseEntity<ResponseDto<Page<PasantiasDto>>> getPasantias(
+    public ResponseEntity<ResponseDto<Page<PasantiaConNombreYLogoEmpresaDto>>> getPasantias(
             @PathVariable String uuid,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "12") Integer size,

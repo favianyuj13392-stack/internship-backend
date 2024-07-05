@@ -14,10 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ucb.edu.bo.internship.internship_backend.dao.PasantiasCarrerasDao;
 import ucb.edu.bo.internship.internship_backend.dao.PasantiasDao;
-import ucb.edu.bo.internship.internship_backend.dto.CarrerasDto;
-import ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto;
-import ucb.edu.bo.internship.internship_backend.dto.PasantiasConInstitucionYCarrerasDto;
-import ucb.edu.bo.internship.internship_backend.dto.PasantiasDto;
+import ucb.edu.bo.internship.internship_backend.dto.*;
 import ucb.edu.bo.internship.internship_backend.entity.Pasantias;
 
 import java.util.ArrayList;
@@ -92,16 +89,16 @@ public class PasantiaBl {
         return new PasantiasConInstitucionYCarrerasDto(pasantiasDto, institucionesDto, carrerasDto);
     }
 
-    public Page<PasantiasDto> obtenerPasantias(Integer page, Integer size, String search, String sort, String active) {
+    public Page<PasantiaConNombreYLogoEmpresaDto> obtenerPasantias(Integer page, Integer size, String search, String sort, String active) {
         try {
             Pageable pageable = buildPageable(page, size, sort);
             Date fechaActual = new Date();
             if (active.equals("true")) {
-                return pasantiasDao.findAllByActivoIsTrueAndFechacierreAfterAndTituloContainingIgnoreCase(fechaActual, search, pageable).map(PasantiasDto::fromEntity);
+                return pasantiasDao.findAllByActivoIsTrueAndFechacierreAfterAndTituloContainingIgnoreCase(fechaActual, search, pageable).map(PasantiaConNombreYLogoEmpresaDto::fromEntity);
             } else if (active.equals("false")) {
-                return pasantiasDao.findAllByActivoIsFalseAndTituloContainingIgnoreCase(search, pageable).map(PasantiasDto::fromEntity);
+                return pasantiasDao.findAllByActivoIsFalseAndTituloContainingIgnoreCase(search, pageable).map(PasantiaConNombreYLogoEmpresaDto::fromEntity);
             } else {
-                return pasantiasDao.findAllByTituloContainingIgnoreCase(search, pageable).map(PasantiasDto::fromEntity);
+                return pasantiasDao.findAllByTituloContainingIgnoreCase(search, pageable).map(PasantiaConNombreYLogoEmpresaDto::fromEntity);
             }
         } catch (Exception e) {
             throw new RuntimeException("Error al obtener las pasantias");

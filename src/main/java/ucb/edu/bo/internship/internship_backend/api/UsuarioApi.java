@@ -29,7 +29,7 @@ public class UsuarioApi {
     public ResponseDto<Boolean> usuarioExiste(@PathVariable String uuid){
         ResponseDto<Boolean> response = new ResponseDto<>();
         try{
-            response.setResponse(usuariosBL.obtenerUsuarioExistencia(uuid) != null);
+            response.setResponse(usuariosBL.obtenerUsuarioExistencia(uuid));
             response.setCode("200");
             response.setErrorMessage("");
         }catch (Exception e){

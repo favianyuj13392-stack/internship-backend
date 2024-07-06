@@ -186,13 +186,26 @@ public class UsuariosBL {
             usuarioRegistroCompletoDto.setIdRoles(rolesDao.findByRol("EMPRESA").getIdroles());
             usuarioRegistroCompletoDto = new UsuarioRegistroCompletoDto(agregarUsuarioInstitucion(usuarioRegistroCompletoDto), usuarioRegistroCompletoDto.getPersona(), usuarioRegistroCompletoDto.getInstitucion(), usuarioRegistroCompletoDto.getCargo());
             //Agregar Institucion
+
+
+
+
             InstitucionesDto institucionesDto = usuarioRegistroCompletoDto.getInstitucion();
-            Instituciones instituciones = institucionesDao.findById(institucionesDto.getIdInstituciones()).orElse(null);
-            if(instituciones == null){
+            Instituciones instituciones = new Instituciones();
+            if(institucionesDto.getIdInstituciones()==null){
                 Instituciones instituciones1 = institucionesDto.toEntity();
                 instituciones1.setActivo(false);
                 instituciones = institucionesDao.save(instituciones1);
+            }else{
+                instituciones = institucionesDao.findById(institucionesDto.getIdInstituciones()).orElse(null);
+            
             }
+
+            if(instituciones == null){
+                instituciones = institucionesDao.save(institucionesDto.toEntity());
+            }           
+
+
             institucionesDto = InstitucionesDto.fromEntity(instituciones);
             usuarioRegistroCompletoDto.setInstitucion(institucionesDto);
 

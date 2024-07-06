@@ -228,4 +228,17 @@ public class UsuariosBL {
             return null;
         }
     }
+
+    public InstitucionesDto obtenerInstitucionPorUsuario(String uuid) {
+        Usuarios usuario = usuariosDao.findByKcUuid(uuid);
+        //also return usuarioInstitucion
+
+        if(usuario != null){
+            Usuariosinstituciones usuariosinstituciones = usuariosInstitucionesDao.findByUsuariosIdusuarios(usuario);
+            if(usuariosinstituciones != null){
+                return InstitucionesDto.fromEntity(usuariosinstituciones.getInstitucionesIdinstituciones());
+            }
+        }
+        return null;
+    }
 }

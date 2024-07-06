@@ -39,6 +39,21 @@ public class UsuarioApi {
         return response;
     }
 
+    @GetMapping("/{uuid}/institucion")
+    public ResponseDto<InstitucionesDto> obtenerInstitucionPorUsuario(@PathVariable String uuid){
+        ResponseDto<InstitucionesDto> response = new ResponseDto<>();
+        try{
+            response.setResponse(usuariosBL.obtenerInstitucionPorUsuario(uuid));
+            response.setCode("200");
+            response.setErrorMessage("");
+        }catch (Exception e){
+            response.setCode("500");
+            response.setErrorMessage(e.getMessage());
+        }
+        return response;
+    }
+
+
     //Agregar una institucion
     @PostMapping("/{uuid}/institucion")
     public ResponseEntity<ResponseDto<InstitucionesDto>> agregarInstitucion(@RequestBody InstitucionesDto institucionesDto, @PathVariable String uuid) {

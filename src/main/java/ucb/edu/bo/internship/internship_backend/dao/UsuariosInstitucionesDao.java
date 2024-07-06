@@ -17,4 +17,7 @@ public interface UsuariosInstitucionesDao extends JpaRepository<Usuariosinstituc
     @Query("SELECT COUNT(u) > 0 FROM Usuariosinstituciones u WHERE u.usuariosIdusuarios.kcUuid = ?1 and u.usuariosIdusuarios.activo = true")
     Boolean existsByUsuariosUuid(String uuid);
     Usuariosinstituciones findByUsuariosIdusuariosAndInstitucionesIdinstituciones(Usuarios idUsuario, Instituciones idInstitucion);
+   
+   
+    Usuariosinstituciones findByUsuariosIdusuarios(Usuarios usuario);
 }

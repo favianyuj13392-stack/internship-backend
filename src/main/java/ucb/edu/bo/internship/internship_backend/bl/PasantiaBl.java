@@ -112,4 +112,8 @@ public class PasantiaBl {
         }
         return PageRequest.of(page, size, Sort.by(order));
     }
+
+    public Long obtenerCantidadPasantiasPorInstitucion(Integer idInstituciones) {
+        return pasantiasDao.countAllByInstitucionesIdinstituciones(idInstituciones);
+    }
 }

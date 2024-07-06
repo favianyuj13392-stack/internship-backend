@@ -235,8 +235,11 @@ public class UsuariosBL {
 
         if(usuario != null){
             Usuariosinstituciones usuariosinstituciones = usuariosInstitucionesDao.findByUsuariosIdusuarios(usuario);
+
             if(usuariosinstituciones != null){
-                return InstitucionesDto.fromEntity(usuariosinstituciones.getInstitucionesIdinstituciones());
+                InstitucionesDto institucionesDto = InstitucionesDto.fromEntity(usuariosinstituciones.getInstitucionesIdinstituciones());
+                institucionesDto.setCantidadPasantias(pasantiasBl.obtenerCantidadPasantiasPorInstitucion(institucionesDto.getIdInstituciones()));
+                return institucionesDto;
             }
         }
         return null;

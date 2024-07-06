@@ -79,4 +79,9 @@ public interface PasantiasDao extends JpaRepository<Pasantias, Integer>{
     Page<Pasantias> findAllByActivoIsFalseAndTituloContainingIgnoreCase(String search, Pageable pageable);
 
     Page<Pasantias> findAllByTituloContainingIgnoreCase(String search, Pageable pageable);
+
+
+    @Query("SELECT COUNT(p) FROM Pasantias p WHERE p.institucionesIdinstituciones.idinstituciones = ?1")
+Long countAllByInstitucionesIdinstituciones(Integer idInstituciones);
+
 }

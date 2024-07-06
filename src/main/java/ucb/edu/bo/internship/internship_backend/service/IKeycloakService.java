@@ -1,6 +1,8 @@
 package ucb.edu.bo.internship.internship_backend.service;
 
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
+
 import ucb.edu.bo.internship.internship_backend.dto.UsuarioRegistroDto;
 import ucb.edu.bo.internship.internship_backend.dto.UsuariosDto;
 
@@ -14,4 +16,6 @@ public interface IKeycloakService {
     UserRepresentation updateUser(String userId, UsuarioRegistroDto userDto);
     UserRepresentation updateUserRoles(String userId, List<String> roles);
     UserRepresentation findUserBySubject(String subject);
+    UserRepresentation addRoleToUser(String userId, String roleName);
+    UserRepresentation addRealmRoleToUser(String userId, String roleName);
 }

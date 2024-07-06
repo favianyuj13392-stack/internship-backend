@@ -79,7 +79,7 @@ public class UsuariosBL {
         if(roles != null){
             List<String> rolesList = new ArrayList<>();
             rolesList.add(roles.getRol());
-            keycloakService.updateUserRoles(usuariosDto.getKc_UUID(), rolesList);
+            keycloakService.addRealmRoleToUser(usuariosDto.getKc_UUID(),rolesList.get(0) );
         }
         Date date = new Date(System.currentTimeMillis());
         usuariosDto.setFechaRegistro(date);
@@ -99,7 +99,7 @@ public class UsuariosBL {
         if(roles != null){
             List<String> rolesList = new ArrayList<>();
             rolesList.add(roles.getRol());
-            keycloakService.updateUserRoles(usuariosDto.getKc_UUID(), rolesList);
+            keycloakService.addRealmRoleToUser(usuariosDto.getKc_UUID(),rolesList.get(0) );
         }
         Date date = new Date(System.currentTimeMillis());
         usuariosDto.setFechaRegistro(date);
@@ -195,12 +195,20 @@ public class UsuariosBL {
             }
             institucionesDto = InstitucionesDto.fromEntity(instituciones);
             usuarioRegistroCompletoDto.setInstitucion(institucionesDto);
+
             //Agregar UsuarioInstitucion
             UsuariosInstitucionesDto usuariosInstitucionesDto = agregarUsuarioInstitucion(usuarioRegistroCompletoDto.getKc_UUID(),
                     usuarioRegistroCompletoDto.getInstitucion().getIdInstituciones(),
                     usuarioRegistroCompletoDto.getCargo()
             );
+           
+
             usuarioRegistroCompletoDto.setCargo(usuariosInstitucionesDto.getCargo());
+
+           
+
+
+
             return usuarioRegistroCompletoDto;
         }catch (Exception e){
             logger.error("Error al agregar usuario completo institucion",e);

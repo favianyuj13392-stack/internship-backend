@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ucb.edu.bo.internship.internship_backend.bl.PasantiaBl;
 import ucb.edu.bo.internship.internship_backend.dto.PasantiasConInstitucionYCarrerasDto;
+import ucb.edu.bo.internship.internship_backend.dto.PasantiasConInstitucionYCarrerasDtoYActivo;
 import ucb.edu.bo.internship.internship_backend.dto.PasantiasDto;
 import ucb.edu.bo.internship.internship_backend.dto.ResponseDto;
 
@@ -52,11 +53,11 @@ public class PasantiaApi {
     }
 
     @GetMapping("/institucion/usuario/{uuid}")
-    public ResponseDto<List<PasantiasConInstitucionYCarrerasDto>> obtenerPasantiasPorUsuario(
+    public ResponseDto<List<PasantiasConInstitucionYCarrerasDtoYActivo>> obtenerPasantiasPorUsuario(
             @PathVariable String uuid
     ){
-        ResponseDto<List<PasantiasConInstitucionYCarrerasDto>> response = new ResponseDto<>();
-        List<PasantiasConInstitucionYCarrerasDto> pasantias;
+        ResponseDto<List<PasantiasConInstitucionYCarrerasDtoYActivo>> response = new ResponseDto<>();
+        List<PasantiasConInstitucionYCarrerasDtoYActivo> pasantias;
         try {
             pasantias = pasantiaBl.obtenerPasantiasPorUsuarioInstitucion(uuid);
             response.setCode("200");

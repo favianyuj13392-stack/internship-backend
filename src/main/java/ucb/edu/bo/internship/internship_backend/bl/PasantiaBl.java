@@ -84,10 +84,39 @@ public class PasantiaBl {
         pasantiasDto.setBeneficios(beneficios);
         pasantiasDto.setFunciones(funciones);
         pasantiasDto.setRequisitos(requisitos);
+
         InstitucionesDto institucionesDto = InstitucionesDto.fromEntity(pasantias1.getInstitucionesIdinstituciones());
         List<CarrerasDto> carrerasDto = pasantiasCarrerasDao.findAllByPasantiasIdpasantias(pasantias1).stream().map(pasantiasCarreras -> CarrerasDto.fromEntity(pasantiasCarreras.getCarrerasIdcarreras())).toList();
         return new PasantiasConInstitucionYCarrerasDto(pasantiasDto, institucionesDto, carrerasDto);
     }
+
+    private PasantiasConInstitucionYCarrerasDtoYActivo toPasantiasConInstitucionYCarrerasDtoYActivo(Pasantias pasantias1) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode areas, beneficios, funciones, requisitos;
+        try{
+            Object areasJson, beneficiosJson, funcionesJson, requisitosJson;
+            areasJson = pasantias1.getAreas();
+            beneficiosJson = pasantias1.getBeneficios();
+            funcionesJson = pasantias1.getFunciones();
+            requisitosJson = pasantias1.getRequisitos();
+            areas = objectMapper.readTree(areasJson.toString());
+            beneficios = objectMapper.readTree(beneficiosJson.toString());
+            funciones = objectMapper.readTree(funcionesJson.toString());
+            requisitos = objectMapper.readTree(requisitosJson.toString());
+        } catch (Exception e) {
+            throw new RuntimeException("Error al convertir areas a objeto:" + e);
+        }
+        PasantiasDto pasantiasDto = PasantiasDto.fromEntity(pasantias1);
+        pasantiasDto.setAreas(areas);
+        pasantiasDto.setBeneficios(beneficios);
+        pasantiasDto.setFunciones(funciones);
+        pasantiasDto.setRequisitos(requisitos);
+
+        InstitucionesDto institucionesDto = InstitucionesDto.fromEntity(pasantias1.getInstitucionesIdinstituciones());
+        List<CarrerasDto> carrerasDto = pasantiasCarrerasDao.findAllByPasantiasIdpasantias(pasantias1).stream().map(pasantiasCarreras -> CarrerasDto.fromEntity(pasantiasCarreras.getCarrerasIdcarreras())).toList();
+        return new PasantiasConInstitucionYCarrerasDtoYActivo(pasantiasDto, institucionesDto, carrerasDto, pasantias1.getActivo());
+    }
+
 
     public Page<PasantiaConNombreYLogoEmpresaDto> obtenerPasantias(Integer page, Integer size, String search, String sort, String active) {
         try {
@@ -117,9 +146,9 @@ public class PasantiaBl {
         return pasantiasDao.countAllByInstitucionesIdinstituciones(idInstituciones);
     }
 
-    public List<PasantiasConInstitucionYCarrerasDto> obtenerPasantiasPorUsuarioInstitucion(String uuid) {
+    public List<PasantiasConInstitucionYCarrerasDtoYActivo> obtenerPasantiasPorUsuarioInstitucion(String uuid) {
         List<Pasantias> pasantias = pasantiasDao.findPasantiasByInstitucionesIdinstitucionesUsuarioUUID(uuid);
         
-        return pasantias.stream().map(this::toPasantiasConInstitucionYCarrerasDto).toList();
+        return pasantias.stream().map(this::toPasantiasConInstitucionYCarrerasDtoYActivo).toList();
     }
 }

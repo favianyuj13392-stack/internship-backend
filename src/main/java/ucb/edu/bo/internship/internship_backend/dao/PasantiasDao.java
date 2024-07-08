@@ -92,17 +92,9 @@ Long countAllByInstitucionesIdinstituciones(Integer idInstituciones);
 FROM
 	pasantias
 	INNER JOIN
-	instituciones
-	ON 
-		pasantias.instituciones_idinstituciones = instituciones.idinstituciones
-	INNER JOIN
-	usuariosinstituciones
-	ON 
-		instituciones.idinstituciones = usuariosinstituciones.instituciones_idinstituciones
-	INNER JOIN
 	usuarios
 	ON 
-		usuariosinstituciones.usuarios_idusuarios = usuarios.idusuarios
+		pasantias.usuarios_idusuarios = usuarios.idusuarios
 WHERE
 	usuarios.kc_uuid = :uuid
     ORDER BY pasantias.idpasantias DESC

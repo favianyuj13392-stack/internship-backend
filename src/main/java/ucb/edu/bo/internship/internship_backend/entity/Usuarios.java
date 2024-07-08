@@ -81,6 +81,10 @@ public class Usuarios implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "usuariosIdusuarios", fetch = FetchType.LAZY)
     private List<Curriculums> curriculumsList;
 
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "usuariosIdusuarios", fetch = FetchType.LAZY)
+    private List<Pasantias> pasantiasList;
+
     public Usuarios() {
     }
 
@@ -201,6 +205,14 @@ public class Usuarios implements Serializable {
 
     public void setCurriculumsList(List<Curriculums> curriculumsList) {
         this.curriculumsList = curriculumsList;
+    }
+
+    public List<Pasantias> getPasantiasList() {
+        return pasantiasList;
+    }
+
+    public void setPasantiasList(List<Pasantias> pasantiasList) {
+        this.pasantiasList = pasantiasList;
     }
 
     @Override

@@ -84,11 +84,23 @@ public class Pasantias implements Serializable {
     private boolean activo;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "pasantiasIdpasantias", fetch = FetchType.LAZY)
     private List<Aplicacionespasantias> aplicacionespasantiasList;
+
+
+
     @JoinColumn(name = "instituciones_idinstituciones", referencedColumnName = "idinstituciones")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Instituciones institucionesIdinstituciones;
+
+    @JoinColumn(name = "usuarios_idusuarios", referencedColumnName = "idusuarios")
+    @ManyToOne(optional = true,fetch = FetchType.LAZY)
+    private Usuarios usuariosIdusuarios;
+
+
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "pasantiasIdpasantias", fetch = FetchType.LAZY)
     private List<Pasantiascarreras> pasantiascarrerasList;
+
+
 
     public Pasantias() {
     }
@@ -112,6 +124,14 @@ public class Pasantias implements Serializable {
 
     public Integer getIdpasantias() {
         return idpasantias;
+    }
+
+    public Usuarios getUsuariosIdusuarios() {
+        return usuariosIdusuarios;
+    }
+
+    public void setUsuariosIdusuarios(Usuarios usuariosIdusuarios) {
+        this.usuariosIdusuarios = usuariosIdusuarios;
     }
 
     public void setIdpasantias(Integer idpasantias) {

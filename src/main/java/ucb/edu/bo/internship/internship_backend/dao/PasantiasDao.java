@@ -84,4 +84,21 @@ public interface PasantiasDao extends JpaRepository<Pasantias, Integer>{
     @Query("SELECT COUNT(p) FROM Pasantias p WHERE p.institucionesIdinstituciones.idinstituciones = ?1")
 Long countAllByInstitucionesIdinstituciones(Integer idInstituciones);
 
+
+//obtener las pasantias que conecten con el usuario institucion y el campo uuid de la tabla usuario hazlo query nativo
+@Query(value = """
+    SELECT
+	pasantias.*
+FROM
+	pasantias
+	INNER JOIN
+	usuarios
+	ON 
+		pasantias.usuarios_idusuarios = usuarios.idusuarios
+WHERE
+	usuarios.kc_uuid = :uuid
+    ORDER BY pasantias.idpasantias DESC
+""", nativeQuery = true)
+List<Pasantias> findPasantiasByInstitucionesIdinstitucionesUsuarioUUID(String uuid);
+
 }

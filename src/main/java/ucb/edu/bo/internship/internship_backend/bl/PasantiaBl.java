@@ -195,6 +195,13 @@ public class PasantiaBl {
             if(!Objects.equals(institucionUsuario.getIdinstituciones(), institucionPasantia.getIdinstituciones())) throw new RuntimeException("No tiene permisos para ver esta pasantía");
             //Obtener todos los datos de la pasantia
             PasantiasDto pasantiasDto = PasantiasDto.fromEntity(pasantia);
+
+            pasantiasDto.setAreas(new ObjectMapper().readTree(pasantia.getAreas().toString()));
+            pasantiasDto.setBeneficios(new ObjectMapper().readTree(pasantia.getBeneficios().toString()));
+            pasantiasDto.setFunciones(new ObjectMapper().readTree(pasantia.getFunciones().toString()));
+            pasantiasDto.setRequisitos(new ObjectMapper().readTree(pasantia.getRequisitos().toString()));
+            
+
             //Obtener los postulantes
             List<Aplicacionespasantias> aplicacionespasantias = pasantia.getAplicacionespasantiasList();
             List<UsuarioCompletoDto> usuarioCompletoDtos = new ArrayList<>();

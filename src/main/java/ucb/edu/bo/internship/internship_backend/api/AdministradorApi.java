@@ -43,17 +43,6 @@ public class AdministradorApi {
     public ResponseEntity<ResponseDto<InstitucionConPasantiasDto>> getInstitucionById(@PathVariable String uuid,@PathVariable Integer id) {
         return handleRequest(() -> institucionBl.obtenerInstitucionById(id));
     }
-    @GetMapping("/pasantia")
-    public ResponseEntity<ResponseDto<Page<PasantiaConNombreYLogoEmpresaDto>>> getPasantias(
-            @PathVariable String uuid,
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "12") Integer size,
-            @RequestParam(defaultValue = "", required = false) String search,
-            @RequestParam(defaultValue = "idpasantias", required = false) String sort,
-            @RequestParam(defaultValue = "", required = false) String active
-    ) {
-        return handleRequest(() -> pasantiaBl.obtenerPasantias(page, size, search, sort,active));
-    }
     @PutMapping("/instituciones/{idInstituciones}/estado")
     public ResponseEntity<ResponseDto<InstitucionesDto>> cambiarEstadoInstitucion(@PathVariable Integer idInstituciones, @RequestBody ChangeEstadoDto estado, @PathVariable String uuid){
         return handleRequest(() -> administradorBl.cambiarEstadoInstitucion(idInstituciones, estado.getEstado()));
@@ -83,22 +72,49 @@ public class AdministradorApi {
     ) {
         return handleRequest(() -> administradorBl.obtenerUsuariosInstitucion(idInstituciones));
     }
-    @PutMapping("/instituciones/{idInstituciones}/usuarios/{idUsuarios}/aceptar")
+    @PutMapping("/instituciones/{idInstituciones}/solicitud/{idsolicitud}/usuarios/{idUsuarios}/aceptar")
     public ResponseEntity<ResponseDto<UsuarioConCorreoYNombreCompletoYFotoDto>> relacionarUsuarioInstitucion(
             @PathVariable String uuid,
             @PathVariable Integer idInstituciones,
+            @PathVariable Integer idsolicitud,
             @PathVariable Integer idUsuarios
     ) {
-        return handleRequest(() -> administradorBl.relacionarUsuarioInstitucion(idInstituciones, idUsuarios, true));
+        return handleRequest(() -> administradorBl.relacionarUsuarioInstitucion(idInstituciones, idsolicitud, idUsuarios, true));
     }
-    @DeleteMapping("/instituciones/{idInstituciones}/usuarios/{idUsuarios}/aceptar")
+    @DeleteMapping("/instituciones/{idInstituciones}/solicitud/{idsolicitud}/usuarios/{idUsuarios}/aceptar")
     public ResponseEntity<ResponseDto<UsuarioConCorreoYNombreCompletoYFotoDto>> desrelacionarUsuarioInstitucion(
             @PathVariable String uuid,
             @PathVariable Integer idInstituciones,
+            @PathVariable Integer idsolicitud,
             @PathVariable Integer idUsuarios
     ) {
-        return handleRequest(() -> administradorBl.relacionarUsuarioInstitucion(idInstituciones, idUsuarios, false));
+        return handleRequest(() -> administradorBl.relacionarUsuarioInstitucion(idInstituciones,idsolicitud, idUsuarios, false));
     }
+
+
+
+    @GetMapping("/pasantia")
+    public ResponseEntity<ResponseDto<Page<PasantiaConNombreYLogoEmpresaDto>>> getPasantias(
+            @PathVariable String uuid,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "12") Integer size,
+            @RequestParam(defaultValue = "", required = false) String search,
+            @RequestParam(defaultValue = "idpasantias", required = false) String sort,
+            @RequestParam(defaultValue = "", required = false) String active
+    ) {
+        return handleRequest(() -> pasantiaBl.obtenerPasantias(page, size, search, sort,active));
+    }
+    @GetMapping("/pasantia/{idPasantia}")
+    public ResponseEntity<ResponseDto<PasantiaConEmpresaYPostulantes>> getPasantia(
+            @PathVariable String uuid,
+            @PathVariable Integer idPasantia
+    ) {
+        return handleRequest(() -> pasantiaBl.obtenerPasantia(idPasantia));
+    }
+
+
+
+
     @PutMapping("/pasantia/{idPasantias}/aceptar")
     public ResponseEntity<ResponseDto<PasantiasDto>> aceptarPasantia(
             @PathVariable String uuid,

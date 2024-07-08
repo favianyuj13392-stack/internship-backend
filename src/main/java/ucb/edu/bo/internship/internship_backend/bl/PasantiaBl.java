@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import ucb.edu.bo.internship.internship_backend.dao.PasantiasCarrerasDao;
 import ucb.edu.bo.internship.internship_backend.dao.PasantiasDao;
 import ucb.edu.bo.internship.internship_backend.dto.*;
+import ucb.edu.bo.internship.internship_backend.entity.Aplicacionespasantias;
 import ucb.edu.bo.internship.internship_backend.entity.Pasantias;
 
 import java.util.ArrayList;
@@ -150,5 +151,28 @@ public class PasantiaBl {
         List<Pasantias> pasantias = pasantiasDao.findPasantiasByInstitucionesIdinstitucionesUsuarioUUID(uuid);
         
         return pasantias.stream().map(this::toPasantiasConInstitucionYCarrerasDtoYActivo).toList();
+    }
+
+    public PasantiaConEmpresaYPostulantes obtenerPasantia(Integer idPasantia) {
+        try{
+            Pasantias pasantias = pasantiasDao.findById(idPasantia).orElse(null);
+            if(pasantias == null){
+                throw new RuntimeException("Pasantia no encontrada");
+            }
+            PasantiasDto pasantiasDto = PasantiasDto.fromEntity(pasantias);
+            Boolean estadoPasantia = pasantias.getActivo();
+            List<Aplicacionespasantias> aplicacionespasantias = pasantias.getAplicacionespasantiasList();
+            //Obtener las personas postulantes
+            List<PersonasDto> personasDto = new ArrayList<>();
+            List<AplicacionPasantiasDto> aplicacionPasantiasDto = new ArrayList<>();
+            for (Aplicacionespasantias aplicacionespasantias1 : aplicacionespasantias) {
+                aplicacionPasantiasDto.add(AplicacionPasantiasDto.fromEntity(aplicacionespasantias1));
+                personasDto.add(PersonasDto.fromEntity(aplicacionespasantias1.getUsuariosIdusuarios().getPersonasIdpersonas()));
+            }
+            InstitucionesDto institucionesDto = InstitucionesDto.fromEntity(pasantias.getInstitucionesIdinstituciones());
+            return new PasantiaConEmpresaYPostulantes(pasantiasDto,estadoPasantia,personasDto,institucionesDto,aplicacionPasantiasDto);
+        }catch (Exception e){
+            throw new RuntimeException("Error al obtener la pasantia",e);
+        }
     }
 }

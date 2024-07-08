@@ -1,6 +1,8 @@
 package ucb.edu.bo.internship.internship_backend.dto;
 
-import java.sql.Date;
+import ucb.edu.bo.internship.internship_backend.entity.Aplicacionespasantias;
+
+import java.util.Date;
 
 public class AplicacionPasantiasDto {
     private Integer idAplicacionPasantias;
@@ -52,6 +54,15 @@ public class AplicacionPasantiasDto {
 
     public void setFechaAplicacion(Date fechaAplicacion) {
         this.fechaAplicacion = fechaAplicacion;
+    }
+
+    public static AplicacionPasantiasDto fromEntity(Aplicacionespasantias aplicacionespasantias){
+        return new AplicacionPasantiasDto(
+            aplicacionespasantias.getIdaplicacionpasantias(),
+            aplicacionespasantias.getUsuariosIdusuarios().getIdusuarios(),
+            aplicacionespasantias.getPasantiasIdpasantias().getIdpasantias(),
+            aplicacionespasantias.getFechaaplicacion()
+        );
     }
 
     @Override

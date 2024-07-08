@@ -1,5 +1,6 @@
 package ucb.edu.bo.internship.internship_backend.bl;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import ucb.edu.bo.internship.internship_backend.dao.*;
 import ucb.edu.bo.internship.internship_backend.dto.*;
@@ -56,39 +57,32 @@ public class AdministradorBl {
             throw new InstitucionServiceExcepcion("Error al obtener los usuarios de la institucion", e);
         }
     }
-
-    public UsuarioConCorreoYNombreCompletoYFotoDto relacionarUsuarioInstitucion(Integer idInstituciones, Integer idUsuarios, Boolean estado) {
+    @Transactional
+    public UsuarioConCorreoYNombreCompletoYFotoDto relacionarUsuarioInstitucion(Integer idInstituciones, Integer idUsuariosInstituciones, Integer idUsuarios, Boolean estado) {
         try {
-            Instituciones instituciones = institucionesDao.findById(idInstituciones).orElse(null);
-            if (instituciones != null) {
-                Usuariosinstituciones usuariosInstituciones = usuariosInstitucionesDao.findByIdInstitucionesAndIdUsuarios(idInstituciones, idUsuarios).orElse(null);
-                if (usuariosInstituciones != null) {
-                    if(usuariosInstituciones.getActivo()){
-                        throw new UsuarioYaRelacionadoException("El usuario ya esta relacionado con la institucion");
-                    }
-                    if(!estado){
-                        //Borrar la relacion y los datos asociados
-                        Usuarios usuarios = usuariosInstituciones.getUsuariosIdusuarios();
-                        Personas personas = usuarios.getPersonasIdpersonas();
-                        Instituciones instituciones1 = usuariosInstituciones.getInstitucionesIdinstituciones();
-                        usuariosInstitucionesDao.delete(usuariosInstituciones);
-                        institucionesDao.delete(instituciones1);
-                        usuariosDao.delete(usuarios);
-                        personasDao.delete(personas);
-                        return new UsuarioConCorreoYNombreCompletoYFotoDto();
-                    }
-                    //Aceptar la relacion
-                    usuariosInstituciones.getUsuariosIdusuarios().setActivo(true);
-                    usuariosInstituciones.getInstitucionesIdinstituciones().setActivo(true);
-                    usuariosInstituciones.setActivo(true);
-                    usuariosInstituciones = usuariosInstitucionesDao.save(usuariosInstituciones);
-                    return new UsuarioConCorreoYNombreCompletoYFotoDto(usuariosInstituciones);
-                }else{
-                    throw new InstitucionNotFoundException("No se encontro la relacion entre el usuario y la institucion");
-                }
-            }else{
-                throw new InstitucionNotFoundException("Institucion no encontrada");
+            Usuariosinstituciones usuariosInstituciones = usuariosInstitucionesDao.findById(idUsuariosInstituciones).orElse(null);
+            if(usuariosInstituciones == null){
+                throw new InstitucionNotFoundException("No se encontro la relacion entre el usuario y la institucion");
             }
+            if(!estado){
+                //Borrar la relacion y los datos asociados
+                Usuarios usuarios = usuariosInstituciones.getUsuariosIdusuarios();
+                Personas personas = usuarios.getPersonasIdpersonas();
+                Instituciones instituciones = usuariosInstituciones.getInstitucionesIdinstituciones();
+                usuariosInstitucionesDao.delete(usuariosInstituciones);
+                if(instituciones.getActivo()){
+                    institucionesDao.delete(instituciones);
+                }
+                usuariosDao.delete(usuarios);
+                personasDao.delete(personas);
+                return new UsuarioConCorreoYNombreCompletoYFotoDto();
+            }
+            //Aceptar la relacion
+            usuariosInstituciones.getUsuariosIdusuarios().setActivo(true);
+            usuariosInstituciones.getInstitucionesIdinstituciones().setActivo(true);
+            usuariosInstituciones.setActivo(true);
+            usuariosInstituciones = usuariosInstitucionesDao.save(usuariosInstituciones);
+            return new UsuarioConCorreoYNombreCompletoYFotoDto(usuariosInstituciones);
         }catch (InstitucionNotFoundException | UsuarioYaRelacionadoException e){
             throw e;
         }catch (Exception e){

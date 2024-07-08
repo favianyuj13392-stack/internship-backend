@@ -70,7 +70,7 @@ public class AdministradorBl {
                 Personas personas = usuarios.getPersonasIdpersonas();
                 Instituciones instituciones = usuariosInstituciones.getInstitucionesIdinstituciones();
                 usuariosInstitucionesDao.delete(usuariosInstituciones);
-                if(instituciones.getActivo()){
+                if(!instituciones.getActivo()){
                     institucionesDao.delete(instituciones);
                 }
                 usuariosDao.delete(usuarios);

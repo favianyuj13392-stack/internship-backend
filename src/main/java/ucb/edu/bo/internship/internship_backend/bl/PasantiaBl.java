@@ -116,4 +116,10 @@ public class PasantiaBl {
     public Long obtenerCantidadPasantiasPorInstitucion(Integer idInstituciones) {
         return pasantiasDao.countAllByInstitucionesIdinstituciones(idInstituciones);
     }
+
+    public List<PasantiasConInstitucionYCarrerasDto> obtenerPasantiasPorUsuarioInstitucion(String uuid) {
+        List<Pasantias> pasantias = pasantiasDao.findPasantiasByInstitucionesIdinstitucionesUsuarioUUID(uuid);
+        
+        return pasantias.stream().map(this::toPasantiasConInstitucionYCarrerasDto).toList();
+    }
 }

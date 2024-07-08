@@ -51,6 +51,27 @@ public class PasantiaApi {
         }
     }
 
+    @GetMapping("/institucion/usuario/{uuid}")
+    public ResponseDto<List<PasantiasConInstitucionYCarrerasDto>> obtenerPasantiasPorUsuario(
+            @PathVariable String uuid
+    ){
+        ResponseDto<List<PasantiasConInstitucionYCarrerasDto>> response = new ResponseDto<>();
+        List<PasantiasConInstitucionYCarrerasDto> pasantias;
+        try {
+            pasantias = pasantiaBl.obtenerPasantiasPorUsuarioInstitucion(uuid);
+            response.setCode("200");
+            response.setResponse(pasantias);
+            response.setErrorMessage(null);
+            return response;
+        }catch (Exception e){
+            response.setCode("500");
+            response.setResponse(null);
+            response.setErrorMessage(e.getMessage());
+            return response;
+        }
+    }
+
+
     @GetMapping("/{id}")
     public ResponseDto<PasantiasDto> obtenerPasantiaPorId(
             @PathVariable Integer id

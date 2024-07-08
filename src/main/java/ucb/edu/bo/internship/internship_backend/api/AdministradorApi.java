@@ -58,6 +58,24 @@ public class AdministradorApi {
     public ResponseEntity<ResponseDto<InstitucionesDto>> cambiarEstadoInstitucion(@PathVariable Integer idInstituciones, @RequestBody ChangeEstadoDto estado, @PathVariable String uuid){
         return handleRequest(() -> administradorBl.cambiarEstadoInstitucion(idInstituciones, estado.getEstado()));
     }
+    //Obtener todas las solicitudes de suscripción a instituciones
+    @GetMapping("/instituciones/usuarios/solicitudes")
+    public ResponseEntity<ResponseDto<List<UsuarioConCorreoYNombreCompletoYFotoDto>>> getUsuarios(
+            @PathVariable String uuid,
+            @RequestParam(defaultValue = "", required = false) String search
+    ) {
+        return handleRequest(() -> administradorBl.obtenerSuscripcionAInstituciones(search));
+    }
+    //Obtener toda la informacion de una solicitud
+    @GetMapping("/institucion/{idInstitucion}/solicitud/{idSolicitud}/usuario/{idUsuario}")
+    public ResponseEntity<ResponseDto<SolicitudIndormacionDto>> getUsuario(
+            @PathVariable String uuid,
+            @PathVariable Integer idInstitucion,
+            @PathVariable Integer idSolicitud,
+            @PathVariable Integer idUsuario
+    ) {
+        return handleRequest(() -> administradorBl.obtenerTodaLaInformacionDeSolicitud(idInstitucion, idSolicitud, idUsuario));
+    }
     @GetMapping("/instituciones/{idInstituciones}/usuarios")
     public ResponseEntity<ResponseDto<List<UsuarioConCorreoYNombreCompletoYFotoDto>>> getUsuariosInstitucion(
             @PathVariable String uuid,

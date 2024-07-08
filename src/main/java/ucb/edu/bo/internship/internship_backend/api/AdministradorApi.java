@@ -43,6 +43,56 @@ public class AdministradorApi {
     public ResponseEntity<ResponseDto<InstitucionConPasantiasDto>> getInstitucionById(@PathVariable String uuid,@PathVariable Integer id) {
         return handleRequest(() -> institucionBl.obtenerInstitucionById(id));
     }
+    @PutMapping("/instituciones/{idInstituciones}/estado")
+    public ResponseEntity<ResponseDto<InstitucionesDto>> cambiarEstadoInstitucion(@PathVariable Integer idInstituciones, @RequestBody ChangeEstadoDto estado, @PathVariable String uuid){
+        return handleRequest(() -> administradorBl.cambiarEstadoInstitucion(idInstituciones, estado.getEstado()));
+    }
+    //Obtener todas las solicitudes de suscripción a instituciones
+    @GetMapping("/instituciones/usuarios/solicitudes")
+    public ResponseEntity<ResponseDto<List<UsuarioConCorreoYNombreCompletoYFotoDto>>> getUsuarios(
+            @PathVariable String uuid,
+            @RequestParam(defaultValue = "", required = false) String search
+    ) {
+        return handleRequest(() -> administradorBl.obtenerSuscripcionAInstituciones(search));
+    }
+    //Obtener toda la informacion de una solicitud
+    @GetMapping("/institucion/{idInstitucion}/solicitud/{idSolicitud}/usuario/{idUsuario}")
+    public ResponseEntity<ResponseDto<SolicitudIndormacionDto>> getUsuario(
+            @PathVariable String uuid,
+            @PathVariable Integer idInstitucion,
+            @PathVariable Integer idSolicitud,
+            @PathVariable Integer idUsuario
+    ) {
+        return handleRequest(() -> administradorBl.obtenerTodaLaInformacionDeSolicitud(idInstitucion, idSolicitud, idUsuario));
+    }
+    @GetMapping("/instituciones/{idInstituciones}/usuarios")
+    public ResponseEntity<ResponseDto<List<UsuarioConCorreoYNombreCompletoYFotoDto>>> getUsuariosInstitucion(
+            @PathVariable String uuid,
+            @PathVariable Integer idInstituciones
+    ) {
+        return handleRequest(() -> administradorBl.obtenerUsuariosInstitucion(idInstituciones));
+    }
+    @PutMapping("/instituciones/{idInstituciones}/solicitud/{idsolicitud}/usuarios/{idUsuarios}/aceptar")
+    public ResponseEntity<ResponseDto<UsuarioConCorreoYNombreCompletoYFotoDto>> relacionarUsuarioInstitucion(
+            @PathVariable String uuid,
+            @PathVariable Integer idInstituciones,
+            @PathVariable Integer idsolicitud,
+            @PathVariable Integer idUsuarios
+    ) {
+        return handleRequest(() -> administradorBl.relacionarUsuarioInstitucion(idInstituciones, idsolicitud, idUsuarios, true));
+    }
+    @DeleteMapping("/instituciones/{idInstituciones}/solicitud/{idsolicitud}/usuarios/{idUsuarios}/aceptar")
+    public ResponseEntity<ResponseDto<UsuarioConCorreoYNombreCompletoYFotoDto>> desrelacionarUsuarioInstitucion(
+            @PathVariable String uuid,
+            @PathVariable Integer idInstituciones,
+            @PathVariable Integer idsolicitud,
+            @PathVariable Integer idUsuarios
+    ) {
+        return handleRequest(() -> administradorBl.relacionarUsuarioInstitucion(idInstituciones,idsolicitud, idUsuarios, false));
+    }
+
+
+
     @GetMapping("/pasantia")
     public ResponseEntity<ResponseDto<Page<PasantiaConNombreYLogoEmpresaDto>>> getPasantias(
             @PathVariable String uuid,
@@ -54,33 +104,17 @@ public class AdministradorApi {
     ) {
         return handleRequest(() -> pasantiaBl.obtenerPasantias(page, size, search, sort,active));
     }
-    @PutMapping("/instituciones/{idInstituciones}/estado")
-    public ResponseEntity<ResponseDto<InstitucionesDto>> cambiarEstadoInstitucion(@PathVariable Integer idInstituciones, @RequestBody ChangeEstadoDto estado, @PathVariable String uuid){
-        return handleRequest(() -> administradorBl.cambiarEstadoInstitucion(idInstituciones, estado.getEstado()));
-    }
-    @GetMapping("/instituciones/{idInstituciones}/usuarios")
-    public ResponseEntity<ResponseDto<List<UsuarioConCorreoYNombreCompletoYFotoDto>>> getUsuariosInstitucion(
+    @GetMapping("/pasantia/{idPasantia}")
+    public ResponseEntity<ResponseDto<PasantiaConEmpresaYPostulantes>> getPasantia(
             @PathVariable String uuid,
-            @PathVariable Integer idInstituciones
+            @PathVariable Integer idPasantia
     ) {
-        return handleRequest(() -> administradorBl.obtenerUsuariosInstitucion(idInstituciones));
+        return handleRequest(() -> pasantiaBl.obtenerPasantia(idPasantia));
     }
-    @PutMapping("/instituciones/{idInstituciones}/usuarios/{idUsuarios}/aceptar")
-    public ResponseEntity<ResponseDto<UsuarioConCorreoYNombreCompletoYFotoDto>> relacionarUsuarioInstitucion(
-            @PathVariable String uuid,
-            @PathVariable Integer idInstituciones,
-            @PathVariable Integer idUsuarios
-    ) {
-        return handleRequest(() -> administradorBl.relacionarUsuarioInstitucion(idInstituciones, idUsuarios, true));
-    }
-    @DeleteMapping("/instituciones/{idInstituciones}/usuarios/{idUsuarios}/aceptar")
-    public ResponseEntity<ResponseDto<UsuarioConCorreoYNombreCompletoYFotoDto>> desrelacionarUsuarioInstitucion(
-            @PathVariable String uuid,
-            @PathVariable Integer idInstituciones,
-            @PathVariable Integer idUsuarios
-    ) {
-        return handleRequest(() -> administradorBl.relacionarUsuarioInstitucion(idInstituciones, idUsuarios, false));
-    }
+
+
+
+
     @PutMapping("/pasantia/{idPasantias}/aceptar")
     public ResponseEntity<ResponseDto<PasantiasDto>> aceptarPasantia(
             @PathVariable String uuid,

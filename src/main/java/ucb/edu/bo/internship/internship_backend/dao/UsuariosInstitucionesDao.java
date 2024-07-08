@@ -7,6 +7,8 @@ import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
 import ucb.edu.bo.internship.internship_backend.entity.Usuarios;
 import ucb.edu.bo.internship.internship_backend.entity.Usuariosinstituciones;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public interface UsuariosInstitucionesDao extends JpaRepository<Usuariosinstituciones, Integer>{
@@ -20,4 +22,8 @@ public interface UsuariosInstitucionesDao extends JpaRepository<Usuariosinstituc
    
    
     Usuariosinstituciones findByUsuariosIdusuarios(Usuarios usuario);
+    //Obtener todas las solicitudes con activo igual a false
+    List<Usuariosinstituciones> findByActivoFalse();
+    //Obtener todas las instituciones
+    List<Usuariosinstituciones> findByInstitucionesIdinstitucionesNombreContainsAndActivoFalse(String nombreInstitucion);
 }

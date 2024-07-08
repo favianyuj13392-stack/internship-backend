@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ucb.edu.bo.internship.internship_backend.bl.InstitucionBl;
 
+import ucb.edu.bo.internship.internship_backend.bl.PasantiaBl;
 import ucb.edu.bo.internship.internship_backend.bl.UsuariosBL;
 import ucb.edu.bo.internship.internship_backend.dto.*;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionNotFoundException;
@@ -20,9 +21,11 @@ import java.util.function.Supplier;
 public class UsuarioApi {
     private final InstitucionBl institucionBl;
     private final UsuariosBL usuariosBL;
-    public UsuarioApi(InstitucionBl institucionBl, UsuariosBL usuariosBL) {
+    private final PasantiaBl pasantiaBl;
+    public UsuarioApi(InstitucionBl institucionBl, UsuariosBL usuariosBL,PasantiaBl pasantiaBl) {
         this.institucionBl = institucionBl;
         this.usuariosBL = usuariosBL;
+        this.pasantiaBl = pasantiaBl;
     }
 
     @GetMapping("/{uuid}/existencia")
@@ -246,5 +249,20 @@ public class UsuarioApi {
         }
         return response;
     }
-
+    @GetMapping("{uuid}/pasantia/{idPasantia}/detalle")
+    public ResponseDto<PasantiaConPostulantesDto> obtenerPasantiaDetalle(
+            @PathVariable String uuid,
+            @PathVariable Integer idPasantia
+    ){
+        ResponseDto<PasantiaConPostulantesDto> response = new ResponseDto<>();
+        try{
+            response.setResponse(pasantiaBl.obtenerPasantiaDetalle(uuid, idPasantia));
+            response.setCode("200");
+            response.setErrorMessage("");
+        }catch (Exception e){
+            response.setCode("500");
+            response.setErrorMessage(e.getMessage());
+        }
+        return response;
+    }
 }

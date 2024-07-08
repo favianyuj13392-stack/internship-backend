@@ -165,6 +165,10 @@ public class PasantiaBl {
                 throw new RuntimeException("Pasantia no encontrada");
             }
             PasantiasDto pasantiasDto = PasantiasDto.fromEntity(pasantias);
+            pasantiasDto.setAreas(new ObjectMapper().readTree(pasantias.getAreas().toString()));
+            pasantiasDto.setBeneficios(new ObjectMapper().readTree(pasantias.getBeneficios().toString()));
+            pasantiasDto.setFunciones(new ObjectMapper().readTree(pasantias.getFunciones().toString()));
+            pasantiasDto.setRequisitos(new ObjectMapper().readTree(pasantias.getRequisitos().toString()));
             Boolean estadoPasantia = pasantias.getActivo();
             List<Aplicacionespasantias> aplicacionespasantias = pasantias.getAplicacionespasantiasList();
             //Obtener las personas postulantes
@@ -211,7 +215,7 @@ public class PasantiaBl {
                 usuarioCompletoDtos.add(usuarioCompletoDto);
             }
             InstitucionesDto institucionesDto = InstitucionesDto.fromEntity(pasantia.getInstitucionesIdinstituciones());
-            return new PasantiaConPostulantesDto(pasantiasDto,usuarioCompletoDtos,institucionesDto);
+            return new PasantiaConPostulantesDto(pasantiasDto,usuarioCompletoDtos,institucionesDto,pasantia.getActivo());
         }catch (Exception e){
             System.out.println(e);
             throw new RuntimeException("Ocurrió un error al obtener la pasantía",e);

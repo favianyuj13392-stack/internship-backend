@@ -14,9 +14,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ucb.edu.bo.internship.internship_backend.dao.PasantiasCarrerasDao;
 import ucb.edu.bo.internship.internship_backend.dao.PasantiasDao;
+import ucb.edu.bo.internship.internship_backend.dao.UsuariosDao;
 import ucb.edu.bo.internship.internship_backend.dto.*;
 import ucb.edu.bo.internship.internship_backend.entity.Aplicacionespasantias;
+import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
 import ucb.edu.bo.internship.internship_backend.entity.Pasantias;
+import ucb.edu.bo.internship.internship_backend.entity.Usuarios;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,10 +30,12 @@ import java.util.Objects;
 public class PasantiaBl {
     private final PasantiasDao pasantiasDao;
     private final PasantiasCarrerasDao pasantiasCarrerasDao;
+    private final UsuariosDao usuariosDao;
 
-    public PasantiaBl(PasantiasDao pasantiasDao, PasantiasCarrerasDao pasantiasCarrerasDao) {
+    public PasantiaBl(PasantiasDao pasantiasDao, PasantiasCarrerasDao pasantiasCarrerasDao,UsuariosDao usuariosDao) {
         this.pasantiasDao = pasantiasDao;
         this.pasantiasCarrerasDao = pasantiasCarrerasDao;
+        this.usuariosDao = usuariosDao;
     }
 
     public Page<PasantiasConInstitucionYCarrerasDto> obtenerPasantiasPorTerminoDeBusqueda(String terminoDeBusqueda, Pageable pageable){
@@ -173,6 +178,36 @@ public class PasantiaBl {
             return new PasantiaConEmpresaYPostulantes(pasantiasDto,estadoPasantia,personasDto,institucionesDto,aplicacionPasantiasDto);
         }catch (Exception e){
             throw new RuntimeException("Error al obtener la pasantia",e);
+        }
+    }
+
+    public PasantiaConPostulantesDto obtenerPasantiaDetalle(String uuid, Integer idPasantia) {
+        try{
+            //Obtener Pasantia
+            Pasantias pasantia = pasantiasDao.findById(idPasantia).orElse(null);
+            if(pasantia==null) throw new RuntimeException("No se encontro la pasantía");
+            //Obtener Usuario
+            Usuarios usuario = usuariosDao.findByKcUuid(uuid);
+            if(usuario==null) throw new RuntimeException("No se encontro el usuario");
+            //Validar que la pasantía y el usuario pertenezcan a la misma empresa
+            Instituciones institucionPasantia = pasantia.getInstitucionesIdinstituciones();
+            Instituciones institucionUsuario = usuario.getUsuariosinstitucionesList().get(0).getInstitucionesIdinstituciones();
+            if(!Objects.equals(institucionUsuario.getIdinstituciones(), institucionPasantia.getIdinstituciones())) throw new RuntimeException("No tiene permisos para ver esta pasantía");
+            //Obtener todos los datos de la pasantia
+            PasantiasDto pasantiasDto = PasantiasDto.fromEntity(pasantia);
+            //Obtener los postulantes
+            List<Aplicacionespasantias> aplicacionespasantias = pasantia.getAplicacionespasantiasList();
+            List<UsuarioCompletoDto> usuarioCompletoDtos = new ArrayList<>();
+            for (Aplicacionespasantias aplicacionespasantias1 : aplicacionespasantias) {
+                UsuarioCompletoDto usuarioCompletoDto = UsuarioCompletoDto.fromEntity(aplicacionespasantias1);
+                usuarioCompletoDto.getUsuario().setKc_UUID(null);
+                usuarioCompletoDtos.add(usuarioCompletoDto);
+            }
+            InstitucionesDto institucionesDto = InstitucionesDto.fromEntity(pasantia.getInstitucionesIdinstituciones());
+            return new PasantiaConPostulantesDto(pasantiasDto,usuarioCompletoDtos,institucionesDto);
+        }catch (Exception e){
+            System.out.println(e);
+            throw new RuntimeException("Ocurrió un error al obtener la pasantía",e);
         }
     }
 }

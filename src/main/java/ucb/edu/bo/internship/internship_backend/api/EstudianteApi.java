@@ -56,7 +56,7 @@ public class EstudianteApi {
     @PostMapping("/{uuid}/curriculum")
     public ResponseDto<Boolean> addCurriculum(
             @PathVariable String uuid,
-            MultipartFile curriculum
+            @RequestParam("file") MultipartFile curriculum
     ) {
         ResponseDto<Boolean> response = new ResponseDto<>();
         try {

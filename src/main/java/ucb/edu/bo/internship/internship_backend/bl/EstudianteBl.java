@@ -72,20 +72,26 @@ public class EstudianteBl {
     }
 
     public Boolean agregarCurriculum(String uuid, MultipartFile curriculum) {
-        Usuarios usuario = usuariosDao.findByKcUuid(uuid);
-        if(!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE")) throw new RuntimeException("El usuario no es un estudiante");
-        NewFileDto newFileDto = minioBl.uploadFile(curriculum, "internship-cv");
-        if(newFileDto == null) throw new RuntimeException("Error al subir el curriculum");
-        String filepath = minioBl.getFile("internship-cv", newFileDto.getFileName());
-        Curriculums curriculumEntity = new Curriculums();
-        curriculumEntity.setFechacargado(new Date());
-        curriculumEntity.setTitulo(curriculum.getOriginalFilename());
-        curriculumEntity.setPdfcurriculum(filepath);
-        curriculumEntity.setUsuariosIdusuarios(usuario);
+        try {
+            System.out.println("subiendo pdf");
+            Usuarios usuario = usuariosDao.findByKcUuid(uuid);
+            if(!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE")) throw new RuntimeException("El usuario no es un estudiante");
+            NewFileDto newFileDto = minioBl.uploadFile(curriculum, "internship-cv");
+            if(newFileDto == null) throw new RuntimeException("Error al subir el curriculum");
+            String filepath = minioBl.getFile("internship-cv", newFileDto.getFileName());
+            Curriculums curriculumEntity = new Curriculums();
+            curriculumEntity.setFechacargado(new Date());
+            curriculumEntity.setTitulo(curriculum.getOriginalFilename());
+            curriculumEntity.setPdfcurriculum(filepath);
+            curriculumEntity.setUsuariosIdusuarios(usuario);
 
-        curriculumsDao.save(curriculumEntity);
+            curriculumsDao.save(curriculumEntity);
 
-        return true;
+            return true;
+        }catch (Exception e){
+            System.out.println(e);
+            throw new RuntimeException("Error al subir el curriculum",e);
+        }
     }
 
     public String obtenerCurriculum(String uuid, String curriculumPdf) {

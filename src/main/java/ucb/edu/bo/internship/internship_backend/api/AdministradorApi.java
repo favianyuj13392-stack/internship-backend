@@ -55,6 +55,14 @@ public class AdministradorApi {
     ) {
         return handleRequest(() -> administradorBl.obtenerSuscripcionAInstituciones(search));
     }
+    //Obtener todas las solicitudes de suscripción a una institución
+    @GetMapping("/instituciones/{idInstitucion}/usuarios/solicitudes")
+    public ResponseEntity<ResponseDto<List<UsuarioConCorreoYNombreCompletoYFotoDto>>> getSolicitudesUsuariosByIdInstitucion(
+            @PathVariable String uuid,
+            @PathVariable Integer idInstitucion
+    ) {
+        return handleRequest(() -> administradorBl.obtenerSuscripcionAInstitucion(idInstitucion));
+    }
     //Obtener toda la informacion de una solicitud
     @GetMapping("/institucion/{idInstitucion}/solicitud/{idSolicitud}/usuario/{idUsuario}")
     public ResponseEntity<ResponseDto<SolicitudIndormacionDto>> getUsuario(
@@ -111,9 +119,6 @@ public class AdministradorApi {
     ) {
         return handleRequest(() -> pasantiaBl.obtenerPasantia(idPasantia));
     }
-
-
-
 
     @PutMapping("/pasantia/{idPasantias}/aceptar")
     public ResponseEntity<ResponseDto<PasantiasDto>> aceptarPasantia(

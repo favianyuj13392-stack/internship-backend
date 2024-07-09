@@ -162,4 +162,14 @@ public class AdministradorBl {
             throw new RuntimeException("Error al obtener la informacion de la solicitud", e);
         }
     }
+    public List<UsuarioConCorreoYNombreCompletoYFotoDto> obtenerSuscripcionAInstitucion(Integer idInstitucion) {
+        try {
+            return usuariosInstitucionesDao.findByInstitucionesIdinstitucionesIdinstitucionesAndActivoTrue(idInstitucion)
+                    .stream()
+                    .map(UsuarioConCorreoYNombreCompletoYFotoDto::new)
+                    .toList();
+        }catch (Exception e){
+            throw new RuntimeException("Error al obtener las suscripciones a la institucion",e);
+        }
+    }
 }

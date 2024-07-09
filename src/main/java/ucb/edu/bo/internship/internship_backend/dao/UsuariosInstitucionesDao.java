@@ -26,4 +26,6 @@ public interface UsuariosInstitucionesDao extends JpaRepository<Usuariosinstituc
     List<Usuariosinstituciones> findByActivoFalse();
     //Obtener todas las instituciones
     List<Usuariosinstituciones> findByInstitucionesIdinstitucionesNombreContainsAndActivoFalse(String nombreInstitucion);
+
+    List<Usuariosinstituciones> findByInstitucionesIdinstitucionesIdinstitucionesAndActivoTrue(Integer idInstitucion);
 }

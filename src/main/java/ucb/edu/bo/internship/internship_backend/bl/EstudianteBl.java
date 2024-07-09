@@ -11,6 +11,7 @@ import ucb.edu.bo.internship.internship_backend.entity.*;
 import ucb.edu.bo.internship.internship_backend.service.MinioService;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -109,4 +110,25 @@ public class EstudianteBl {
         return true;
     }
 
+    public List<CurriculumsDto> obtenerTodosLosCurriculums(String uuid) {
+        try{
+            Usuarios usuario = usuariosDao.findByKcUuid(uuid);
+            if(!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE")) throw new RuntimeException("El usuario no es un estudiante");
+            return curriculumsDao.findByUsuariosIdusuarios(usuario).stream().map(CurriculumsDto::fromEntity).toList();
+        }catch (Exception e){
+            throw new RuntimeException("Error al obtener los curriculums",e);
+        }
+    }
+    public CurriculumsDto eliminarCurriculum(String uuid, Integer curriculumId) {
+        try{
+            Usuarios usuario = usuariosDao.findByKcUuid(uuid);
+            if(!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE")) throw new RuntimeException("El usuario no es un estudiante");
+            Curriculums curriculum = curriculumsDao.findById(curriculumId).orElseThrow(() -> new RuntimeException("Curriculum no encontrado"));
+            if(!curriculum.getUsuariosIdusuarios().equals(usuario)) throw new RuntimeException("El curriculum no pertenece al usuario");
+            curriculumsDao.delete(curriculum);
+            return CurriculumsDto.fromEntity(curriculum);
+        }catch (Exception e){
+            throw new RuntimeException("Error al eliminar el curriculum",e);
+        }
+    }
 }

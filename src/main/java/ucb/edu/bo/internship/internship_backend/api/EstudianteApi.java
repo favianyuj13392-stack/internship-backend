@@ -3,9 +3,12 @@ package ucb.edu.bo.internship.internship_backend.api;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ucb.edu.bo.internship.internship_backend.bl.EstudianteBl;
+import ucb.edu.bo.internship.internship_backend.dto.CurriculumsDto;
 import ucb.edu.bo.internship.internship_backend.dto.PersonasDto;
 import ucb.edu.bo.internship.internship_backend.dto.ResponseDto;
 import ucb.edu.bo.internship.internship_backend.dto.UsuariosDto;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/estudiante")
@@ -101,7 +104,32 @@ public class EstudianteApi {
         }
         return response;
     }
-
-
-
+    //Obtener todos los curriculum de un estudiante
+    @GetMapping("{uuid}/curruculum")
+    public ResponseDto<List<CurriculumsDto>> getCurriculum(@PathVariable String uuid) {
+        ResponseDto<List<CurriculumsDto>> response = new ResponseDto<>();
+        try {
+            response.setResponse(estudianteBl.obtenerTodosLosCurriculums(uuid));
+            response.setCode("200");
+            response.setErrorMessage("");
+        }catch (Exception e) {
+            response.setCode("500");
+            response.setErrorMessage(e.getMessage());
+        }
+        return response;
+    }
+    //Eliminar un curriculum
+    @DeleteMapping("{uuid}/curriculum/{curriculumId}")
+    public ResponseDto<CurriculumsDto> deleteCurriculum(@PathVariable String uuid, @PathVariable Integer curriculumId) {
+        ResponseDto<CurriculumsDto> response = new ResponseDto<>();
+        try {
+            response.setResponse(estudianteBl.eliminarCurriculum(uuid, curriculumId));
+            response.setCode("200");
+            response.setErrorMessage("");
+        }catch (Exception e) {
+            response.setCode("500");
+            response.setErrorMessage(e.getMessage());
+        }
+        return response;
+    }
 }

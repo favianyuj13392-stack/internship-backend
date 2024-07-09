@@ -1,6 +1,8 @@
 package ucb.edu.bo.internship.internship_backend.dto;
 
-import java.sql.Date;
+import ucb.edu.bo.internship.internship_backend.entity.Curriculums;
+
+import java.util.Date;
 
 public class CurriculumsDto {
     private Integer idCurriculums;
@@ -73,5 +75,14 @@ public class CurriculumsDto {
             "}";
     }
 
-    
+
+    public static CurriculumsDto fromEntity(Curriculums curriculums) {
+        return new CurriculumsDto(
+            curriculums.getIdcurriculums(),
+            curriculums.getUsuariosIdusuarios().getIdusuarios(),
+            curriculums.getFechacargado(),
+            curriculums.getTitulo(),
+            curriculums.getPdfcurriculum()
+        );
+    }
 }

@@ -217,7 +217,7 @@ public class PasantiaBl {
             //Obtener la aplicación
             Aplicacionespasantias aplicacionespasantias = aplicacionPasantiasDao.findById(idAplicacionPasantia).orElse(null);
             if (aplicacionespasantias == null) throw new RuntimeException("No se encontró la aplicación");
-
+            if(aplicacionespasantias.getActivo()) throw new RuntimeException("La aplicación ya fue aceptada");
             //Cambiar el estado de la aplicación
             aplicacionespasantias.setActivo(true);
             aplicacionespasantias = aplicacionPasantiasDao.save(aplicacionespasantias);
@@ -232,7 +232,9 @@ public class PasantiaBl {
             seleccionaplicante.setUsuariosinstitucionesIdusuariosinstituciones(usuariosDao.findByKcUuid(uuid).getUsuariosinstitucionesList().get(0));
             seleccionaplicante = seleccionAplicanteDao.save(seleccionaplicante);
             return SeleccionAplicanteDto.fromEntity(seleccionaplicante);
-        } catch (Exception e) {
+        }catch (RuntimeException e) {
+            throw e;
+        }catch (Exception e) {
             throw new RuntimeException("Ocurrió un error al aceptar la aplicación", e);
         }
     }

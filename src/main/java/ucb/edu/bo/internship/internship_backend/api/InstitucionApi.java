@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.service.annotation.GetExchange;
 import ucb.edu.bo.internship.internship_backend.bl.InstitucionBl;
 import ucb.edu.bo.internship.internship_backend.dto.*;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionNotFoundException;
@@ -56,6 +57,24 @@ public class InstitucionApi {
             @RequestParam(defaultValue = "6") Integer size) {
         return handleRequest(() -> institucionBl.obtenerInstitucionesDestacadas(page, size));
     }
+
+    //Obtener usuario por uuid
+    @GetMapping("/usuario/{uuid}")
+    public ResponseDto<UsuariosDto> getUsuarioInstitucionByUuid(
+            @PathVariable String uuid
+    ) {
+        ResponseDto<UsuariosDto> response = new ResponseDto<>();
+        try {
+            response.setResponse(institucionBl.obtenerUsuarioInstitucionByUuid(uuid));
+            response.setCode("200");
+            response.setErrorMessage("");
+        }catch (Exception e) {
+            response.setCode("500");
+            response.setErrorMessage(e.getMessage());
+        }
+        return response;
+    }
+
     private <T> ResponseEntity<ResponseDto<T>> handleRequest(Supplier<T> supplier) {
         ResponseDto<T> responseDto = new ResponseDto<>();
         try {

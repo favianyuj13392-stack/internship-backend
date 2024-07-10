@@ -52,6 +52,13 @@ public class UsuariosConPersonaYCarreraDto extends UsuariosDto{
         this.carrera = carrera;
     }
 
+    public UsuariosConPersonaYCarreraDto(UsuariosDto usuariosDto, PersonasDto persona) {
+        super(usuariosDto.getIdUsuarios(), usuariosDto.getKc_UUID(), usuariosDto.getCorreo(), usuariosDto.getFechaRegistro(), usuariosDto.getHoraRegistro(), usuariosDto.getIdRoles(), usuariosDto.getIdPersonas(), usuariosDto.getIdCarreras());
+        this.persona = persona;
+
+    }
+
+
     public PersonasDto getPersona() {
         return this.persona;
     }

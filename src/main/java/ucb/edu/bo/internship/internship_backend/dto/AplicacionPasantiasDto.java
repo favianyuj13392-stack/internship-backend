@@ -10,17 +10,19 @@ public class AplicacionPasantiasDto {
     private Integer idPasantias;
     private Date fechaAplicacion;
     private Boolean activo;
+    private String urlCurriculum;
 
 
     public AplicacionPasantiasDto() {
     }
 
-    public AplicacionPasantiasDto(Integer idAplicacionPasantias, Integer idUsuarios, Integer idPasantias, Date fechaAplicacion,Boolean activo) {
+    public AplicacionPasantiasDto(Integer idAplicacionPasantias, Integer idUsuarios, Integer idPasantias, Date fechaAplicacion,Boolean activo,String urlCurriculum) {
         this.idAplicacionPasantias = idAplicacionPasantias;
         this.idUsuarios = idUsuarios;
         this.idPasantias = idPasantias;
         this.fechaAplicacion = fechaAplicacion;
         this.activo = activo;
+        this.urlCurriculum = urlCurriculum;
     }
 
 
@@ -66,13 +68,22 @@ public class AplicacionPasantiasDto {
         this.activo = activo;
     }
 
+    public String getUrlCurriculum() {
+        return urlCurriculum;
+    }
+
+    public void setUrlCurriculum(String urlCurriculum) {
+        this.urlCurriculum = urlCurriculum;
+    }
+
     public static AplicacionPasantiasDto fromEntity(Aplicacionespasantias aplicacionespasantias){
         return new AplicacionPasantiasDto(
             aplicacionespasantias.getIdaplicacionpasantias(),
             aplicacionespasantias.getUsuariosIdusuarios().getIdusuarios(),
             aplicacionespasantias.getPasantiasIdpasantias().getIdpasantias(),
             aplicacionespasantias.getFechaaplicacion(),
-            aplicacionespasantias.getActivo()
+            aplicacionespasantias.getActivo(),
+            aplicacionespasantias.getCurriculumsIdcurriculums().getPdfcurriculum()
         );
     }
 

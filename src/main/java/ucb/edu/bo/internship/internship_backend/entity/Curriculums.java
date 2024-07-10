@@ -4,22 +4,11 @@
  */
 package ucb.edu.bo.internship.internship_backend.entity;
 
-import jakarta.persistence.Basic;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.NamedQueries;
-import jakarta.persistence.NamedQuery;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -54,6 +43,8 @@ public class Curriculums implements Serializable {
     @JoinColumn(name = "usuarios_idusuarios", referencedColumnName = "idusuarios")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Usuarios usuariosIdusuarios;
+    @OneToMany(mappedBy = "curriculumsIdcurriculums", fetch = FetchType.LAZY)
+    private List<Aplicacionespasantias> aplicacionespasantiasList;
 
     public Curriculums() {
     }
@@ -107,6 +98,14 @@ public class Curriculums implements Serializable {
 
     public void setUsuariosIdusuarios(Usuarios usuariosIdusuarios) {
         this.usuariosIdusuarios = usuariosIdusuarios;
+    }
+
+    public List<Aplicacionespasantias> getAplicacionespasantiasList() {
+        return aplicacionespasantiasList;
+    }
+
+    public void setAplicacionespasantiasList(List<Aplicacionespasantias> aplicacionespasantiasList) {
+        this.aplicacionespasantiasList = aplicacionespasantiasList;
     }
 
     @Override

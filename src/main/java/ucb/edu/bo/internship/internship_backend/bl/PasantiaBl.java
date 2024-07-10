@@ -12,14 +12,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ucb.edu.bo.internship.internship_backend.dao.PasantiasCarrerasDao;
-import ucb.edu.bo.internship.internship_backend.dao.PasantiasDao;
-import ucb.edu.bo.internship.internship_backend.dao.UsuariosDao;
+import ucb.edu.bo.internship.internship_backend.dao.*;
 import ucb.edu.bo.internship.internship_backend.dto.*;
-import ucb.edu.bo.internship.internship_backend.entity.Aplicacionespasantias;
-import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
-import ucb.edu.bo.internship.internship_backend.entity.Pasantias;
-import ucb.edu.bo.internship.internship_backend.entity.Usuarios;
+import ucb.edu.bo.internship.internship_backend.entity.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,11 +26,15 @@ public class PasantiaBl {
     private final PasantiasDao pasantiasDao;
     private final PasantiasCarrerasDao pasantiasCarrerasDao;
     private final UsuariosDao usuariosDao;
+    private final AplicacionPasantiasDao aplicacionPasantiasDao;
+    private final SeleccionAplicanteDao seleccionAplicanteDao;
 
-    public PasantiaBl(PasantiasDao pasantiasDao, PasantiasCarrerasDao pasantiasCarrerasDao,UsuariosDao usuariosDao) {
+    public PasantiaBl(PasantiasDao pasantiasDao, PasantiasCarrerasDao pasantiasCarrerasDao,UsuariosDao usuariosDao, AplicacionPasantiasDao aplicacionPasantiasDao, SeleccionAplicanteDao seleccionAplicanteDao) {
         this.pasantiasDao = pasantiasDao;
         this.pasantiasCarrerasDao = pasantiasCarrerasDao;
         this.usuariosDao = usuariosDao;
+        this.aplicacionPasantiasDao = aplicacionPasantiasDao;
+        this.seleccionAplicanteDao = seleccionAplicanteDao;
     }
 
     public Page<PasantiasConInstitucionYCarrerasDto> obtenerPasantiasPorTerminoDeBusqueda(String terminoDeBusqueda, Pageable pageable){
@@ -185,24 +184,16 @@ public class PasantiaBl {
 
     public PasantiaConPostulantesDto obtenerPasantiaDetalle(String uuid, Integer idPasantia) {
         try{
+            if(!validarRelacionInstitucionUsuario(uuid, idPasantia)) throw new RuntimeException("No tiene permisos para ver esta pasantía");
             //Obtener Pasantia
             Pasantias pasantia = pasantiasDao.findById(idPasantia).orElse(null);
-            if(pasantia==null) throw new RuntimeException("No se encontro la pasantía");
-            //Obtener Usuario
-            Usuarios usuario = usuariosDao.findByKcUuid(uuid);
-            if(usuario==null) throw new RuntimeException("No se encontro el usuario");
-            //Validar que la pasantía y el usuario pertenezcan a la misma empresa
-            Instituciones institucionPasantia = pasantia.getInstitucionesIdinstituciones();
-            Instituciones institucionUsuario = usuario.getUsuariosinstitucionesList().get(0).getInstitucionesIdinstituciones();
-            if(!Objects.equals(institucionUsuario.getIdinstituciones(), institucionPasantia.getIdinstituciones())) throw new RuntimeException("No tiene permisos para ver esta pasantía");
+            if(pasantia == null) throw new RuntimeException("No se encontró la pasantía");
             //Obtener todos los datos de la pasantia
             PasantiasDto pasantiasDto = PasantiasDto.fromEntity(pasantia);
-
             pasantiasDto.setAreas(pasantia.getAreas());
             pasantiasDto.setBeneficios(pasantia.getBeneficios());
             pasantiasDto.setFunciones(pasantia.getFunciones());
             pasantiasDto.setRequisitos(pasantia.getRequisitos());
-            
 
             //Obtener los postulantes
             List<Aplicacionespasantias> aplicacionespasantias = pasantia.getAplicacionespasantiasList();
@@ -213,10 +204,98 @@ public class PasantiaBl {
                 usuarioCompletoDtos.add(usuarioCompletoDto);
             }
             InstitucionesDto institucionesDto = InstitucionesDto.fromEntity(pasantia.getInstitucionesIdinstituciones());
-            return new PasantiaConPostulantesDto(pasantiasDto,usuarioCompletoDtos,institucionesDto,pasantia.getActivo());
-        }catch (Exception e){
-            System.out.println(e);
-            throw new RuntimeException("Ocurrió un error al obtener la pasantía",e);
+            return new PasantiaConPostulantesDto(pasantiasDto, usuarioCompletoDtos, institucionesDto, pasantia.getActivo());
+        } catch (Exception e) {
+            throw new RuntimeException("Ocurrió un error al obtener la pasantía", e);
         }
+    }
+
+    public SeleccionAplicanteDto aceptarAplicacionPasantia(String uuid, Integer idPasantia, Integer idAplicacionPasantia, String comentarios) {
+        try {
+            if (!validarRelacionInstitucionUsuario(uuid, idPasantia)) throw new RuntimeException("No tiene permisos para ver esta pasantía");
+
+            //Obtener la aplicación
+            Aplicacionespasantias aplicacionespasantias = aplicacionPasantiasDao.findById(idAplicacionPasantia).orElse(null);
+            if (aplicacionespasantias == null) throw new RuntimeException("No se encontró la aplicación");
+            if(aplicacionespasantias.getActivo()) throw new RuntimeException("La aplicación ya fue aceptada");
+            //Cambiar el estado de la aplicación
+            aplicacionespasantias.setActivo(true);
+            aplicacionespasantias = aplicacionPasantiasDao.save(aplicacionespasantias);
+
+            //Crear una nueva Seleccion aplicante
+            Seleccionaplicante seleccionaplicante = new Seleccionaplicante();
+            seleccionaplicante.setActivo(true);
+            seleccionaplicante.setComentarios(comentarios);
+            seleccionaplicante.setFechaseleccion(new Date());
+            seleccionaplicante.setHoraseleccion(new Date());
+            seleccionaplicante.setAplicacionespasantiasIdaplicacionpasantias(aplicacionespasantias);
+            seleccionaplicante.setUsuariosinstitucionesIdusuariosinstituciones(usuariosDao.findByKcUuid(uuid).getUsuariosinstitucionesList().get(0));
+            seleccionaplicante = seleccionAplicanteDao.save(seleccionaplicante);
+            return SeleccionAplicanteDto.fromEntity(seleccionaplicante);
+        }catch (RuntimeException e) {
+            throw e;
+        }catch (Exception e) {
+            throw new RuntimeException("Ocurrió un error al aceptar la aplicación", e);
+        }
+    }
+
+    public AplicacionPasantiasDto rechazarAplicacionPasantia(String uuid, Integer idPasantia, Integer idAplicacionPasantia) {
+        try {
+            if (!validarRelacionInstitucionUsuario(uuid, idPasantia)) throw new RuntimeException("No tiene permisos para ver esta pasantía");
+
+            //Obtener la aplicación
+            Aplicacionespasantias aplicacionespasantias = aplicacionPasantiasDao.findById(idAplicacionPasantia).orElse(null);
+            if (aplicacionespasantias == null) throw new RuntimeException("No se encontró la aplicación");
+
+            //Eliminar la aplicación
+            aplicacionPasantiasDao.delete(aplicacionespasantias);
+            return new AplicacionPasantiasDto();
+        } catch (Exception e) {
+            throw new RuntimeException("Ocurrió un error al rechazar la aplicación", e);
+        }
+    }
+
+    public SeleccionAplicanteDto finalizarPasantiaSinSeleccion(String uuid, Integer idPasantia) {
+        try {
+            if (!validarRelacionInstitucionUsuario(uuid, idPasantia)) throw new RuntimeException("No tiene permisos para ver esta pasantía");
+
+            //Obtener Pasantia
+            Pasantias pasantia = pasantiasDao.findById(idPasantia).orElse(null);
+            if (pasantia == null) throw new RuntimeException("No se encontró la pasantía");
+
+            //Obtener las aplicaciones y validar que no haya aplicantes
+            List<Aplicacionespasantias> aplicacionespasantias = pasantia.getAplicacionespasantiasList();
+            if (!aplicacionespasantias.isEmpty()) throw new RuntimeException("No se puede finalizar la pasantía porque hay aplicantes, por favor seleccione a un aplicante o rechace todas las aplicaciones");
+
+            //Crear una nueva Seleccion aplicante
+            Seleccionaplicante seleccionaplicante = new Seleccionaplicante();
+            seleccionaplicante.setActivo(false);
+            seleccionaplicante.setComentarios("No se seleccionó a ningún aplicante");
+            seleccionaplicante.setFechaseleccion(new Date());
+            seleccionaplicante.setHoraseleccion(new Date());
+            seleccionaplicante.setAplicacionespasantiasIdaplicacionpasantias(null);
+            seleccionaplicante.setUsuariosinstitucionesIdusuariosinstituciones(usuariosDao.findByKcUuid(uuid).getUsuariosinstitucionesList().get(0));
+            seleccionaplicante = seleccionAplicanteDao.save(seleccionaplicante);
+            return SeleccionAplicanteDto.fromEntity(seleccionaplicante);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Ocurrió un error al finalizar la pasantía", e);
+        }
+    }
+    private Boolean validarRelacionInstitucionUsuario(String uuid, Integer idPasantia) {
+        //Obtener Pasantia
+        Pasantias pasantia = pasantiasDao.findById(idPasantia).orElse(null);
+        if(pasantia == null) throw new RuntimeException("No se encontró la pasantía");
+
+        //Obtener Usuario
+        Usuarios usuario = usuariosDao.findByKcUuid(uuid);
+        if(usuario == null) throw new RuntimeException("No se encontró el usuario");
+
+        //Validar que la pasantía y el usuario pertenezcan a la misma empresa
+        Instituciones institucionPasantia = pasantia.getInstitucionesIdinstituciones();
+        Instituciones institucionUsuario = usuario.getUsuariosinstitucionesList().get(0).getInstitucionesIdinstituciones();
+
+        return Objects.equals(institucionUsuario.getIdinstituciones(), institucionPasantia.getIdinstituciones());
     }
 }

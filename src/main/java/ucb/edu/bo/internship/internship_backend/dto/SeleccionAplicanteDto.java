@@ -1,26 +1,41 @@
 package ucb.edu.bo.internship.internship_backend.dto;
+import ucb.edu.bo.internship.internship_backend.entity.Seleccionaplicante;
 
-import java.sql.Date;
-import java.sql.Time;
-
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.Date;
 public class SeleccionAplicanteDto {
     private Integer idSeleccionAplicante;
     private Integer idAplicacionPasantias;
     private Integer idUsuarios;
     private Date fechaSeleccion;
-    private Time horaSeleccion;
+    private LocalTime horaSeleccion;
     private String comentarios;
 
     public SeleccionAplicanteDto() {
     }
 
-    public SeleccionAplicanteDto(Integer idSeleccionAplicante, Integer idAplicacionPasantias, Integer idUsuarios, Date fechaSeleccion, Time horaSeleccion, String comentarios) {
+    public SeleccionAplicanteDto(Integer idSeleccionAplicante, Integer idAplicacionPasantias, Integer idUsuarios, Date fechaSeleccion, LocalTime horaSeleccion, String comentarios) {
         this.idSeleccionAplicante = idSeleccionAplicante;
         this.idAplicacionPasantias = idAplicacionPasantias;
         this.idUsuarios = idUsuarios;
         this.fechaSeleccion = fechaSeleccion;
         this.horaSeleccion = horaSeleccion;
         this.comentarios = comentarios;
+    }
+
+    public static SeleccionAplicanteDto fromEntity(Seleccionaplicante seleccionaplicante) {
+        LocalTime horaseleccion = seleccionaplicante.getHoraseleccion().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalTime();
+        return new SeleccionAplicanteDto(
+            seleccionaplicante.getIdseleccionaplicante(),
+            seleccionaplicante.getAplicacionespasantiasIdaplicacionpasantias().getIdaplicacionpasantias(),
+            seleccionaplicante.getUsuariosinstitucionesIdusuariosinstituciones().getIdusuariosinstituciones(),
+            seleccionaplicante.getFechaseleccion(),
+            horaseleccion,
+            seleccionaplicante.getComentarios()
+        );
     }
 
     public Integer getIdSeleccionAplicante() {
@@ -55,11 +70,11 @@ public class SeleccionAplicanteDto {
         this.fechaSeleccion = fechaSeleccion;
     }
 
-    public Time getHoraSeleccion() {
+    public LocalTime getHoraSeleccion() {
         return this.horaSeleccion;
     }
 
-    public void setHoraSeleccion(Time horaSeleccion) {
+    public void setHoraSeleccion(LocalTime horaSeleccion) {
         this.horaSeleccion = horaSeleccion;
     }
 

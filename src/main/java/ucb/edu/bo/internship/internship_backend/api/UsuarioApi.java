@@ -13,6 +13,7 @@ import ucb.edu.bo.internship.internship_backend.exception.institucion.Institucio
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionServiceExcepcion;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.UsuarioYaRelacionadoException;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 
@@ -250,6 +251,7 @@ public class UsuarioApi {
         }
         return response;
     }
+    //Obtener detalles como: Aplicantes, Institucion y pasantía
     @GetMapping("{uuid}/pasantia/{idPasantia}/detalle")
     public ResponseDto<PasantiaConPostulantesDto> obtenerPasantiaDetalle(
             @PathVariable String uuid,
@@ -258,6 +260,48 @@ public class UsuarioApi {
         ResponseDto<PasantiaConPostulantesDto> response = new ResponseDto<>();
         try{
             response.setResponse(pasantiaBl.obtenerPasantiaDetalle(uuid, idPasantia));
+            response.setCode("200");
+            response.setErrorMessage("");
+        }catch (Exception e){
+            response.setCode("500");
+            response.setErrorMessage(e.getMessage());
+        }
+        return response;
+    }
+    //Aceptar solicitud de pasantía
+    @PutMapping("{uuid}/pasantia/{idPasantia}/aplicacion/{idAplicacionPasantia}/aceptar")
+    public ResponseDto<SeleccionAplicanteDto> aceptarPasantia(@PathVariable String uuid, @PathVariable Integer idPasantia, @PathVariable Integer idAplicacionPasantia, @RequestBody AceptarSolicitudRequestDto aceptarSolicitudRequestDto ){
+        ResponseDto<SeleccionAplicanteDto> response = new ResponseDto<>();
+        try{
+            response.setResponse(pasantiaBl.aceptarAplicacionPasantia(uuid, idPasantia, idAplicacionPasantia,aceptarSolicitudRequestDto.getComentarios()));
+            response.setCode("200");
+            response.setErrorMessage("");
+        }catch (Exception e){
+            response.setCode("500");
+            response.setErrorMessage(e.getMessage());
+        }
+        return response;
+    }
+    //Rechazar solicitud de pasantía
+    @DeleteMapping("{uuid}/pasantia/{idPasantia}/aplicacion/{idAplicacionPasantia}/rechazar")
+    public ResponseDto<AplicacionPasantiasDto> rechazarPasantia(@PathVariable String uuid, @PathVariable Integer idPasantia, @PathVariable Integer idAplicacionPasantia){
+        ResponseDto<AplicacionPasantiasDto> response = new ResponseDto<>();
+        try{
+            response.setResponse(pasantiaBl.rechazarAplicacionPasantia(uuid, idPasantia, idAplicacionPasantia));
+            response.setCode("200");
+            response.setErrorMessage("");
+        }catch (Exception e){
+            response.setCode("500");
+            response.setErrorMessage(e.getMessage());
+        }
+        return response;
+    }
+    //Marcar pasantía como finalizada y sin aplicantes seleccionados
+    @PutMapping("{uuid}/pasantia/{idPasantia}/finalizar/sin-seleccion")
+    public ResponseDto<SeleccionAplicanteDto> finalizarPasantiaSinSeleccion(@PathVariable String uuid, @PathVariable Integer idPasantia){
+        ResponseDto<SeleccionAplicanteDto> response = new ResponseDto<>();
+        try{
+            response.setResponse(pasantiaBl.finalizarPasantiaSinSeleccion(uuid, idPasantia));
             response.setCode("200");
             response.setErrorMessage("");
         }catch (Exception e){

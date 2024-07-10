@@ -11,6 +11,7 @@ import ucb.edu.bo.internship.internship_backend.entity.*;
 import ucb.edu.bo.internship.internship_backend.service.MinioService;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -71,20 +72,26 @@ public class EstudianteBl {
     }
 
     public Boolean agregarCurriculum(String uuid, MultipartFile curriculum) {
-        Usuarios usuario = usuariosDao.findByKcUuid(uuid);
-        if(!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE")) throw new RuntimeException("El usuario no es un estudiante");
-        NewFileDto newFileDto = minioBl.uploadFile(curriculum, "internship-cv");
-        if(newFileDto == null) throw new RuntimeException("Error al subir el curriculum");
-        String filepath = minioBl.getFile("internship-cv", newFileDto.getFileName());
-        Curriculums curriculumEntity = new Curriculums();
-        curriculumEntity.setFechacargado(new Date());
-        curriculumEntity.setTitulo(curriculum.getOriginalFilename());
-        curriculumEntity.setPdfcurriculum(filepath);
-        curriculumEntity.setUsuariosIdusuarios(usuario);
+        try {
+            System.out.println("subiendo pdf");
+            Usuarios usuario = usuariosDao.findByKcUuid(uuid);
+            if(!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE")) throw new RuntimeException("El usuario no es un estudiante");
+            NewFileDto newFileDto = minioBl.uploadFile(curriculum, "internship-cv");
+            if(newFileDto == null) throw new RuntimeException("Error al subir el curriculum");
+            String filepath = minioBl.getFile("internship-cv", newFileDto.getFileName());
+            Curriculums curriculumEntity = new Curriculums();
+            curriculumEntity.setFechacargado(new Date());
+            curriculumEntity.setTitulo(curriculum.getOriginalFilename());
+            curriculumEntity.setPdfcurriculum(filepath);
+            curriculumEntity.setUsuariosIdusuarios(usuario);
 
-        curriculumsDao.save(curriculumEntity);
+            curriculumsDao.save(curriculumEntity);
 
-        return true;
+            return true;
+        }catch (Exception e){
+            System.out.println(e);
+            throw new RuntimeException("Error al subir el curriculum",e);
+        }
     }
 
     public String obtenerCurriculum(String uuid, String curriculumPdf) {
@@ -109,4 +116,49 @@ public class EstudianteBl {
         return true;
     }
 
+    public List<CurriculumsDto> obtenerTodosLosCurriculums(String uuid) {
+        try{
+            Usuarios usuario = usuariosDao.findByKcUuid(uuid);
+            if(!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE")) throw new RuntimeException("El usuario no es un estudiante");
+            return curriculumsDao.findByUsuariosIdusuarios(usuario).stream().map(CurriculumsDto::fromEntity).toList();
+        }catch (Exception e){
+            throw new RuntimeException("Error al obtener los curriculums",e);
+        }
+    }
+    public CurriculumsDto eliminarCurriculum(String uuid, Integer curriculumId) {
+        try{
+            Usuarios usuario = usuariosDao.findByKcUuid(uuid);
+            if(!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE")) throw new RuntimeException("El usuario no es un estudiante");
+            Curriculums curriculum = curriculumsDao.findById(curriculumId).orElseThrow(() -> new RuntimeException("Curriculum no encontrado"));
+            if(!curriculum.getUsuariosIdusuarios().equals(usuario)) throw new RuntimeException("El curriculum no pertenece al usuario");
+            curriculumsDao.delete(curriculum);
+            return CurriculumsDto.fromEntity(curriculum);
+        }catch (Exception e){
+            throw new RuntimeException("Error al eliminar el curriculum",e);
+        }
+    }
+
+    public AplicacionPasantiasDto aplicarPasantia(String uuid, Integer pasantiaId, Integer idCurriculum) {
+        try{
+            Usuarios usuario = usuariosDao.findByKcUuid(uuid);
+            if(!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE")) throw new RuntimeException("El usuario no es un estudiante");
+            Curriculums curriculum = curriculumsDao.findById(idCurriculum).orElseThrow(() -> new RuntimeException("Curriculum no encontrado"));
+            if(!curriculum.getUsuariosIdusuarios().equals(usuario)) throw new RuntimeException("El curriculum no pertenece al usuario");
+            Pasantias pasantia = pasantiasDao.findById(pasantiaId).orElseThrow(() -> new RuntimeException("Pasantia no encontrada"));
+            List<Aplicacionespasantias> aplicacionespasantias = aplicacionPasantiasDao.findByUsuariosIdusuariosAndPasantiasIdpasantias(usuario,pasantia);
+            if(!aplicacionespasantias.isEmpty()) throw new RuntimeException("Ya aplicaste a esta pasantia");
+            Aplicacionespasantias aplicacion = new Aplicacionespasantias();
+            aplicacion.setUsuariosIdusuarios(usuario);
+            aplicacion.setPasantiasIdpasantias(pasantia);
+            aplicacion.setFechaaplicacion(new Date());
+            aplicacion.setActivo(false);
+            aplicacion.setCurriculumsIdcurriculums(curriculum);
+            aplicacion = aplicacionPasantiasDao.save(aplicacion);
+            return AplicacionPasantiasDto.fromEntity(aplicacion);
+        }catch (RuntimeException e){
+            throw e;
+        }catch (Exception e){
+            throw new RuntimeException("Error al aplicar a la pasantia",e);
+        }
+    }
 }

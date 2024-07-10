@@ -55,6 +55,9 @@ public class Aplicacionespasantias implements Serializable {
     @JoinColumn(name = "usuarios_idusuarios", referencedColumnName = "idusuarios")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Usuarios usuariosIdusuarios;
+    @JoinColumn(name = "curriculums_idcurriculums", referencedColumnName = "idcurriculums")
+    @ManyToOne(optional = true, fetch =FetchType.LAZY)
+    private Curriculums curriculumsIdcurriculums;
     @OneToMany(mappedBy = "aplicacionespasantiasIdaplicacionpasantias", fetch = FetchType.LAZY)
     private List<Seleccionaplicante> seleccionaplicanteList;
 
@@ -109,6 +112,14 @@ public class Aplicacionespasantias implements Serializable {
 
     public void setUsuariosIdusuarios(Usuarios usuariosIdusuarios) {
         this.usuariosIdusuarios = usuariosIdusuarios;
+    }
+
+    public Curriculums getCurriculumsIdcurriculums() {
+        return curriculumsIdcurriculums;
+    }
+
+    public void setCurriculumsIdcurriculums(Curriculums curriculumsIdcurriculums) {
+        this.curriculumsIdcurriculums = curriculumsIdcurriculums;
     }
 
     public List<Seleccionaplicante> getSeleccionaplicanteList() {

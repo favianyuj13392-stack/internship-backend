@@ -137,4 +137,23 @@ public class EstudianteBl {
             throw new RuntimeException("Error al eliminar el curriculum",e);
         }
     }
+
+    public AplicacionPasantiasDto aplicarPasantia(String uuid, Integer pasantiaId, Integer idCurriculum) {
+        try{
+            Usuarios usuario = usuariosDao.findByKcUuid(uuid);
+            if(!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE")) throw new RuntimeException("El usuario no es un estudiante");
+            Pasantias pasantia = pasantiasDao.findById(pasantiaId).orElseThrow(() -> new RuntimeException("Pasantia no encontrada"));
+            Curriculums curriculum = curriculumsDao.findById(idCurriculum).orElseThrow(() -> new RuntimeException("Curriculum no encontrado"));
+            Aplicacionespasantias aplicacion = new Aplicacionespasantias();
+            aplicacion.setUsuariosIdusuarios(usuario);
+            aplicacion.setPasantiasIdpasantias(pasantia);
+            aplicacion.setFechaaplicacion(new Date());
+            aplicacion.setActivo(false);
+            aplicacion.setCurriculumsIdcurriculums(curriculum);
+            aplicacion = aplicacionPasantiasDao.save(aplicacion);
+            return AplicacionPasantiasDto.fromEntity(aplicacion);
+        }catch (Exception e){
+            throw new RuntimeException("Error al aplicar a la pasantia",e);
+        }
+    }
 }

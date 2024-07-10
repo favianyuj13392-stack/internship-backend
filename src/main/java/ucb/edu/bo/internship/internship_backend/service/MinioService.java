@@ -34,14 +34,18 @@ public class MinioService {
     }
 
     public NewFileDto uploadFile(MultipartFile file, String bucket) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        String fileName = UUID.randomUUID() + "." + file.getOriginalFilename().split("\\.")[file.getOriginalFilename().split("\\.").length - 1];
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null) throw new AssertionError();
+        String uniqueFilename = generateUniqueFilename(originalFilename);
+        uniqueFilename = uniqueFilename.replace(" ", "_");
+        //String fileName = UUID.randomUUID() + "." + file.getOriginalFilename().split("\\.")[file.getOriginalFilename().split("\\.").length - 1];
         minioClient.putObject(PutObjectArgs
                 .builder()
                 .bucket(bucket)
-                .object(fileName)
+                .object(uniqueFilename)
                 .stream(file.getInputStream(), file.getSize(), -1)
                 .build());
-        return new NewFileDto(fileName, file.getContentType(), bucket);
+        return new NewFileDto(uniqueFilename, file.getContentType(), bucket);
     }
 
     public String getFile(String bucket, String fileName) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {

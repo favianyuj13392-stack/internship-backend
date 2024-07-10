@@ -142,8 +142,11 @@ public class EstudianteBl {
         try{
             Usuarios usuario = usuariosDao.findByKcUuid(uuid);
             if(!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE")) throw new RuntimeException("El usuario no es un estudiante");
-            Pasantias pasantia = pasantiasDao.findById(pasantiaId).orElseThrow(() -> new RuntimeException("Pasantia no encontrada"));
             Curriculums curriculum = curriculumsDao.findById(idCurriculum).orElseThrow(() -> new RuntimeException("Curriculum no encontrado"));
+            if(!curriculum.getUsuariosIdusuarios().equals(usuario)) throw new RuntimeException("El curriculum no pertenece al usuario");
+            Pasantias pasantia = pasantiasDao.findById(pasantiaId).orElseThrow(() -> new RuntimeException("Pasantia no encontrada"));
+            List<Aplicacionespasantias> aplicacionespasantias = aplicacionPasantiasDao.findByUsuariosIdusuariosAndPasantiasIdpasantias(usuario,pasantia);
+            if(!aplicacionespasantias.isEmpty()) throw new RuntimeException("Ya aplicaste a esta pasantia");
             Aplicacionespasantias aplicacion = new Aplicacionespasantias();
             aplicacion.setUsuariosIdusuarios(usuario);
             aplicacion.setPasantiasIdpasantias(pasantia);
@@ -152,6 +155,8 @@ public class EstudianteBl {
             aplicacion.setCurriculumsIdcurriculums(curriculum);
             aplicacion = aplicacionPasantiasDao.save(aplicacion);
             return AplicacionPasantiasDto.fromEntity(aplicacion);
+        }catch (RuntimeException e){
+            throw e;
         }catch (Exception e){
             throw new RuntimeException("Error al aplicar a la pasantia",e);
         }

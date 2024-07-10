@@ -52,7 +52,7 @@ public class Pasantias implements Serializable {
     @Basic(optional = false)
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "areas")
-    private Object areas;
+    private List<String> areas;
     @Basic(optional = false)
     @Column(name = "titulo")
     private String titulo;
@@ -62,15 +62,15 @@ public class Pasantias implements Serializable {
     @Basic(optional = false)
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "requisitos")
-    private Object requisitos;
+    private List<String> requisitos;
     @Basic(optional = false)
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "funciones")
-    private Object funciones;
+    private List<String> funciones;
     @Basic(optional = false)
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "beneficios")
-    private Object beneficios;
+    private List<String> beneficios;
     @Basic(optional = false)
     @Column(name = "fechacierre")
     @Temporal(TemporalType.DATE)
@@ -109,7 +109,7 @@ public class Pasantias implements Serializable {
         this.idpasantias = idpasantias;
     }
 
-    public Pasantias(Integer idpasantias, Object areas, String titulo, String descripcion, Object requisitos, Object funciones, Object beneficios, Date fechacierre, Date fechaingreso, boolean activo) {
+    public Pasantias(Integer idpasantias, List<String> areas, String titulo, String descripcion, List<String> requisitos, List<String> funciones, List<String> beneficios, Date fechacierre, Date fechaingreso, boolean activo) {
         this.idpasantias = idpasantias;
         this.areas = areas;
         this.titulo = titulo;
@@ -138,11 +138,11 @@ public class Pasantias implements Serializable {
         this.idpasantias = idpasantias;
     }
 
-    public Object getAreas() {
+    public List<String> getAreas() {
         return areas;
     }
 
-    public void setAreas(Object areas) {
+    public void setAreas(List<String> areas) {
         this.areas = areas;
     }
 
@@ -162,27 +162,27 @@ public class Pasantias implements Serializable {
         this.descripcion = descripcion;
     }
 
-    public Object getRequisitos() {
+    public List<String> getRequisitos() {
         return requisitos;
     }
 
-    public void setRequisitos(Object requisitos) {
+    public void setRequisitos(List<String> requisitos) {
         this.requisitos = requisitos;
     }
 
-    public Object getFunciones() {
+    public List<String> getFunciones() {
         return funciones;
     }
 
-    public void setFunciones(Object funciones) {
+    public void setFunciones(List<String> funciones) {
         this.funciones = funciones;
     }
 
-    public Object getBeneficios() {
+    public List<String> getBeneficios() {
         return beneficios;
     }
 
-    public void setBeneficios(Object beneficios) {
+    public void setBeneficios(List<String> beneficios) {
         this.beneficios = beneficios;
     }
 

@@ -70,18 +70,17 @@ public class PasantiaBl {
     }
 
     private PasantiasConInstitucionYCarrerasDto toPasantiasConInstitucionYCarrerasDto(Pasantias pasantias1) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode areas, beneficios, funciones, requisitos;
+        List<String> areas, beneficios, funciones, requisitos;
         try{
-            Object areasJson, beneficiosJson, funcionesJson, requisitosJson;
+            List<String> areasJson, beneficiosJson, funcionesJson, requisitosJson;
             areasJson = pasantias1.getAreas();
             beneficiosJson = pasantias1.getBeneficios();
             funcionesJson = pasantias1.getFunciones();
             requisitosJson = pasantias1.getRequisitos();
-            areas = objectMapper.readTree(areasJson.toString());
-            beneficios = objectMapper.readTree(beneficiosJson.toString());
-            funciones = objectMapper.readTree(funcionesJson.toString());
-            requisitos = objectMapper.readTree(requisitosJson.toString());
+            areas = areasJson;
+            beneficios = beneficiosJson;
+            funciones = funcionesJson;
+            requisitos = requisitosJson;
         } catch (Exception e) {
             throw new RuntimeException("Error al convertir areas a objeto:" + e);
         }
@@ -97,18 +96,17 @@ public class PasantiaBl {
     }
 
     private PasantiasConInstitucionYCarrerasDtoYActivo toPasantiasConInstitucionYCarrerasDtoYActivo(Pasantias pasantias1) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode areas, beneficios, funciones, requisitos;
+        List<String> areas, beneficios, funciones, requisitos;
         try{
-            Object areasJson, beneficiosJson, funcionesJson, requisitosJson;
+            List<String> areasJson, beneficiosJson, funcionesJson, requisitosJson;
             areasJson = pasantias1.getAreas();
             beneficiosJson = pasantias1.getBeneficios();
             funcionesJson = pasantias1.getFunciones();
             requisitosJson = pasantias1.getRequisitos();
-            areas = objectMapper.readTree(areasJson.toString());
-            beneficios = objectMapper.readTree(beneficiosJson.toString());
-            funciones = objectMapper.readTree(funcionesJson.toString());
-            requisitos = objectMapper.readTree(requisitosJson.toString());
+            areas = areasJson;
+            beneficios = beneficiosJson;
+            funciones = funcionesJson;
+            requisitos = requisitosJson;
         } catch (Exception e) {
             throw new RuntimeException("Error al convertir areas a objeto:" + e);
         }
@@ -165,10 +163,10 @@ public class PasantiaBl {
                 throw new RuntimeException("Pasantia no encontrada");
             }
             PasantiasDto pasantiasDto = PasantiasDto.fromEntity(pasantias);
-            pasantiasDto.setAreas(new ObjectMapper().readTree(pasantias.getAreas().toString()));
-            pasantiasDto.setBeneficios(new ObjectMapper().readTree(pasantias.getBeneficios().toString()));
-            pasantiasDto.setFunciones(new ObjectMapper().readTree(pasantias.getFunciones().toString()));
-            pasantiasDto.setRequisitos(new ObjectMapper().readTree(pasantias.getRequisitos().toString()));
+            pasantiasDto.setAreas(pasantias.getAreas());
+            pasantiasDto.setBeneficios(pasantias.getBeneficios());
+            pasantiasDto.setFunciones(pasantias.getFunciones());
+            pasantiasDto.setRequisitos(pasantias.getRequisitos());
             Boolean estadoPasantia = pasantias.getActivo();
             List<Aplicacionespasantias> aplicacionespasantias = pasantias.getAplicacionespasantiasList();
             //Obtener las personas postulantes
@@ -200,10 +198,10 @@ public class PasantiaBl {
             //Obtener todos los datos de la pasantia
             PasantiasDto pasantiasDto = PasantiasDto.fromEntity(pasantia);
 
-            pasantiasDto.setAreas(new ObjectMapper().readTree(pasantia.getAreas().toString()));
-            pasantiasDto.setBeneficios(new ObjectMapper().readTree(pasantia.getBeneficios().toString()));
-            pasantiasDto.setFunciones(new ObjectMapper().readTree(pasantia.getFunciones().toString()));
-            pasantiasDto.setRequisitos(new ObjectMapper().readTree(pasantia.getRequisitos().toString()));
+            pasantiasDto.setAreas(pasantia.getAreas());
+            pasantiasDto.setBeneficios(pasantia.getBeneficios());
+            pasantiasDto.setFunciones(pasantia.getFunciones());
+            pasantiasDto.setRequisitos(pasantia.getRequisitos());
             
 
             //Obtener los postulantes

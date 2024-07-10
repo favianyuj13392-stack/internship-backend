@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResponseDto<?>> handleException(Exception e) {
         ResponseDto<?> responseDto = new ResponseDto<>();
         responseDto.setCode("500");
-        responseDto.setErrorMessage("Error interno del servidor");
+        responseDto.setErrorMessage("Error interno del servidor"+e.getMessage());
         return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

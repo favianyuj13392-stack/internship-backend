@@ -3,6 +3,7 @@ package ucb.edu.bo.internship.internship_backend.dto;
 import ucb.edu.bo.internship.internship_backend.entity.Pasantias;
 
 import java.sql.Date;
+import java.util.List;
 
 public class PasantiasDto {
     private Integer idPasantias;
@@ -147,12 +148,12 @@ public class PasantiasDto {
     public Pasantias toEntity() {
         Pasantias pasantias = new Pasantias();
         pasantias.setIdpasantias(this.idPasantias);
-        pasantias.setAreas(this.areas);
+        pasantias.setAreas( (List<String>) this.areas);
         pasantias.setTitulo(this.titulo);
         pasantias.setDescripcion(this.descripcion);
-        pasantias.setRequisitos(this.requisitos);
-        pasantias.setFunciones(this.funciones);
-        pasantias.setBeneficios(this.beneficios);
+        pasantias.setRequisitos((List<String>) this.requisitos);
+        pasantias.setFunciones((List<String>) this.funciones);
+        pasantias.setBeneficios((List<String>) this.beneficios);
         pasantias.setFechacierre(this.fechaCierre);
         pasantias.setFechaingreso(this.fechaIngreso);
         return pasantias;

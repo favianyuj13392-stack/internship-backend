@@ -431,6 +431,14 @@ public class InstitucionBl {
         }
     }
 
+    public UsuariosDto obtenerUsuarioInstitucionByUuid(String uuid){
+        Usuarios usuario = usuariosDao.findByKcUuid(uuid);
+        if(!Objects.equals(usuario.getRolesIdroles().getRol(), "EMPRESA")) throw new RuntimeException("El usuario no es una empresa");
+        UsuariosConPersonaYCarreraDto usuarioDto = new UsuariosConPersonaYCarreraDto();
+        return new UsuariosConPersonaYCarreraDto(UsuariosDto.fromEntity(usuario),
+                PersonasDto.fromEntity(usuario.getPersonasIdpersonas()));
+    }
+
     private Boolean validarRelacionUsuarioInstitucion(String uuid, Integer idInstitucion){
         return usuariosInstitucionesDao.existsByUsuariosUuidAndInstitucionesIdinstituciones(uuid, idInstitucion);
     }

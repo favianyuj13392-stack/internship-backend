@@ -281,6 +281,14 @@ public class InstitucionBl {
                 Pasantias pasantias = pasantiasDto.toEntity();
                 pasantias.setActivo(false);
                 pasantias.setInstitucionesIdinstituciones(institucionesDao.findByIdinstitucionesAndActivo(institucionId, true));
+                pasantias.setUsuariosIdusuarios(usuariosDao.findByKcUuid(uuid));
+                pasantias.setFechaingreso(new Date());
+                
+                //pasantias.setFechacierre(new Date());
+                pasantias.setActivo(false);
+                pasantias.setIdpasantias(null);
+                
+
                 pasantias = pasantiasDao.save(pasantias);
                 return PasantiasDto.fromEntity(pasantias);
             } else {
@@ -305,10 +313,10 @@ public class InstitucionBl {
                     pasantias.setDescripcion(pasantiasDto.getDescripcion());
                     pasantias.setFechaingreso(pasantiasDto.getFechaIngreso());
                     pasantias.setFechacierre(pasantiasDto.getFechaCierre());
-                    pasantias.setRequisitos(pasantiasDto.getRequisitos());
-                    pasantias.setAreas(pasantiasDto.getAreas());
-                    pasantias.setFunciones(pasantiasDto.getFunciones());
-                    pasantias.setBeneficios(pasantiasDto.getBeneficios());
+                    pasantias.setRequisitos((List<String>) pasantiasDto.getRequisitos());
+                    pasantias.setAreas((List<String>)  pasantiasDto.getAreas());
+                    pasantias.setFunciones( (List<String>)  pasantiasDto.getFunciones());
+                    pasantias.setBeneficios( (List<String>)  pasantiasDto.getBeneficios());
                     pasantias = pasantiasDao.save(pasantias);
                     return PasantiasDto.fromEntity(pasantias);
                 } else {

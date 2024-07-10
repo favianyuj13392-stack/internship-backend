@@ -164,7 +164,8 @@ public class UsuarioApi {
             return new ResponseEntity<>(responseDto, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             responseDto.setCode("500");
-            responseDto.setErrorMessage("Error interno del servidor");
+            responseDto.setErrorMessage("Error interno del servidor"+e.getMessage());
+            System.out.println(e.getMessage());
             return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

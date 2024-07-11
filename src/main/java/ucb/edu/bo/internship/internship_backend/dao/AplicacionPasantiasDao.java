@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import ucb.edu.bo.internship.internship_backend.entity.Aplicacionespasantias;
+import ucb.edu.bo.internship.internship_backend.entity.Curriculums;
 import ucb.edu.bo.internship.internship_backend.entity.Pasantias;
 import ucb.edu.bo.internship.internship_backend.entity.Usuarios;
 
@@ -17,4 +18,6 @@ public interface AplicacionPasantiasDao extends JpaRepository<Aplicacionespasant
     Aplicacionespasantias findByPasantiasIdpasantiasAndUsuariosIdusuarios(Pasantias idpasantias, Usuarios idusuarios);
 
     List<Aplicacionespasantias> findByUsuariosIdusuariosAndPasantiasIdpasantias(Usuarios usuario, Pasantias pasantia);
+
+    List<Aplicacionespasantias> findByCurriculumsIdcurriculums(Curriculums curriculum);
 }

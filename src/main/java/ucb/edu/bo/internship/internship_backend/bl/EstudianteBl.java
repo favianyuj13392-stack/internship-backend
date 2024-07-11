@@ -117,6 +117,10 @@ public class EstudianteBl {
         Usuarios usuario = usuariosDao.findByKcUuid(uuid);
         Pasantias pasantia = pasantiasDao.findById(idPasantia).orElseThrow(() -> new RuntimeException("Pasantia no encontrada"));
         if(!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE")) throw new RuntimeException("El usuario no es un estudiante");
+        Curriculums curriculum = curriculumsDao.findById(curriculumId).orElseThrow(() -> new RuntimeException("Curriculum no encontrado"));
+        List<Aplicacionespasantias> aplicacionespasantias = aplicacionPasantiasDao.findByUsuariosIdusuariosAndPasantiasIdpasantias(usuario,pasantia);
+        if(!aplicacionespasantias.isEmpty()) throw new RuntimeException("Ya aplicaste a esta pasantia");
+        
         Aplicacionespasantias aplicacion = new Aplicacionespasantias();
         aplicacion.setUsuariosIdusuarios(usuario);
         aplicacion.setPasantiasIdpasantias(pasantia);

@@ -37,7 +37,10 @@ public class InstitucionBl {
     private final UsuariosBL usuariosBL;
     private final AplicacionPasantiasDao aplicacionPasantiasDao;
     private final SeleccionAplicanteDao seleccionAplicanteDao;
-    public InstitucionBl(InstitucionesDao institucionesDao, PasantiasDao pasantiasDao, UsuariosInstitucionesDao usuariosInstitucionesDao,UsuariosDao usuariosDao, UsuariosBL usuariosBL, AplicacionPasantiasDao aplicacionPasantiasDao, SeleccionAplicanteDao seleccionAplicanteDao) {
+    private final PersonasDao personasDao;
+
+    public InstitucionBl(InstitucionesDao institucionesDao, PasantiasDao pasantiasDao, UsuariosInstitucionesDao usuariosInstitucionesDao,UsuariosDao usuariosDao, UsuariosBL usuariosBL, AplicacionPasantiasDao aplicacionPasantiasDao, SeleccionAplicanteDao seleccionAplicanteDao,
+                         PersonasDao personasDao) {
         this.institucionesDao = institucionesDao;
         this.pasantiasDao = pasantiasDao;
         this.usuariosInstitucionesDao = usuariosInstitucionesDao;
@@ -45,6 +48,7 @@ public class InstitucionBl {
         this.usuariosBL = usuariosBL;
         this.aplicacionPasantiasDao = aplicacionPasantiasDao;
         this.seleccionAplicanteDao = seleccionAplicanteDao;
+        this.personasDao = personasDao;
     }
     /*@Transactional
     public UsuarioRegistroCompletoDto agregarInstitucionConUsuario(UsuariosInstitucionesDto usuariosInstitucionesDto){
@@ -431,11 +435,38 @@ public class InstitucionBl {
         }
     }
 
-    public UsuariosDto obtenerUsuarioInstitucionByUuid(String uuid){
+    public UsuarioConPersonaEInstitucionDto obtenerUsuarioInstitucionByUuid(String uuid){
         Usuarios usuario = usuariosDao.findByKcUuid(uuid);
         if(!Objects.equals(usuario.getRolesIdroles().getRol(), "EMPRESA")) throw new RuntimeException("El usuario no es una empresa");
-        return new UsuariosConPersonaYCarreraDto(UsuariosDto.fromEntity(usuario),
-                PersonasDto.fromEntity(usuario.getPersonasIdpersonas()));
+        return new UsuarioConPersonaEInstitucionDto(
+                UsuariosDto.fromEntity(usuario),
+                PersonasDto.fromEntity(usuario.getPersonasIdpersonas()),
+                UsuariosInstitucionesDto.fromEntity(
+                        usuariosInstitucionesDao.findByUsuariosIdusuarios(usuario)
+                )
+        );
+    }
+
+    public Boolean actualizarUsuarioInstitucion(String uuid, UsuarioConPersonaEInstitucionDto usuario){
+        Usuarios usuarioEntity = usuariosDao.findByKcUuid(uuid);
+        if(!Objects.equals(usuarioEntity.getRolesIdroles().getRol(), "EMPRESA")) throw new RuntimeException("El usuario no es una empresa");
+        Usuariosinstituciones usuariosinstituciones = usuariosInstitucionesDao.findByUsuariosIdusuarios(usuarioEntity);
+        if(usuariosinstituciones == null) throw new RuntimeException("El usuario no esta relacionado con ninguna institucion");
+        usuariosinstituciones.setCargo(usuario.getUsuarioInstitucion().getCargo());
+        usuarioEntity.setCorreo(usuario.getCorreo());
+
+        Personas persona = usuarioEntity.getPersonasIdpersonas();
+        persona.setNombres(usuario.getPersona().getNombre());
+        persona.setApellidopaterno(usuario.getPersona().getApellidoPaterno());
+        persona.setApellidomaterno(usuario.getPersona().getApellidoMaterno());
+        persona.setCi(usuario.getPersona().getCi());
+        persona.setFechadenacimiento(usuario.getPersona().getFechaDeNacimiento());
+        persona.setTelefono(usuario.getPersona().getTelefono());
+
+        personasDao.save(persona);
+        usuariosDao.save(usuarioEntity);
+        usuariosInstitucionesDao.save(usuariosinstituciones);
+        return true;
     }
 
     private Boolean validarRelacionUsuarioInstitucion(String uuid, Integer idInstitucion){

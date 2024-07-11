@@ -75,6 +75,23 @@ public class InstitucionApi {
         return response;
     }
 
+    @PutMapping("/usuario/{uuid}")
+    public ResponseDto<Boolean> actualizarUsuario(
+            @PathVariable String uuid,
+            @RequestBody UsuarioConPersonaEInstitucionDto usuario
+    ) {
+        ResponseDto<Boolean> response = new ResponseDto<>();
+        try {
+            response.setResponse(institucionBl.actualizarUsuarioInstitucion(uuid, usuario));
+            response.setCode("200");
+            response.setErrorMessage("");
+        }catch (Exception e) {
+            response.setCode("500");
+            response.setErrorMessage(e.getMessage());
+        }
+        return response;
+    }
+
     private <T> ResponseEntity<ResponseDto<T>> handleRequest(Supplier<T> supplier) {
         ResponseDto<T> responseDto = new ResponseDto<>();
         try {

@@ -38,7 +38,6 @@ public class MinioService {
         if (originalFilename == null) throw new AssertionError();
         String uniqueFilename = generateUniqueFilename(originalFilename);
         uniqueFilename = uniqueFilename.replace(" ", "_");
-        //String fileName = UUID.randomUUID() + "." + file.getOriginalFilename().split("\\.")[file.getOriginalFilename().split("\\.").length - 1];
         minioClient.putObject(PutObjectArgs
                 .builder()
                 .bucket(bucket)

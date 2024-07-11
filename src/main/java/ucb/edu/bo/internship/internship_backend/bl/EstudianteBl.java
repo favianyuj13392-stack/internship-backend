@@ -1,8 +1,14 @@
 package ucb.edu.bo.internship.internship_backend.bl;
 
+import io.minio.*;
+import org.apache.commons.compress.utils.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ucb.edu.bo.internship.internship_backend.dao.*;
@@ -27,9 +33,10 @@ public class EstudianteBl {
 
     private Logger logger = LoggerFactory.getLogger(EstudianteBl.class);
     private final PasantiasDao pasantiasDao;
+    private final MinioClient minioClient;
 
     public EstudianteBl(UsuariosDao usuariosDao, PersonasDao personasDao, RolesDao rolesDao, CurriculumsDao curriculumsDao, MinioBl minioBl, AplicacionPasantiasDao aplicacionPasantiasDao,
-                        PasantiasDao pasantiasDao) {
+                        PasantiasDao pasantiasDao, MinioClient minioClient) {
         this.usuariosDao = usuariosDao;
         this.personasDao = personasDao;
         this.rolesDao = rolesDao;
@@ -37,6 +44,7 @@ public class EstudianteBl {
         this.minioBl = minioBl;
         this.aplicacionPasantiasDao = aplicacionPasantiasDao;
         this.pasantiasDao = pasantiasDao;
+        this.minioClient = minioClient;
     }
 
     public UsuariosDto obtenerEstudianteByUuid(String uuid) {
@@ -71,27 +79,29 @@ public class EstudianteBl {
         return true;
     }
 
-    public Boolean agregarCurriculum(String uuid, MultipartFile curriculum) {
+    public Boolean agregarCurriculum(String uuid, MultipartFile curriculum,String fullUrl) {
         try {
             System.out.println("subiendo pdf");
             Usuarios usuario = usuariosDao.findByKcUuid(uuid);
-            if(!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE")) throw new RuntimeException("El usuario no es un estudiante");
+            if (!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE"))  throw new RuntimeException("El usuario no es un estudiante");
             NewFileDto newFileDto = minioBl.uploadFile(curriculum, "internship-cv");
-            if(newFileDto == null) throw new RuntimeException("Error al subir el curriculum");
-            String filepath = minioBl.getFile("internship-cv", newFileDto.getFileName());
+            if (newFileDto == null) throw new RuntimeException("Error al subir el curriculum");
+            String downloadUrl = generateDownloadUrl("internship-cv", newFileDto.getFileName(),fullUrl);
             Curriculums curriculumEntity = new Curriculums();
             curriculumEntity.setFechacargado(new Date());
             curriculumEntity.setTitulo(curriculum.getOriginalFilename());
-            curriculumEntity.setPdfcurriculum(filepath);
+            curriculumEntity.setPdfcurriculum(downloadUrl);
             curriculumEntity.setUsuariosIdusuarios(usuario);
-
             curriculumsDao.save(curriculumEntity);
 
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
-            throw new RuntimeException("Error al subir el curriculum",e);
+            throw new RuntimeException("Error al subir el curriculum", e);
         }
+    }
+    private String generateDownloadUrl(String bucket, String fileName,String fullUrl) {
+        return fullUrl +"/api/v1/estudiante/public/files/download/" + fileName;
     }
 
     public String obtenerCurriculum(String uuid, String curriculumPdf) {
@@ -159,6 +169,31 @@ public class EstudianteBl {
             throw e;
         }catch (Exception e){
             throw new RuntimeException("Error al aplicar a la pasantia",e);
+        }
+    }
+
+    public ResponseEntity<byte[]> downloadFile(String idFile) {
+        try {
+            StatObjectResponse stat = minioClient.statObject(
+                    StatObjectArgs.builder()
+                            .bucket("internship-cv")
+                            .object(idFile)
+                            .build()
+            );
+            GetObjectResponse fileContent = minioClient.getObject(
+                    GetObjectArgs.builder()
+                            .bucket("internship-cv")
+                            .object(idFile)
+                            .build()
+            );
+            byte[] fileBytes = IOUtils.toByteArray(fileContent);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + stat.object() + "\"")
+                    .body(fileBytes);
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

@@ -1,5 +1,8 @@
 package ucb.edu.bo.internship.internship_backend.api;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ucb.edu.bo.internship.internship_backend.bl.EstudianteBl;
@@ -53,11 +56,21 @@ public class EstudianteApi {
     @PostMapping("/{uuid}/curriculum")
     public ResponseDto<Boolean> addCurriculum(
             @PathVariable String uuid,
-            @RequestParam("file") MultipartFile curriculum
+            @RequestParam("file") MultipartFile curriculum,
+            HttpServletRequest request
     ) {
+
+        // Obtener la URL completa del request
+        String fullUrl = request.getRequestURL().toString();
+        String queryString = request.getQueryString();
+        if (queryString != null) {
+            fullUrl += "?" + queryString;
+        }
+        //recortar la url a solo la base quitando el endpoint
+        fullUrl = fullUrl.substring(0, fullUrl.indexOf("/api/v1/estudiante/"));
         ResponseDto<Boolean> response = new ResponseDto<>();
         try {
-            response.setResponse(estudianteBl.agregarCurriculum(uuid, curriculum));
+            response.setResponse(estudianteBl.agregarCurriculum(uuid, curriculum,fullUrl));
             response.setCode("200");
             response.setErrorMessage("");
         }catch (Exception e) {
@@ -65,6 +78,14 @@ public class EstudianteApi {
             response.setErrorMessage(e.getMessage());
         }
         return response;
+    }
+    @GetMapping("/public/files/download/{idFile}")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable String idFile) {
+        try {
+            return estudianteBl.downloadFile(idFile);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @GetMapping("/{uuid}/curriculum/{archivo}")

@@ -17,9 +17,9 @@ public class MinioBl {
 
     public NewFileDto uploadFile(MultipartFile file, String bucketName) {
        try{
-           NewFileDto fileDto = minioService.uploadFile(file, bucketName);
-           return fileDto;
+           return minioService.uploadFile(file, bucketName);
        }catch (Exception e){
+           System.out.println(e);
              return null;
        }
     }

@@ -141,8 +141,13 @@ public class EstudianteBl {
             if(!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE")) throw new RuntimeException("El usuario no es un estudiante");
             Curriculums curriculum = curriculumsDao.findById(curriculumId).orElseThrow(() -> new RuntimeException("Curriculum no encontrado"));
             if(!curriculum.getUsuariosIdusuarios().equals(usuario)) throw new RuntimeException("El curriculum no pertenece al usuario");
+            //Validar que no tenga aplicaciones
+            List<Aplicacionespasantias> aplicaciones = aplicacionPasantiasDao.findByCurriculumsIdcurriculums(curriculum);
+            if(!aplicaciones.isEmpty()) throw new RuntimeException("El curriculum tiene aplicaciones a pasantias");
             curriculumsDao.delete(curriculum);
             return CurriculumsDto.fromEntity(curriculum);
+        }catch (RuntimeException e){
+            throw e;
         }catch (Exception e){
             throw new RuntimeException("Error al eliminar el curriculum",e);
         }

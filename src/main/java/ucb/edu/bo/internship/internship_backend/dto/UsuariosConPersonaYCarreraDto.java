@@ -53,7 +53,7 @@ public class UsuariosConPersonaYCarreraDto extends UsuariosDto{
     }
 
     public UsuariosConPersonaYCarreraDto(UsuariosDto usuariosDto, PersonasDto persona) {
-        super(usuariosDto.getIdUsuarios(), usuariosDto.getKc_UUID(), usuariosDto.getCorreo(), usuariosDto.getFechaRegistro(), usuariosDto.getHoraRegistro(), usuariosDto.getIdRoles(), usuariosDto.getIdPersonas(), usuariosDto.getIdCarreras());
+        super(usuariosDto.getIdUsuarios(), usuariosDto.getKc_UUID(), usuariosDto.getCorreo(), usuariosDto.getFechaRegistro(), usuariosDto.getHoraRegistro(), usuariosDto.getIdRoles(), usuariosDto.getIdPersonas(),null);
         this.persona = persona;
 
     }

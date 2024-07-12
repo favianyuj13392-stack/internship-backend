@@ -106,7 +106,12 @@ public class UsuariosDto {
         usuarioDto.setHoraRegistro(new Time(usuario.getHoraregistro().getTime()));
         usuarioDto.setIdRoles(usuario.getRolesIdroles().getIdroles());
         usuarioDto.setIdPersonas(usuario.getPersonasIdpersonas().getIdpersonas());
-        usuarioDto.setIdCarreras(usuario.getCarrerasIdcarreras().getIdcarreras());
+        if(usuario.getCarrerasIdcarreras() != null) {
+            usuarioDto.setIdCarreras(usuario.getCarrerasIdcarreras().getIdcarreras());
+        }else{
+            usuarioDto.setIdCarreras(null);
+        }
+
         return usuarioDto;
     }
     public static UsuariosDto fromEntityInstitucion(Usuarios usuario){

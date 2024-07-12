@@ -1,5 +1,7 @@
 package ucb.edu.bo.internship.internship_backend.bl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.minio.*;
 import org.apache.commons.compress.utils.IOUtils;
 import org.slf4j.Logger;
@@ -199,6 +201,34 @@ public class EstudianteBl {
                     .body(fileBytes);
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    public UsuarioCompletoDto obtenerEstudianteCompleto(Integer idEstudiante) {
+        try{
+            Personas estudiante = personasDao.findById(idEstudiante).orElseThrow(() -> new RuntimeException("Estudiante no encontrado"));
+            ObjectMapper objectMapper = new ObjectMapper();
+            String experienciaString  = estudiante.getExperiencia().toString();
+            JsonNode experiencia = objectMapper.readTree(experienciaString);
+            estudiante.setExperiencia(experiencia);
+
+            //now with habilidades,habiidadesseleccionadas and redesSociales
+            String habilidadesString = estudiante.getHabilidades().toString();
+            JsonNode habilidades = objectMapper.readTree(habilidadesString);
+            estudiante.setHabilidades(habilidades);
+
+            String habilidadesSeleccionadaString = estudiante.getHabilidadesseleccionadas().toString();
+            JsonNode habilidadesSeleccionada = objectMapper.readTree(habilidadesSeleccionadaString);
+            estudiante.setHabilidadesseleccionadas(habilidadesSeleccionada);
+
+            String redesSocialesString = estudiante.getRedessociales().toString();
+            JsonNode redesSociales = objectMapper.readTree(redesSocialesString);
+            estudiante.setRedessociales(redesSociales);
+            return new UsuarioCompletoDto(PersonasDto.fromEntity(estudiante),UsuariosDto.fromEntity(estudiante.getUsuariosList().get(0)));
+        }catch (RuntimeException e) {
+            throw e;
+        }catch (Exception e) {
+            throw new RuntimeException("Error al obtener el estudiante",e);
         }
     }
 }

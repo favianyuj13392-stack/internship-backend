@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ucb.edu.bo.internship.internship_backend.bl.AdministradorBl;
+import ucb.edu.bo.internship.internship_backend.bl.EstudianteBl;
 import ucb.edu.bo.internship.internship_backend.bl.InstitucionBl;
 import ucb.edu.bo.internship.internship_backend.bl.PasantiaBl;
 import ucb.edu.bo.internship.internship_backend.dto.*;
@@ -21,10 +22,12 @@ public class AdministradorApi {
     private final AdministradorBl administradorBl;
     private final InstitucionBl institucionBl;
     private final PasantiaBl pasantiaBl;
-    public AdministradorApi(AdministradorBl administradorBl, InstitucionBl institucionBl, PasantiaBl pasantiaBl) {
+    private final EstudianteBl estudianteBl;
+    public AdministradorApi(AdministradorBl administradorBl, InstitucionBl institucionBl, PasantiaBl pasantiaBl, EstudianteBl estudianteBl) {
         this.administradorBl = administradorBl;
         this.pasantiaBl = pasantiaBl;
         this.institucionBl = institucionBl;
+        this.estudianteBl = estudianteBl;
     }
     //Obtener todas las instituciones
     @GetMapping("/instituciones")
@@ -119,6 +122,23 @@ public class AdministradorApi {
     ) {
         return handleRequest(() -> pasantiaBl.obtenerPasantia(idPasantia));
     }
+    //Obtener el perfil de un estudiante
+    @GetMapping("/estudiante/{idEstudiante}")
+    public ResponseEntity<ResponseDto<UsuarioCompletoDto>> getEstudiante(
+            @PathVariable String uuid,
+            @PathVariable Integer idEstudiante
+    ) {
+        return handleRequest(() -> estudianteBl.obtenerEstudianteCompleto(idEstudiante));
+    }
+    //Obtener una solicitud de aplicación a pasantía
+    @GetMapping("/solicitud/{idSolicitud}")
+    public ResponseEntity<ResponseDto<AplicacionPasantiasDto>> getSolicitud(
+            @PathVariable String uuid,
+            @PathVariable Integer idSolicitud
+    ) {
+        return handleRequest(() -> administradorBl.obtenerSolicitudDeAplicacion( idSolicitud));
+    }
+
 
     @PutMapping("/pasantia/{idPasantias}/aceptar")
     public ResponseEntity<ResponseDto<PasantiasDto>> aceptarPasantia(

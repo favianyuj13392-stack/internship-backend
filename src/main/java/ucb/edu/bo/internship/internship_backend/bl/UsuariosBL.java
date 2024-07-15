@@ -244,4 +244,19 @@ public class UsuariosBL {
         }
         return null;
     }
+
+    public Boolean obtenerUsuarioAprobado(String uuid) {
+        Usuarios usuario = usuariosDao.findByKcUuid(uuid);
+        if(usuario != null){
+            Usuariosinstituciones usuariosinstituciones = usuariosInstitucionesDao.findByUsuariosIdusuarios(usuario);
+            if(usuariosinstituciones != null){
+                if(usuariosinstituciones.getActivo()==true && usuario.getActivo()==true){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
 }

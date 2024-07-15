@@ -43,6 +43,21 @@ public class UsuarioApi {
         return response;
     }
 
+
+    @GetMapping("/{uuid}/empresa/aprobado")
+    public ResponseDto<Boolean> usuarioAprobado(@PathVariable String uuid){
+        ResponseDto<Boolean> response = new ResponseDto<>();
+        try{
+            response.setResponse(usuariosBL.obtenerUsuarioAprobado(uuid));
+            response.setCode("200");
+            response.setErrorMessage("");
+        }catch (Exception e){
+            response.setCode("500");
+            response.setErrorMessage(e.getMessage());
+        }
+        return response;
+    }
+
     @GetMapping("/{uuid}/institucion")
     public ResponseDto<InstitucionesDto> obtenerInstitucionPorUsuario(@PathVariable String uuid){
         ResponseDto<InstitucionesDto> response = new ResponseDto<>();

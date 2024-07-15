@@ -1,6 +1,7 @@
 package ucb.edu.bo.internship.internship_backend.dto;
 
 import ucb.edu.bo.internship.internship_backend.entity.Aplicacionespasantias;
+import ucb.edu.bo.internship.internship_backend.entity.Pasantias;
 
 import java.util.Date;
 
@@ -11,13 +12,13 @@ public class AplicacionPasantiasInformacionPasantiasDto {
     private Date fechaAplicacion;
     private Boolean activo;
     private String urlCurriculum;
-    private PasantiasDto pasantiasDto;
+    private PasantiasConInstitucionDto pasantiasDto;
 
 
     public AplicacionPasantiasInformacionPasantiasDto() {
     }
 
-    public AplicacionPasantiasInformacionPasantiasDto(Integer idAplicacionPasantias, Integer idUsuarios, Integer idPasantias, Date fechaAplicacion,Boolean activo,String urlCurriculum, PasantiasDto pasantiasDto) {
+    public AplicacionPasantiasInformacionPasantiasDto(Integer idAplicacionPasantias, Integer idUsuarios, Integer idPasantias, Date fechaAplicacion,Boolean activo,String urlCurriculum, PasantiasConInstitucionDto pasantiasDto) {
         this.idAplicacionPasantias = idAplicacionPasantias;
         this.idUsuarios = idUsuarios;
         this.idPasantias = idPasantias;
@@ -33,7 +34,7 @@ public class AplicacionPasantiasInformacionPasantiasDto {
         return this.pasantiasDto;
     }
 
-    public void setPasantiasDto(PasantiasDto pasantiasDto) {
+    public void setPasantiasDto(PasantiasConInstitucionDto pasantiasDto) {
         this.pasantiasDto = pasantiasDto;
     }
     
@@ -89,15 +90,36 @@ public class AplicacionPasantiasInformacionPasantiasDto {
     }
 
     public static AplicacionPasantiasInformacionPasantiasDto fromEntity(Aplicacionespasantias aplicacionespasantias){
-        return new AplicacionPasantiasInformacionPasantiasDto(
-            aplicacionespasantias.getIdaplicacionpasantias(),
-            aplicacionespasantias.getUsuariosIdusuarios().getIdusuarios(),
-            aplicacionespasantias.getPasantiasIdpasantias().getIdpasantias(),
-            aplicacionespasantias.getFechaaplicacion(),
-            aplicacionespasantias.getActivo(),
-            aplicacionespasantias.getCurriculumsIdcurriculums().getPdfcurriculum(), 
-            PasantiasDto.fromEntity(aplicacionespasantias.getPasantiasIdpasantias())
-        );
+        AplicacionPasantiasInformacionPasantiasDto aplicacionPasantiasDto = new AplicacionPasantiasInformacionPasantiasDto();
+        aplicacionPasantiasDto.setIdAplicacionPasantias(aplicacionespasantias.getIdaplicacionpasantias());
+        aplicacionPasantiasDto.setIdUsuarios(aplicacionespasantias.getUsuariosIdusuarios().getIdusuarios());
+        aplicacionPasantiasDto.setIdPasantias(aplicacionespasantias.getPasantiasIdpasantias().getIdpasantias());
+        aplicacionPasantiasDto.setFechaAplicacion(aplicacionespasantias.getFechaaplicacion());
+        aplicacionPasantiasDto.setActivo(aplicacionespasantias.getActivo());
+        aplicacionPasantiasDto.setUrlCurriculum(aplicacionespasantias.getCurriculumsIdcurriculums().getPdfcurriculum());
+        PasantiasDto pasantiasDto = PasantiasConInstitucionDto.fromEntity(aplicacionespasantias.getPasantiasIdpasantias());
+
+        PasantiasConInstitucionDto pasantiasConInstitucionDto = new PasantiasConInstitucionDto();
+        InstitucionesDto institucionesDto = InstitucionesDto.fromEntity(aplicacionespasantias.getPasantiasIdpasantias().getInstitucionesIdinstituciones());
+        pasantiasConInstitucionDto.setInstitucion(institucionesDto);
+        pasantiasConInstitucionDto.setIdPasantias(pasantiasDto.getIdPasantias());
+        pasantiasConInstitucionDto.setAreas(pasantiasDto.getAreas());
+        pasantiasConInstitucionDto.setTitulo(pasantiasDto.getTitulo());
+        pasantiasConInstitucionDto.setDescripcion(pasantiasDto.getDescripcion());
+        pasantiasConInstitucionDto.setRequisitos(pasantiasDto.getRequisitos());
+        pasantiasConInstitucionDto.setFunciones(pasantiasDto.getFunciones());
+        pasantiasConInstitucionDto.setBeneficios(pasantiasDto.getBeneficios());
+        pasantiasConInstitucionDto.setFechaCierre(pasantiasDto.getFechaCierre());
+        pasantiasConInstitucionDto.setFechaIngreso(pasantiasDto.getFechaIngreso());
+        aplicacionPasantiasDto.setPasantiasDto(pasantiasConInstitucionDto);
+
+
+
+
+
+
+
+        return aplicacionPasantiasDto;
     }
 
     @Override

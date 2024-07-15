@@ -12,6 +12,10 @@ public class UsuarioCompletoDto {
         this.usuario = usuario;
         this.aplicacionPasantia = aplicacionPasantia;
     }
+    public UsuarioCompletoDto(PersonasDto persona, UsuariosDto usuario){
+        this.persona = persona;
+        this.usuario = usuario;
+    }
     public UsuarioCompletoDto(){}
 
     public PersonasDto getPersona() {

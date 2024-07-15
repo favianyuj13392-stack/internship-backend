@@ -1,5 +1,7 @@
 package ucb.edu.bo.internship.internship_backend.bl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import ucb.edu.bo.internship.internship_backend.dao.*;
@@ -18,12 +20,14 @@ public class AdministradorBl {
     private final PasantiasDao pasantiasDao;
     private final UsuariosDao usuariosDao;
     private final PersonasDao personasDao;
-    public AdministradorBl(InstitucionesDao institucionesDao, UsuariosInstitucionesDao usuariosInstitucionesDao, PasantiasDao pasantiasDao, UsuariosDao usuariosDao, PersonasDao personasDao) {
+    private final AplicacionPasantiasDao aplicacionPasantiasDao;
+    public AdministradorBl(InstitucionesDao institucionesDao, UsuariosInstitucionesDao usuariosInstitucionesDao, PasantiasDao pasantiasDao, UsuariosDao usuariosDao, PersonasDao personasDao,AplicacionPasantiasDao aplicacionPasantiasDao){
         this.institucionesDao = institucionesDao;
         this.usuariosInstitucionesDao = usuariosInstitucionesDao;
         this.pasantiasDao = pasantiasDao;
         this.usuariosDao = usuariosDao;
         this.personasDao = personasDao;
+        this.aplicacionPasantiasDao = aplicacionPasantiasDao;
     }
 
     public InstitucionesDto cambiarEstadoInstitucion(Integer idInstituciones, Boolean estado) {
@@ -170,6 +174,18 @@ public class AdministradorBl {
                     .toList();
         }catch (Exception e){
             throw new RuntimeException("Error al obtener las suscripciones a la institucion",e);
+        }
+    }
+
+    public AplicacionPasantiasDto obtenerSolicitudDeAplicacion(Integer idSolicitud) {
+        try {
+            Aplicacionespasantias aplicacionespasantias = aplicacionPasantiasDao.findById(idSolicitud).orElseThrow(() -> new RuntimeException("Solicitud de aplicacion no encontrada"));
+            return AplicacionPasantiasDto.fromEntity(aplicacionespasantias);
+        }catch (RuntimeException e){
+            throw e;
+        }catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al obtener la informacion de la solicitud", e);
         }
     }
 }

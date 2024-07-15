@@ -136,6 +136,22 @@ public class EstudianteApi {
         }
         return response;
     }
+
+    @GetMapping("{uuid}/aplicaciones/pasantias")
+    public ResponseDto<List<AplicacionPasantiasInformacionPasantiasDto>> getAplicacionesPasantias(@PathVariable String uuid) {
+        ResponseDto<List<AplicacionPasantiasInformacionPasantiasDto>> response = new ResponseDto<>();
+        try {
+            response.setResponse(estudianteBl.obtenerAplicacionesPasantias(uuid));
+            response.setCode("200");
+            response.setErrorMessage("");
+        }catch (Exception e) {
+            response.setCode("500");
+            response.setErrorMessage(e.getMessage());
+        }
+        return response;
+    }
+
+
     //Eliminar un curriculum
     @DeleteMapping("{uuid}/curriculum/{curriculumId}")
     public ResponseDto<CurriculumsDto> deleteCurriculum(@PathVariable String uuid, @PathVariable Integer curriculumId) {

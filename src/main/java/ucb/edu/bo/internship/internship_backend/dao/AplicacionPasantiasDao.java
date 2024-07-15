@@ -10,6 +10,7 @@ import ucb.edu.bo.internship.internship_backend.entity.Pasantias;
 import ucb.edu.bo.internship.internship_backend.entity.Usuarios;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AplicacionPasantiasDao extends JpaRepository<Aplicacionespasantias, Integer>{
 
@@ -20,4 +21,6 @@ public interface AplicacionPasantiasDao extends JpaRepository<Aplicacionespasant
     List<Aplicacionespasantias> findByUsuariosIdusuariosAndPasantiasIdpasantias(Usuarios usuario, Pasantias pasantia);
 
     List<Aplicacionespasantias> findByCurriculumsIdcurriculums(Curriculums curriculum);
+
+    List<Aplicacionespasantias> findByUsuariosIdusuarios(Usuarios usuario);
 }

@@ -235,4 +235,18 @@ public class EstudianteBl {
             throw new RuntimeException("Error al obtener el estudiante",e);
         }
     }
+
+    public List<AplicacionPasantiasInformacionPasantiasDto> obtenerAplicacionesPasantias(String uuid) {
+        try{
+            Usuarios usuario = usuariosDao.findByKcUuid(uuid);
+            if(!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE")) throw new RuntimeException("El usuario no es un estudiante");
+            List<Aplicacionespasantias> aplicaciones = aplicacionPasantiasDao.findByUsuariosIdusuarios(usuario);
+            return aplicaciones.stream().map(AplicacionPasantiasInformacionPasantiasDto::fromEntity).toList();
+            
+        }catch (RuntimeException e){
+            throw e;
+        }catch (Exception e){
+            throw new RuntimeException("Error al obtener las aplicaciones a pasantias",e);
+        }
+    }
 }

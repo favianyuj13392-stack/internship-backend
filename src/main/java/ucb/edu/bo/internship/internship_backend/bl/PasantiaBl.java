@@ -7,19 +7,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import ucb.edu.bo.internship.internship_backend.dao.*;
 import ucb.edu.bo.internship.internship_backend.dto.*;
 import ucb.edu.bo.internship.internship_backend.entity.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PasantiaBl {
@@ -28,13 +23,111 @@ public class PasantiaBl {
     private final UsuariosDao usuariosDao;
     private final AplicacionPasantiasDao aplicacionPasantiasDao;
     private final SeleccionAplicanteDao seleccionAplicanteDao;
+    private final CarrerasDao carrerasDao;
 
-    public PasantiaBl(PasantiasDao pasantiasDao, PasantiasCarrerasDao pasantiasCarrerasDao,UsuariosDao usuariosDao, AplicacionPasantiasDao aplicacionPasantiasDao, SeleccionAplicanteDao seleccionAplicanteDao) {
+    private final Logger logger = LoggerFactory.getLogger(PasantiaBl.class);
+
+    public PasantiaBl(PasantiasDao pasantiasDao, PasantiasCarrerasDao pasantiasCarrerasDao,UsuariosDao usuariosDao, AplicacionPasantiasDao aplicacionPasantiasDao, SeleccionAplicanteDao seleccionAplicanteDao,
+                      CarrerasDao carrerasDao) {
         this.pasantiasDao = pasantiasDao;
         this.pasantiasCarrerasDao = pasantiasCarrerasDao;
         this.usuariosDao = usuariosDao;
         this.aplicacionPasantiasDao = aplicacionPasantiasDao;
         this.seleccionAplicanteDao = seleccionAplicanteDao;
+        this.carrerasDao = carrerasDao;
+    }
+
+    public Page<PasantiasConInstitucionYCarrerasDto> obtenerPasantiasPorFiltros(
+            String terminoDeBusqueda,
+            List<String> areas,
+            Integer idCarrera,
+            Pageable pageable
+    ){
+        if (terminoDeBusqueda == null && areas == null && idCarrera == null){
+            return obtenerTodasPasantias(pageable);
+        } else if (terminoDeBusqueda == null && areas == null && idCarrera != null){
+            return obtenerPasantiasPorCarrera(idCarrera, pageable);
+        } else if (terminoDeBusqueda == null && areas != null && idCarrera == null){
+            return obtenerPasantiasPorAreas(areas, pageable);
+        } else if (terminoDeBusqueda == null && areas != null && idCarrera != null){
+            return obtenerPasantiasPorAreasYCarrera(areas, idCarrera, pageable);
+        } else if (terminoDeBusqueda != null && areas == null && idCarrera == null){
+            return obtenerPasantiasPorTerminoDeBusqueda(terminoDeBusqueda, pageable);
+        } else if (terminoDeBusqueda != null && areas == null && idCarrera != null){
+            return obtenerPasantiasPorTerminoDeBusquedaYCarrera(terminoDeBusqueda, idCarrera, pageable);
+        } else if (terminoDeBusqueda != null && areas != null && idCarrera == null){
+            return obtenerPasantiasPorTerminoDeBusquedaAreas(terminoDeBusqueda, areas, pageable);
+        } else {
+            return obtenerPasantiasPorTerminoDeBusquedaAreasYCarrera(terminoDeBusqueda, areas, idCarrera, pageable);
+
+        }
+    }
+
+    public Page<PasantiasConInstitucionYCarrerasDto> obtenerTodasPasantias(Pageable pageable){
+        Date fechaActual = new Date();
+        return pasantiasDao.findAllByActivoIsTrueAndFechacierreAfter(
+                fechaActual,
+                pageable
+        ).map(this::toPasantiasConInstitucionYCarrerasDto);
+    }
+
+    public Page<PasantiasConInstitucionYCarrerasDto> obtenerPasantiasPorCarrera(Integer idCarrera, Pageable pageable){
+        Date fechaActual = new Date();
+        return pasantiasDao.findAllByActivoIsTrueAndFechacierreAfterAndCarreras(
+                fechaActual,
+                idCarrera,
+                pageable
+        ).map(this::toPasantiasConInstitucionYCarrerasDto);
+    }
+
+    public Page<PasantiasConInstitucionYCarrerasDto> obtenerPasantiasPorAreas(List<String> areas, Pageable pageable){
+        Date fechaActual = new Date();
+        return pasantiasDao.findAllByActivoIsTrueAndFechacierreAfterAndAreas(
+                fechaActual,
+                areas,
+                pageable
+        ).map(this::toPasantiasConInstitucionYCarrerasDto);
+    }
+
+    public Page<PasantiasConInstitucionYCarrerasDto> obtenerPasantiasPorAreasYCarrera(List<String> areas, Integer idCarrera, Pageable pageable){
+        Date fechaActual = new Date();
+        return pasantiasDao.findAllByActivoIsTrueAndFechacierreAfterAndAreasAndCarreras(
+                fechaActual,
+                areas,
+                idCarrera,
+                pageable
+        ).map(this::toPasantiasConInstitucionYCarrerasDto);
+    }
+
+    public Page<PasantiasConInstitucionYCarrerasDto> obtenerPasantiasPorTerminoDeBusquedaYCarrera(String terminoDeBusqueda, Integer idCarrera, Pageable pageable){
+        Date fechaActual = new Date();
+        return pasantiasDao.findAllByActivoIsTrueAndFechacierreAfterAndTituloAndCarreras(
+                fechaActual,
+                terminoDeBusqueda,
+                idCarrera,
+                pageable
+        ).map(this::toPasantiasConInstitucionYCarrerasDto);
+    }
+
+    public Page<PasantiasConInstitucionYCarrerasDto> obtenerPasantiasPorTerminoDeBusquedaAreas(String terminoDeBusqueda, List<String> areas, Pageable pageable){
+        Date fechaActual = new Date();
+        return pasantiasDao.findAllByActivoIsTrueAndFechacierreAfterAndTituloAndAreas(
+                fechaActual,
+                terminoDeBusqueda,
+                areas,
+                pageable
+        ).map(this::toPasantiasConInstitucionYCarrerasDto);
+    }
+
+    public Page<PasantiasConInstitucionYCarrerasDto> obtenerPasantiasPorTerminoDeBusquedaAreasYCarrera(String terminoDeBusqueda, List<String> areas, Integer idCarrera, Pageable pageable){
+        Date fechaActual = new Date();
+        return pasantiasDao.findAllByActivoIsTrueAndFechacierreAfterAndTituloAndAreasAndCarreras(
+                fechaActual,
+                terminoDeBusqueda,
+                areas,
+                idCarrera,
+                pageable
+        ).map(this::toPasantiasConInstitucionYCarrerasDto);
     }
 
     public Page<PasantiasConInstitucionYCarrerasDto> obtenerPasantiasPorTerminoDeBusqueda(String terminoDeBusqueda, Pageable pageable){
@@ -46,14 +139,6 @@ public class PasantiaBl {
         ).map(this::toPasantiasConInstitucionYCarrerasDto);
     }
 
-
-    public Page<PasantiasConInstitucionYCarrerasDto> obtenerTodasPasantias(Pageable pageable){
-        Date fechaActual = new Date();
-        return pasantiasDao.findAllByActivoIsTrueAndFechacierreAfter(
-                fechaActual,
-                pageable
-        ).map(this::toPasantiasConInstitucionYCarrerasDto);
-    }
 
     public PasantiasDto obtenerPasantiaPorId(Integer id){
         Pasantias pasantias = pasantiasDao.findByIdpasantiasAndActivoIsTrue(id);
@@ -90,7 +175,7 @@ public class PasantiaBl {
         pasantiasDto.setRequisitos(requisitos);
 
         InstitucionesDto institucionesDto = InstitucionesDto.fromEntity(pasantias1.getInstitucionesIdinstituciones());
-        List<CarrerasDto> carrerasDto = pasantiasCarrerasDao.findAllByPasantiasIdpasantias(pasantias1).stream().map(pasantiasCarreras -> CarrerasDto.fromEntity(pasantiasCarreras.getCarrerasIdcarreras())).toList();
+        List<CarrerasDto> carrerasDto = pasantias1.getPasantiascarrerasList().stream().map(pasantiasCarreras -> CarrerasDto.fromEntity(pasantiasCarreras.getCarrerasIdcarreras())).toList();
         return new PasantiasConInstitucionYCarrerasDto(pasantiasDto, institucionesDto, carrerasDto);
     }
 
@@ -283,6 +368,24 @@ public class PasantiaBl {
             throw new RuntimeException("Ocurrió un error al finalizar la pasantía", e);
         }
     }
+
+    public Set<String> obtenerAreas(){
+        List<PasantiasConInstitucionYCarrerasDto> pasantias = pasantiasDao.findAll().stream()
+                .map(this::toPasantiasConInstitucionYCarrerasDto)
+                .toList();
+
+        return pasantias.stream()
+                .flatMap(pasantia -> ((List<?>) pasantia.getAreas()).stream())
+                .map(Object::toString)
+                .collect(Collectors.toSet());
+    }
+
+    public Set<CarrerasDto> obtenerCarreras(){
+        return carrerasDao.findAll().stream()
+                .map(CarrerasDto::fromEntity)
+                .collect(Collectors.toSet());
+    }
+
     private Boolean validarRelacionInstitucionUsuario(String uuid, Integer idPasantia) {
         //Obtener Pasantia
         Pasantias pasantia = pasantiasDao.findById(idPasantia).orElse(null);
@@ -298,4 +401,5 @@ public class PasantiaBl {
 
         return Objects.equals(institucionUsuario.getIdinstituciones(), institucionPasantia.getIdinstituciones());
     }
+
 }

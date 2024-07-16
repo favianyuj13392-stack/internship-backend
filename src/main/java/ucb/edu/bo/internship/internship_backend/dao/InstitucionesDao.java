@@ -67,4 +67,32 @@ public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
 
     Instituciones findByNombre(String nombre);
 
+    @Query(value = """
+    SELECT DISTINCT i.*
+    FROM instituciones i
+    WHERE i.activo = true
+    AND LOWER(i.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
+    AND EXISTS(
+        SELECT 1
+        FROM jsonb_array_elements_text(i.sectores) AS sector
+        WHERE sector = (:sectorParam)
+    )
+    """, nativeQuery = true)
+    Page<Instituciones> findAllWithCountPasantiasAndNombreAndSectores(String search, String sectorParam, Pageable pageable);
+
+    @Query(value = """
+    SELECT DISTINCT i.*
+    FROM instituciones i
+    WHERE i.activo = true
+    AND EXISTS(
+        SELECT 1
+        FROM jsonb_array_elements_text(i.sectores) AS sector
+        WHERE sector = (:sectorParam)
+    )
+    """, nativeQuery = true)
+    Page<Instituciones> findAllBySector(
+            String sectorParam,
+            Pageable pageable
+    );
+
 }

@@ -13,6 +13,7 @@ import ucb.edu.bo.internship.internship_backend.exception.institucion.UsuarioYaR
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 @RequestMapping("/api/v1/institucion")
@@ -28,8 +29,10 @@ public class InstitucionApi {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "12") Integer size,
             @RequestParam(defaultValue = "", required = false) String search,
-            @RequestParam(defaultValue = "idinstituciones", required = false) String sort) {
-        return handleRequest(() -> institucionBl.obtenerInstituciones(page, size, search, sort,"true"));
+            @RequestParam(defaultValue = "idinstituciones", required = false) String sort,
+            @RequestParam(required = false) String sector
+            ) {
+        return handleRequest(() -> institucionBl.obtenerInstituciones(page, size, search, sort,"true", sector));
     }
 
     // Obtener todos los id y nombre de las instituciones activas
@@ -90,6 +93,11 @@ public class InstitucionApi {
             response.setErrorMessage(e.getMessage());
         }
         return response;
+    }
+
+    @GetMapping("/sectores")
+    public ResponseEntity<ResponseDto<Set<String>>> obtenerSectores(){
+        return handleRequest(institucionBl::obtenerSectores);
     }
 
     private <T> ResponseEntity<ResponseDto<T>> handleRequest(Supplier<T> supplier) {

@@ -2,6 +2,8 @@ package ucb.edu.bo.internship.internship_backend.bl;
 
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,11 +24,9 @@ import ucb.edu.bo.internship.internship_backend.exception.institucion.Institucio
 import ucb.edu.bo.internship.internship_backend.exception.institucion.UsuarioYaRelacionadoException;
 
 import java.sql.Time;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
-import java.util.Date;
-import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class InstitucionBl {
@@ -39,6 +39,7 @@ public class InstitucionBl {
     private final SeleccionAplicanteDao seleccionAplicanteDao;
     private final PersonasDao personasDao;
 
+    private final Logger logger = LoggerFactory.getLogger(InstitucionBl.class);
     public InstitucionBl(InstitucionesDao institucionesDao, PasantiasDao pasantiasDao, UsuariosInstitucionesDao usuariosInstitucionesDao,UsuariosDao usuariosDao, UsuariosBL usuariosBL, AplicacionPasantiasDao aplicacionPasantiasDao, SeleccionAplicanteDao seleccionAplicanteDao,
                          PersonasDao personasDao) {
         this.institucionesDao = institucionesDao;
@@ -77,17 +78,29 @@ public class InstitucionBl {
         }
     }
     //Obtener todas las instituciones
-    public Page<InstitucionesDto> obtenerInstituciones(Integer page, Integer size, String search,String sort,String active){
+    public Page<InstitucionesDto> obtenerInstituciones(Integer page, Integer size, String search,String sort,String active, String sector){
         try{
             Page<InstitucionesDto> instituciones;
             Pageable pageable = buildPageable(page, size, sort);
             if(Objects.equals(active, ""))
             {
                 //Obtener todas las instituciones sin diferenciar si estan activas o no
-                if(search != null && !search.isEmpty()) {
+//                if(search != null && !search.isEmpty()) {
+//                    instituciones = institucionesDao.findAllWithCountPasantiasAndNombreContaining(search, pageable);
+//                } else {
+//                    instituciones = institucionesDao.findAllWithCountPasantias(pageable);
+//                }
+                //if to retrieve instituciones considering sector and search value
+                if (search == null && sector == null) {
+                    instituciones = institucionesDao.findAllWithCountPasantias(pageable);
+                } else if (search == null && sector!=null) {
+                    instituciones = institucionesDao.findAllBySector(sector, pageable).map(InstitucionesDto::fromEntity);
+                } else if (search != null && sector == null) {
                     instituciones = institucionesDao.findAllWithCountPasantiasAndNombreContaining(search, pageable);
                 } else {
-                    instituciones = institucionesDao.findAllWithCountPasantias(pageable);
+                    instituciones = institucionesDao.findAllWithCountPasantiasAndNombreAndSectores(search, sector, pageable).map(
+                            InstitucionesDto::fromEntity
+                    );
                 }
             }else{
                 if(!active.equals("true") && !active.equals("false")){
@@ -95,10 +108,16 @@ public class InstitucionBl {
                 }else{
                     Boolean activeBoolean = Boolean.parseBoolean(active);
 
-                    if(search != null && !search.isEmpty()){
-                        instituciones = institucionesDao.findAllWithCountPasantiasAndNombreContainingAndActivo(search, activeBoolean, pageable);
-                    }else {
-                        instituciones = institucionesDao.findAllByActivoWithCountPasantias(activeBoolean, pageable);
+                    if (search == null && sector == null) {
+                        instituciones = institucionesDao.findAllWithCountPasantias(pageable);
+                    } else if (search == null && sector!=null) {
+                        instituciones = institucionesDao.findAllBySector(sector, pageable).map(InstitucionesDto::fromEntity);
+                    } else if (search != null && sector == null) {
+                        instituciones = institucionesDao.findAllWithCountPasantiasAndNombreContaining(search, pageable);
+                    } else {
+                        instituciones = institucionesDao.findAllWithCountPasantiasAndNombreAndSectores(search, sector, pageable).map(
+                                InstitucionesDto::fromEntity
+                        );
                     }
                 }
             }
@@ -106,7 +125,7 @@ public class InstitucionBl {
         }catch (UsuarioYaRelacionadoException e){
             throw e;
         }catch (Exception e){
-            throw new InstitucionServiceExcepcion("Error al obtener las instituciones",e);
+            throw new RuntimeException("Error al obtener las instituciones: "+e.getMessage());
         }
     }
     @NotNull
@@ -467,6 +486,13 @@ public class InstitucionBl {
         usuariosDao.save(usuarioEntity);
         usuariosInstitucionesDao.save(usuariosinstituciones);
         return true;
+    }
+
+    public Set<String> obtenerSectores(){
+        return institucionesDao.findAll().stream()
+                .map(Instituciones::getSectores)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
     }
 
     private Boolean validarRelacionUsuarioInstitucion(String uuid, Integer idInstitucion){

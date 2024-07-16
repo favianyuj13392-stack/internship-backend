@@ -37,9 +37,10 @@ public class AdministradorApi {
             @RequestParam(defaultValue = "12") Integer size,
             @RequestParam(defaultValue = "", required = false) String search,
             @RequestParam(defaultValue = "idinstituciones", required = false) String sort,
-            @RequestParam(defaultValue = "", required = false) String active
+            @RequestParam(defaultValue = "", required = false) String active,
+            @RequestParam(defaultValue = "", required = false) String sector
             ) {
-        return handleRequest(() -> institucionBl.obtenerInstituciones(page, size, search, sort,active));
+        return handleRequest(() -> institucionBl.obtenerInstituciones(page, size, search, sort,active, sector));
     }
     // Obtener una institución por id
     @GetMapping("/instituciones/{id}")

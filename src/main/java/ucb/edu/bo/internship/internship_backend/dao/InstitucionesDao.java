@@ -55,7 +55,7 @@ public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
         LIMIT 4
     """, nativeQuery = true)
     List<Instituciones> findTop4InstitucionesBySectoresAndPasantias(Integer idInstitucion);
-    @Query("SELECT new ucb.edu.bo.internship.internship_backend.dto.InstitucionesConCOUNTPasantiasDto(i.idinstituciones,i.nombre, COUNT(p.idpasantias)) FROM Instituciones i JOIN Pasantias p ON i.idinstituciones = p.institucionesIdinstituciones.idinstituciones WHERE i.activo = ?1 GROUP BY i.idinstituciones order by COUNT(p.idpasantias) DESC")
+    @Query("SELECT new ucb.edu.bo.internship.internship_backend.dto.InstitucionesConCOUNTPasantiasDto(i.idinstituciones,i.nombre, COUNT(p.idpasantias),i.logoempresa) FROM Instituciones i JOIN Pasantias p ON i.idinstituciones = p.institucionesIdinstituciones.idinstituciones WHERE i.activo = ?1 GROUP BY i.idinstituciones order by COUNT(p.idpasantias) DESC")
     Page<InstitucionesConCOUNTPasantiasDto> getAllNameAndCountPasantiasByActivo(boolean b, Pageable pageable);
     @Query("select count (*) from Instituciones i where i.activo = true")
     Long countAllByActivo();

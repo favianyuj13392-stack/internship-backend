@@ -355,16 +355,19 @@ public class PasantiaBl {
             //Crear una nueva Seleccion aplicante
             Seleccionaplicante seleccionaplicante = new Seleccionaplicante();
             seleccionaplicante.setActivo(false);
-            seleccionaplicante.setComentarios("No se seleccionó a ningún aplicante");
+            seleccionaplicante.setComentarios("No se seleccionó a ningún aplicante en la pasantía: " + pasantia.getTitulo());
             seleccionaplicante.setFechaseleccion(new Date());
             seleccionaplicante.setHoraseleccion(new Date());
             seleccionaplicante.setAplicacionespasantiasIdaplicacionpasantias(null);
             seleccionaplicante.setUsuariosinstitucionesIdusuariosinstituciones(usuariosDao.findByKcUuid(uuid).getUsuariosinstitucionesList().get(0));
             seleccionaplicante = seleccionAplicanteDao.save(seleccionaplicante);
-            return SeleccionAplicanteDto.fromEntity(seleccionaplicante);
+            //Borrar la pasantía
+            pasantiasDao.delete(pasantia);
+            return SeleccionAplicanteDto.fromEntityWithOutAplicacionesPasantia(seleccionaplicante);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
+            System.out.println(e);
             throw new RuntimeException("Ocurrió un error al finalizar la pasantía", e);
         }
     }

@@ -209,9 +209,8 @@ public class PasantiaBl {
     public Page<PasantiaConNombreYLogoEmpresaDto> obtenerPasantias(Integer page, Integer size, String search, String sort, String active) {
         try {
             Pageable pageable = buildPageable(page, size, sort);
-            Date fechaActual = new Date();
             if (active.equals("true")) {
-                return pasantiasDao.findAllByActivoIsTrueAndFechacierreAfterAndTituloContainingIgnoreCase(fechaActual, search, pageable).map(PasantiaConNombreYLogoEmpresaDto::fromEntity);
+                return pasantiasDao.findAllByActivoIsTrueAndTituloContainingIgnoreCase(search, pageable).map(PasantiaConNombreYLogoEmpresaDto::fromEntity);
             } else if (active.equals("false")) {
                 return pasantiasDao.findAllByActivoIsFalseAndTituloContainingIgnoreCase(search, pageable).map(PasantiaConNombreYLogoEmpresaDto::fromEntity);
             } else {
@@ -251,6 +250,7 @@ public class PasantiaBl {
             pasantiasDto.setBeneficios(pasantias.getBeneficios());
             pasantiasDto.setFunciones(pasantias.getFunciones());
             pasantiasDto.setRequisitos(pasantias.getRequisitos());
+            pasantiasDto.setSinAplicantes(pasantias.isSinaplicantes());
             Boolean estadoPasantia = pasantias.getActivo();
             List<Aplicacionespasantias> aplicacionespasantias = pasantias.getAplicacionespasantiasList();
             //Obtener las personas postulantes
@@ -279,6 +279,7 @@ public class PasantiaBl {
             pasantiasDto.setBeneficios(pasantia.getBeneficios());
             pasantiasDto.setFunciones(pasantia.getFunciones());
             pasantiasDto.setRequisitos(pasantia.getRequisitos());
+            pasantiasDto.setSinAplicantes(pasantia.isSinaplicantes());
 
             //Obtener los postulantes
             List<Aplicacionespasantias> aplicacionespasantias = pasantia.getAplicacionespasantiasList();
@@ -355,14 +356,16 @@ public class PasantiaBl {
             //Crear una nueva Seleccion aplicante
             Seleccionaplicante seleccionaplicante = new Seleccionaplicante();
             seleccionaplicante.setActivo(false);
-            seleccionaplicante.setComentarios("No se seleccionó a ningún aplicante en la pasantía: " + pasantia.getTitulo());
+            seleccionaplicante.setComentarios("No se seleccionó a ningún aplicante en la pasantía: " + pasantia.getIdpasantias().toString());
             seleccionaplicante.setFechaseleccion(new Date());
             seleccionaplicante.setHoraseleccion(new Date());
             seleccionaplicante.setAplicacionespasantiasIdaplicacionpasantias(null);
             seleccionaplicante.setUsuariosinstitucionesIdusuariosinstituciones(usuariosDao.findByKcUuid(uuid).getUsuariosinstitucionesList().get(0));
             seleccionaplicante = seleccionAplicanteDao.save(seleccionaplicante);
-            //Borrar la pasantía
-            pasantiasDao.delete(pasantia);
+            //Marcar pasantía como sin aplicantes
+            pasantia.setSinaplicantes(true);
+            pasantia.setFechacierre(new Date());
+            pasantiasDao.save(pasantia);
             return SeleccionAplicanteDto.fromEntityWithOutAplicacionesPasantia(seleccionaplicante);
         } catch (RuntimeException e) {
             throw e;

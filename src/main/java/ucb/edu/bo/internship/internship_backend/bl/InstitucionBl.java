@@ -107,15 +107,14 @@ public class InstitucionBl {
                     throw new UsuarioYaRelacionadoException("El parametro active debe ser true o false");
                 }else{
                     Boolean activeBoolean = Boolean.parseBoolean(active);
-
                     if (search == null && sector == null) {
-                        instituciones = institucionesDao.findAllWithCountPasantias(pageable);
+                        instituciones = institucionesDao.findAllWithCountPasantiasAndActivo(activeBoolean,pageable);
                     } else if (search == null && sector!=null) {
-                        instituciones = institucionesDao.findAllBySector(sector, pageable).map(InstitucionesDto::fromEntity);
+                        instituciones = institucionesDao.findAllBySectorAndActivo(sector,activeBoolean, pageable).map(InstitucionesDto::fromEntity);
                     } else if (search != null && sector == null) {
-                        instituciones = institucionesDao.findAllWithCountPasantiasAndNombreContaining(search, pageable);
+                        instituciones = institucionesDao.findAllWithCountPasantiasAndNombreContainingAndActivo(search,activeBoolean, pageable);
                     } else {
-                        instituciones = institucionesDao.findAllWithCountPasantiasAndNombreAndSectores(search, sector, pageable).map(
+                        instituciones = institucionesDao.findAllWithCountPasantiasAndNombreAndSectoresAndActivo(search, sector, activeBoolean, pageable).map(
                                 InstitucionesDto::fromEntity
                         );
                     }

@@ -82,6 +82,9 @@ public class Pasantias implements Serializable {
     @Basic(optional = false)
     @Column(name = "activo")
     private boolean activo;
+    @Basic(optional = true)
+    @Column(name="sinaplicantes")
+    private Boolean sinaplicantes;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "pasantiasIdpasantias", fetch = FetchType.LAZY)
     private List<Aplicacionespasantias> aplicacionespasantiasList;
 
@@ -109,7 +112,7 @@ public class Pasantias implements Serializable {
         this.idpasantias = idpasantias;
     }
 
-    public Pasantias(Integer idpasantias, List<String> areas, String titulo, String descripcion, List<String> requisitos, List<String> funciones, List<String> beneficios, Date fechacierre, Date fechaingreso, boolean activo) {
+    public Pasantias(Integer idpasantias, List<String> areas, String titulo, String descripcion, List<String> requisitos, List<String> funciones, List<String> beneficios, Date fechacierre, Date fechaingreso, boolean activo, Boolean sinaplicantes) {
         this.idpasantias = idpasantias;
         this.areas = areas;
         this.titulo = titulo;
@@ -120,6 +123,7 @@ public class Pasantias implements Serializable {
         this.fechacierre = fechacierre;
         this.fechaingreso = fechaingreso;
         this.activo = activo;
+        this.sinaplicantes = sinaplicantes;
     }
 
     public Integer getIdpasantias() {
@@ -208,6 +212,14 @@ public class Pasantias implements Serializable {
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+
+    public Boolean isSinaplicantes() {
+        return sinaplicantes;
+    }
+
+    public void setSinaplicantes(Boolean sinaplicantes) {
+        this.sinaplicantes = sinaplicantes;
     }
 
     public List<Aplicacionespasantias> getAplicacionespasantiasList() {

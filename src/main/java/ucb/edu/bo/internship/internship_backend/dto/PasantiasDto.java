@@ -15,6 +15,7 @@ public class PasantiasDto {
     private Object beneficios;
     private Date fechaCierre;
     private Date fechaIngreso;
+    private Boolean sinAplicantes;
 
     public PasantiasDto() {
     }
@@ -114,6 +115,14 @@ public class PasantiasDto {
 
     public void setFechaIngreso(Date fechaIngreso) {
         this.fechaIngreso = fechaIngreso;
+    }
+
+    public Boolean getSinAplicantes() {
+        return sinAplicantes;
+    }
+
+    public void setSinAplicantes(Boolean sinAplicantes) {
+        this.sinAplicantes = sinAplicantes;
     }
 
     @Override

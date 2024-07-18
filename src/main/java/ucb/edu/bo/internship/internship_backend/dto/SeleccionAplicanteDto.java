@@ -37,6 +37,29 @@ public class SeleccionAplicanteDto {
             seleccionaplicante.getComentarios()
         );
     }
+    public static SeleccionAplicanteDto fromEntityWithOutAplicacionesPasantia(Seleccionaplicante seleccionaplicante) {
+        LocalTime horaseleccion = seleccionaplicante.getHoraseleccion().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalTime();
+        return new SeleccionAplicanteDto(
+                seleccionaplicante.getIdseleccionaplicante(),
+                null,
+                seleccionaplicante.getUsuariosinstitucionesIdusuariosinstituciones().getIdusuariosinstituciones(),
+                seleccionaplicante.getFechaseleccion(),
+                horaseleccion,
+                seleccionaplicante.getComentarios()
+        );
+    }
+    public static SeleccionAplicanteDto fromEntityWithOutHora(Seleccionaplicante seleccionaplicante) {
+        return new SeleccionAplicanteDto(
+            seleccionaplicante.getIdseleccionaplicante(),
+            seleccionaplicante.getAplicacionespasantiasIdaplicacionpasantias().getIdaplicacionpasantias(),
+            seleccionaplicante.getUsuariosinstitucionesIdusuariosinstituciones().getIdusuariosinstituciones(),
+            seleccionaplicante.getFechaseleccion(),
+            null,
+            seleccionaplicante.getComentarios()
+        );
+    }
 
     public Integer getIdSeleccionAplicante() {
         return this.idSeleccionAplicante;

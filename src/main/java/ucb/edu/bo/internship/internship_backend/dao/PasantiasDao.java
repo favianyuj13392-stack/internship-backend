@@ -26,6 +26,10 @@ public interface PasantiasDao extends JpaRepository<Pasantias, Integer>{
             String titulo,
             Pageable pageable
     );
+    Page<Pasantias> findAllByActivoIsTrueAndTituloContainingIgnoreCase(
+            String titulo,
+            Pageable pageable
+    );
 
     @Query(value = """
             SELECT DISTINCT p.*\s

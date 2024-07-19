@@ -32,6 +32,8 @@ public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
     Page<InstitucionesDto> findAllWithCountPasantiasAndNombreContaining(String search, Pageable pageable);
     @Query("select new ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto(i,COUNT(p.idpasantias)) from Instituciones i left join Pasantias p on i.idinstituciones = p.institucionesIdinstituciones.idinstituciones group by i.idinstituciones")
     Page<InstitucionesDto> findAllWithCountPasantias(Pageable pageable);
+    @Query("select new ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto(i,COUNT(p.idpasantias)) from Instituciones i left join Pasantias p on i.idinstituciones = p.institucionesIdinstituciones.idinstituciones where i.activo = ?1 group by i.idinstituciones")
+    Page<InstitucionesDto> findAllWithCountPasantiasAndActivo(Boolean activo,Pageable pageable);
 
     @Query("SELECT new ucb.edu.bo.internship.internship_backend.dto.InstitucionNombreDto(i.idinstituciones, i.nombre,i.logoempresa) FROM Instituciones i WHERE i.activo = ?1")
     List<InstitucionNombreDto> getAllIdAndNameByActivo(Boolean activo);
@@ -80,6 +82,19 @@ public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
     """, nativeQuery = true)
     Page<Instituciones> findAllWithCountPasantiasAndNombreAndSectores(String search, String sectorParam, Pageable pageable);
 
+
+    @Query(value = """
+    SELECT DISTINCT i.*
+    FROM instituciones i
+    WHERE i.activo = :activo
+    AND LOWER(i.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
+    AND EXISTS(
+        SELECT 1
+        FROM jsonb_array_elements_text(i.sectores) AS sector
+        WHERE sector = (:sectorParam)
+    )
+    """, nativeQuery = true)
+    Page<Instituciones> findAllWithCountPasantiasAndNombreAndSectoresAndActivo(String search, String sectorParam,Boolean activo, Pageable pageable);
     @Query(value = """
     SELECT DISTINCT i.*
     FROM instituciones i
@@ -92,6 +107,22 @@ public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
     """, nativeQuery = true)
     Page<Instituciones> findAllBySector(
             String sectorParam,
+            Pageable pageable
+    );
+
+    @Query(value = """
+    SELECT DISTINCT i.*
+    FROM instituciones i
+    WHERE i.activo = :activo
+    AND EXISTS(
+        SELECT 1
+        FROM jsonb_array_elements_text(i.sectores) AS sector
+        WHERE sector = (:sectorParam)
+    )
+    """, nativeQuery = true)
+    Page<Instituciones> findAllBySectorAndActivo(
+            String sectorParam,
+            Boolean activo,
             Pageable pageable
     );
 

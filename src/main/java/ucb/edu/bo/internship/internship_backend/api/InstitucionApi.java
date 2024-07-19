@@ -57,7 +57,7 @@ public class InstitucionApi {
     @GetMapping("/destacadas")
     public ResponseEntity<ResponseDto<Page<InstitucionesConCOUNTPasantiasDto>>> getInstitucionesDestacadas(
             @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "6") Integer size) {
+            @RequestParam(defaultValue = "10") Integer size) {
         return handleRequest(() -> institucionBl.obtenerInstitucionesDestacadas(page, size));
     }
 

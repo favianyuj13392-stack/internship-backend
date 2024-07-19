@@ -130,15 +130,18 @@ security-constraints:
             # list of methods that can access the endpoint
             - GET
 
-    - auth-roles:
-        -permitAll
-      security-collections:
-        - name: permitAll get methods
-          patterns:
-            - /api/v1/usuario/*/empresa/aprobado
-            - /api/v1/institucion
-            - /api/v1/institucion/*
-          methods:
-            - GET
+#    - auth-roles:
+#        -permitAll
+#      security-collections:
+#        - name: permitAll get methods
+#          patterns:
+#            - /api/v1/usuario/*/empresa/aprobado
+#            - /api/v1/institucion
+#            - /api/v1/institucion/destacadas
+#            - /api/v1/institucion/nombre
+#            - /api/v1/institucion/sectores
+#            - /api/v1/institucion/*/relacionadas
+#          methods:
+#            - GET
 
 

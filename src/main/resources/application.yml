@@ -51,44 +51,94 @@ security-constraints:
     #Example of security constraints
     - auth-roles:
         #list of roles that can access this endpoint
-        - ESTUDIANTE
-        - ADMIN
+        - EMPRESA
       security-collections:
-        - name: student
+        - name: empresa put methods
           patterns:
             # list of endpoints that require the roles specified above
-            - /test/student
-            - /test/student/*
-            - /test/student/**
+            - /api/v1/usuario/*/pasantia/*
+            - /api/v1/usuario/*/institucion/*
+            - /api/v1/institucion/usuario/*
+          methods:
+            # list of methods that can access the endpoint
+            - PUT
+
+    #Example of security constraints
+    - auth-roles:
+        #list of roles that can access this endpoint
+        - EMPRESA
+      security-collections:
+        - name: empresa post methods
+          patterns:
+            # list of endpoints that require the roles specified above
+            - /api/v1/usuario/*/institucion
+            - /api/v1/usuario/*/institucion/*
+          methods:
+            # list of methods that can access the endpoint
+            - POST
+
+    - auth-roles:
+        #list of roles that can access this endpoint
+        - EMPRESA
+      security-collections:
+        - name: empresa get methods
+          patterns:
+            # list of endpoints that require the roles specified above
+            - /api/v1/usuario/*/institucion
+            - /api/v1/institucion/usuario/*
           methods:
             # list of methods that can access the endpoint
             - GET
 
     - auth-roles:
+        #list of roles that can access this endpoint
         - EMPRESA
       security-collections:
-        - name: business
+        - name: empresa delete methods
           patterns:
-            - /test/business
+            # list of endpoints that require the roles specified above
+            - /api/v1/usuario/*/institucion/*
+            - /api/v1/usuario/*/pasantia/*
           methods:
-            - GET
+            # list of methods that can access the endpoint
+            - DELETE
 
     - auth-roles:
-        - ADMIN
+        #list of roles that can access this endpoint
+        - authenticated
       security-collections:
-        - name: admin
+        - name: authenticated post methods
           patterns:
-            - /test/admin
-          methods:
-            - GET
-
-    - auth-roles:
-        - permitAll
-      security-collections:
-        - name: public
-          patterns:
+            # list of endpoints that require the roles specified above
             - /api/v1/usuario
+            - /api/v1/usuario/institucion
+            - /api/v1/usuario/persona
           methods:
+            # list of methods that can access the endpoint
             - POST
+
+    - auth-roles:
+        #list of roles that can access this endpoint
+        - authenticated
+      security-collections:
+        - name: authenticated post methods
+          patterns:
+            # list of endpoints that require the roles specified above
+            - /api/v1/usuario/*/pasantia/*/detalle #Verificar
+            - /api/v1/usuario/*/institucion/*/pasantias #Verificar
+          methods:
+            # list of methods that can access the endpoint
+            - GET
+
+    - auth-roles:
+        -permitAll
+      security-collections:
+        - name: permitAll get methods
+          patterns:
+            - /api/v1/usuario/*/empresa/aprobado
+            - /api/v1/institucion
+            - /api/v1/institucion/*
+          methods:
+            - GET
 
 

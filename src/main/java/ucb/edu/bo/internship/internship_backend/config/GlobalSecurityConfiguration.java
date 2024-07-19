@@ -100,10 +100,17 @@ public class GlobalSecurityConfiguration {
                                                     .requestMatchers(patterns.toArray(new String[0]))
                                                     .permitAll();
                                         }else{
-                                            logger.info("CONFIGURATION name: " + name + " patterns: " + patterns + " configuration: " + authRoles + " with no methods");
-                                            authorizeHttpRequests
-                                                    .requestMatchers(patterns.toArray(new String[0]))
-                                                    .hasAnyRole(authRoles.toArray(new String[0]));
+                                            if(role.equals("authenticated")){
+                                                logger.info("CONFIGURATION name: " + name + " patterns: " + patterns + " configuration: authenticated with no methods");
+                                                authorizeHttpRequests
+                                                        .requestMatchers(patterns.toArray(new String[0]))
+                                                        .authenticated();
+                                            }else{
+                                                logger.info("CONFIGURATION name: " + name + " patterns: " + patterns + " configuration: " + authRoles + " with no methods");
+                                                authorizeHttpRequests
+                                                        .requestMatchers(patterns.toArray(new String[0]))
+                                                        .hasAnyRole(authRoles.toArray(new String[0]));
+                                            }
                                         }
                                     }else{
                                         logger.info("CONFIGURATION name: " + name + " patterns: " + patterns + " configuration:" + authRoles + " with no methods");

@@ -45,89 +45,114 @@ token:
 environment:
   frontend_url: ${FRONTEND_URL:http://localhost:5173}
 
-##Configuraciones de seguridad
-#security-constraints:
-#  constraints:
-#    #Example of security constraints
-#    - auth-roles:
-#        #list of roles that can access this endpoint
-#        - EMPRESA
-#      security-collections:
-#        - name: empresa put methods
-#          patterns:
-#            # list of endpoints that require the roles specified above
-#            - /api/v1/usuario/*/pasantia/*
-#            - /api/v1/usuario/*/institucion/*
-#            - /api/v1/institucion/usuario/*
-#          methods:
-#            # list of methods that can access the endpoint
-#            - PUT
-#
-#    #Example of security constraints
-#    - auth-roles:
-#        #list of roles that can access this endpoint
-#        - EMPRESA
-#      security-collections:
-#        - name: empresa post methods
-#          patterns:
-#            # list of endpoints that require the roles specified above
-#            - /api/v1/usuario/*/institucion
-#            - /api/v1/usuario/*/institucion/*
-#          methods:
-#            # list of methods that can access the endpoint
-#            - POST
-#
-#    - auth-roles:
-#        #list of roles that can access this endpoint
-#        - EMPRESA
-#      security-collections:
-#        - name: empresa get methods
-#          patterns:
-#            # list of endpoints that require the roles specified above
-#            - /api/v1/usuario/*/institucion
-#            - /api/v1/institucion/usuario/*
-#          methods:
-#            # list of methods that can access the endpoint
-#            - GET
-#
-#    - auth-roles:
-#        #list of roles that can access this endpoint
-#        - EMPRESA
-#      security-collections:
-#        - name: empresa delete methods
-#          patterns:
-#            # list of endpoints that require the roles specified above
-#            - /api/v1/usuario/*/institucion/*
-#            - /api/v1/usuario/*/pasantia/*
-#          methods:
-#            # list of methods that can access the endpoint
-#            - DELETE
-#
-#    - auth-roles:
-#        #list of roles that can access this endpoint
-#        - authenticated
-#      security-collections:
-#        - name: authenticated post methods
-#          patterns:
-#            # list of endpoints that require the roles specified above
-#            - /api/v1/usuario
-#            - /api/v1/usuario/institucion
-#            - /api/v1/usuario/persona
-#          methods:
-#            # list of methods that can access the endpoint
-#            - POST
-#
-#    - auth-roles:
-#        #list of roles that can access this endpoint
-#        - authenticated
-#      security-collections:
-#        - name: authenticated post methods
-#          patterns:
-#            # list of endpoints that require the roles specified above
-#            - /api/v1/usuario/*/pasantia/*/detalle #Verificar
-#            - /api/v1/usuario/*/institucion/*/pasantias #Verificar
-#          methods:
-#            # list of methods that can access the endpoint
-#            - GET
+#Configuraciones de seguridad
+security-constraints:
+  constraints:
+    - auth-roles:
+        - permitAll
+      security-collections:
+        - name: permitAll
+          patterns:
+            - /api/v1/pasantia/carreras
+            - /api/v1/pasantia/areas
+            - /api/v1/pasantia/recuento
+            - /api/v1/pasantia
+            - /api/v1/institucion/sectores
+            - /api/v1/institucion
+            - /api/v1/institucion/*/relacionadas
+            - /api/v1/institucion/*
+          methods:
+            - GET
+
+    - auth-roles:
+        - authenticated
+      security-collections:
+        - name: authenticated get methods
+          patterns:
+            - /api/v1/usuario/*/existencia
+            - /api/v1/pasantia/*
+            - /api/v1/pasantia/*/relacionadas
+            - /api/v1/public/files/download/*
+            - /api/v1/usuario/*/empresa/aprobado
+          methods:
+            - GET
+
+    - auth-roles:
+        - authenticated
+      security-collections:
+        - name: authenticated post methods
+          patterns:
+            - /api/v1/files/upload
+            - /api/v1/usuario
+            - /api/v1/usuario/*/institucion/*/pasantia/*/noaplicante
+            - /api/v1/usuario/persona
+          methods:
+            - POST
+
+    - auth-roles:
+        - EMPRESA
+      security-collections:
+        - name: empresa put and get methods
+          patterns:
+            - /api/v1/pasantia/institucion/usuario/*
+            - /api/v1/usuario/*/pasantia/*/finalizar/sin-seleccion
+            - /api/v1/usuario/*/pasantia/*/aplicacion/*/aceptar
+            - /api/v1/usuario/*/instituion/*/pasantia/*
+            - /api/v1/usuario/*/institucion/*
+            - /api/v1/usuario/*/institucion
+            - /api/v1/usuario/*/pasantia/*/detalle
+            - /api/v1/usuario/*/institucion/*/pasantias
+          methods:
+            - GET
+            - PUT
+
+    - auth-roles:
+        - EMPRESA
+      security-collections:
+        - name: empresa post methods
+          patterns:
+            - /api/v1/usuario/*/institucion/*
+            - /api/v1/usuario/*/institucion
+            - /api/v1/usuario/*/institucion/*/pasantia
+            - /api/v1/usuario/institucion
+          methods:
+            - POST
+
+    - auth-roles:
+        - EMPRESA
+      security-collections:
+        - name: empresa delete methods
+          patterns:
+            - /api/v1/usuario/*/pasantia/*/aplicacion/*/rechazar
+          methods:
+            - DELETE
+
+    - auth-roles:
+        - ADMIN
+      security-collections:
+        - name: admin
+          patterns:
+            - /api/v1/admin/**
+          methods:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+
+    - auth-roles:
+        - ESTUDIANTE
+      security-collections:
+        - name: estudiante
+          patterns:
+            - /api/v1/estudiante/**
+            - /api/v1/usuario/*/institucion/*/pasantia/*/aplicantes/*
+            - /api/v1/usuario/*/institucion/*/pasantias/*
+          methods:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+
+
 
 

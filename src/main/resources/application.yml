@@ -63,6 +63,7 @@ security-constraints:
             - /api/v1/institucion/*
             - /api/v1/public/files/download/*
             - /api/v1/usuario/*/existencia
+            - /api/v1/estudiante/public/files/download/*
           methods:
             - GET
 

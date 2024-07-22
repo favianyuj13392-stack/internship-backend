@@ -55,7 +55,7 @@ security-constraints:
           patterns:
             - /api/v1/pasantia/carreras
             - /api/v1/pasantia/areas
-            - /api/v1/pasantia/recuento
+            - /api/v1/inicio/recuento
             - /api/v1/pasantia
             - /api/v1/institucion/sectores
             - /api/v1/institucion

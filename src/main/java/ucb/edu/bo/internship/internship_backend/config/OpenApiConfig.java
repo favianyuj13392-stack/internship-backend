@@ -12,9 +12,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @OpenAPIDefinition(
         info = @Info(
-                title = "Knowix API",
+                title = "Internship API",
                 version = "1.0.0",
-                description = "API for Knowix application"
+                description = "API for Internship application"
         ),
         security = {
                 @SecurityRequirement(name = "bearerAuth")

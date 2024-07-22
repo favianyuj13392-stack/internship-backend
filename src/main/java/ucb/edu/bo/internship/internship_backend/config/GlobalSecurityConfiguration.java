@@ -168,7 +168,7 @@ public class GlobalSecurityConfiguration {
                 .oauth2ResourceServer( (oauth2) -> {oauth2.jwt( (jwt) -> jwt.jwtAuthenticationConverter(keycloakJwtTokenConverter));})
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
-                .addFilterBefore(new RegistrationCompletionFilter(keycloakJwtTokenConverter, usuariosBL, clientUrl), BasicAuthenticationFilter.class)
+//                .addFilterBefore(new RegistrationCompletionFilter(keycloakJwtTokenConverter, usuariosBL, clientUrl), BasicAuthenticationFilter.class)
                 .build();
     }
 }

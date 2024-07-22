@@ -61,6 +61,8 @@ security-constraints:
             - /api/v1/institucion
             - /api/v1/institucion/*/relacionadas
             - /api/v1/institucion/*
+            - /api/v1/public/files/download/*
+            - /api/v1/usuario/*/existencia
           methods:
             - GET
 
@@ -69,10 +71,8 @@ security-constraints:
       security-collections:
         - name: authenticated get methods
           patterns:
-            - /api/v1/usuario/*/existencia
             - /api/v1/pasantia/*
             - /api/v1/pasantia/*/relacionadas
-            - /api/v1/public/files/download/*
             - /api/v1/usuario/*/empresa/aprobado
           methods:
             - GET

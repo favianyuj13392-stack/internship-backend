@@ -222,26 +222,26 @@ public class AdministradorBl {
             parsedFechaInicio = format.parse(fechaInicioEstudiante);
             parsedFechaFin = format.parse(fechaFinEstudiante);
             return new KPISDto(
-                    usuariosDao.countEstudiantes().orElse(0L),
-                    usuariosDao.countEstudiantesPorCarrera(idCarreraEstudiante).orElse(0L),
-                    usuariosDao.countEstudiantesPorFecha(parsedFechaInicio,parsedFechaFin).orElse(0L),
-                    pasantiasDao.countPasantiasActivo(true).orElse(0L),
-                    pasantiasDao.countPasantiasActivo(false).orElse(0L),
-                    pasantiasDao.countPasantiasPorCarrera(idCarreraPasantia).orElse(0L),
-                    pasantiasDao.countPasantiasPorEmpresa(idEmpresaPasantia).orElse(0L),
-                    pasantiasDao.countPasantiasPorSector(sectorPasantia).orElse(0L),
-                    pasantiasDao.countPasantiasPorArea(areaPasantia).orElse(0L),
-                    aplicacionPasantiasDao.countByPasantiasIdpasantias().orElse(0L),
-                    aplicacionPasantiasDao.countByPasantiasIdpasantiasByCarrera(idCarreraAplicacion).orElse(0L),
-                    aplicacionPasantiasDao.countByPasantiasIdpasantiasByEmpresa(idInstitucionAplicacion).orElse(0L),
-                    aplicacionPasantiasDao.countByPasantiasIdpasantiasBySector(sectorAplicacion).orElse(0L),
-                    aplicacionPasantiasDao.countByPasantiasIdpasantiasByArea(areaAplicacion).orElse(0L),
-                    aplicacionPasantiasDao.countByActivo(true).orElse(0L),
-                    pasantiasDao.countPasantiasQueNoAceptaronEstudiantes().orElse(0L),
+                    usuariosDao.countEstudiantes().orElse(0L),//LISTO
+                    usuariosDao.countEstudiantesPorCarrera(idCarreraEstudiante).orElse(0L),//LISTO
+                    usuariosDao.countEstudiantesPorFecha(parsedFechaInicio,parsedFechaFin).orElse(0L),//LISTO
+                    pasantiasDao.countPasantiasActivo(true).orElse(0L),//LISTO
+                    pasantiasDao.countPasantiasActivo(false).orElse(0L),//LISTO
+                    pasantiasDao.countPasantiasPorCarrera(idCarreraPasantia).orElse(0L),// PENDIENTE
+                    pasantiasDao.countPasantiasPorEmpresa(idEmpresaPasantia).orElse(0L),//LISTO
+                    pasantiasDao.countPasantiasPorSector(sectorPasantia).orElse(0L),//LISTO
+                    pasantiasDao.countPasantiasPorArea(areaPasantia).orElse(0L),//LISTO
+                    aplicacionPasantiasDao.countByPasantiasIdpasantias().orElse(0L),//LISTO
+                    aplicacionPasantiasDao.countByPasantiasIdpasantiasByCarrera(idCarreraAplicacion).orElse(0L),//PENDIENTE
+                    aplicacionPasantiasDao.countByPasantiasIdpasantiasByEmpresa(idInstitucionAplicacion).orElse(0L),//LISTO
+                    aplicacionPasantiasDao.countByPasantiasIdpasantiasBySector(sectorAplicacion).orElse(0L),//LISTO
+                    aplicacionPasantiasDao.countByPasantiasIdpasantiasByArea(areaAplicacion).orElse(0L),//LISTO
+                    aplicacionPasantiasDao.countByActivo(true).orElse(0L),//LISTO
+                    pasantiasDao.countPasantiasQueNoAceptaronEstudiantes().orElse(0L),//LISTO
                     curriculumsDao.count(),
-                    curriculumsDao.promedioCurriculumsPorEstudiante(1).orElse(0.0),
-                    institucionesDao.countAllByActivo(),
-                    institucionesDao.countAllBySector(sectorInstitucion).orElse(0L),
+                    curriculumsDao.promedioCurriculumsPorEstudiante(1).orElse(0.0),//LISTO
+                    institucionesDao.countAllByActivo(),//Listo
+                    institucionesDao.countAllBySector(sectorInstitucion).orElse(0L),//Listo
                     usuariosDao.countUsuariosEmpresa().orElse(0L),
                     usuariosInstitucionesDao.countUsuariosPorEmpresa(idEmpresaUsuarios).orElse(0L)
             );

@@ -31,8 +31,8 @@ public interface AplicacionPasantiasDao extends JpaRepository<Aplicacionespasant
     // Obtener la cantidad de aplicaciones de pasantias por carrera
     @Query("SELECT COUNT(a) FROM Aplicacionespasantias a JOIN a.pasantiasIdpasantias p JOIN p.pasantiascarrerasList pc WHERE pc.carrerasIdcarreras.idcarreras = ?1")
     Optional<Long> countByPasantiasIdpasantiasByCarrera(Integer idcarrera);
-    //Obtener la cantidad de aplicaciones de pasantias por empresa
-    @Query("SELECT COUNT(a) FROM Aplicacionespasantias a JOIN a.pasantiasIdpasantias p JOIN p.institucionesIdinstituciones e WHERE e.idinstituciones = ?1")
+    //Obtener la cantidad de aplicaciones activas de pasantias por empresa
+    @Query("SELECT COUNT(a) FROM Aplicacionespasantias a JOIN a.pasantiasIdpasantias p JOIN p.institucionesIdinstituciones e WHERE e.idinstituciones = ?1 and a.activo = true")
     Optional<Long> countByPasantiasIdpasantiasByEmpresa(Integer idempresa);
     //Obtener la cantidad de aplicaciones de pasantias por sector
     @Query(value = "" +

@@ -231,6 +231,7 @@ List<Pasantias> findPasantiasByInstitucionesIdinstitucionesUsuarioUUID(String uu
             "from Pasantias p " +
             "inner join public.instituciones a on p.instituciones_idinstituciones = a.idinstituciones " +
             "WHERE p.activo = true " +
+            "AND p.sinaplicantes is not true " +
             "AND EXISTS(" +
             "SELECT 1 FROM jsonb_array_elements_text(a.sectores) AS sector WHERE sector = ?1" +
             ")",nativeQuery = true)

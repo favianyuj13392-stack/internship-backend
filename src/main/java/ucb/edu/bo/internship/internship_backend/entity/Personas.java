@@ -75,7 +75,7 @@ public class Personas implements Serializable {
 
     @Column(name = "anioingresouniversidad")
     private Integer anioingresouniversidad;
-    @Column(name = "descripcion")
+    @Column(name = "descripcion", length = 1000)
     private String descripcion;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "habilidades")

@@ -11,6 +11,7 @@ import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
     @Query("SELECT i FROM Instituciones i WHERE i.activo = ?1")
@@ -125,5 +126,15 @@ public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
             Boolean activo,
             Pageable pageable
     );
-
+    //Funcion que devuelve un long con la cantidad de instituciones que tienen un sector especifico
+    @Query(value = """
+    SELECT COUNT(i.idinstituciones)
+    FROM instituciones i
+    WHERE EXISTS(
+        SELECT 1
+        FROM jsonb_array_elements_text(i.sectores) AS sector
+        WHERE lower(sector) = lower(?1)
+    )
+    """, nativeQuery = true)
+    Optional<Long> countAllBySector(String sector);
 }

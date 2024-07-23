@@ -28,4 +28,6 @@ public interface UsuariosInstitucionesDao extends JpaRepository<Usuariosinstituc
     List<Usuariosinstituciones> findByInstitucionesIdinstitucionesNombreContainsAndActivoFalse(String nombreInstitucion);
 
     List<Usuariosinstituciones> findByInstitucionesIdinstitucionesIdinstitucionesAndActivoTrue(Integer idInstitucion);
+    @Query("SELECT COUNT(u) from Usuariosinstituciones u where u.activo = true and u.institucionesIdinstituciones.idinstituciones = ?1")
+    Optional<Long> countUsuariosPorEmpresa(Integer idEmpresaUsuarios);
 }

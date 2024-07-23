@@ -130,12 +130,22 @@ public class GlobalSecurityConfiguration {
                                                         .permitAll();
                                             }
                                         }else{
-                                            logger.info("CONFIGURATION name: " + name + " patterns: " + patterns + " configuration: " + authRoles + " with methods: " + httpMethods);
-                                            for (HttpMethod httpMethod: httpMethods
-                                            ) {
-                                                authorizeHttpRequests
-                                                        .requestMatchers(httpMethod, patterns.toArray(new String[0]))
-                                                        .hasAnyRole(authRoles.toArray(new String[0]));
+                                            if(role.equals("authenticated")) {
+                                                logger.info("CONFIGURATION name: " + name + " patterns: " + patterns + " configuration: authenticated with methods: " + httpMethods);
+                                                for (HttpMethod httpMethod : httpMethods
+                                                ) {
+                                                    authorizeHttpRequests
+                                                            .requestMatchers(httpMethod, patterns.toArray(new String[0]))
+                                                            .authenticated();
+                                                }
+                                            }else{
+                                                logger.info("CONFIGURATION name: " + name + " patterns: " + patterns + " configuration: " + authRoles + " with methods: " + httpMethods);
+                                                for (HttpMethod httpMethod: httpMethods
+                                                ) {
+                                                    authorizeHttpRequests
+                                                            .requestMatchers(httpMethod, patterns.toArray(new String[0]))
+                                                            .hasAnyRole(authRoles.toArray(new String[0]));
+                                                }
                                             }
                                         }
                                     }else{
@@ -158,7 +168,7 @@ public class GlobalSecurityConfiguration {
                 .oauth2ResourceServer( (oauth2) -> {oauth2.jwt( (jwt) -> jwt.jwtAuthenticationConverter(keycloakJwtTokenConverter));})
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
-                .addFilterBefore(new RegistrationCompletionFilter(keycloakJwtTokenConverter, usuariosBL, clientUrl), BasicAuthenticationFilter.class)
+//                .addFilterBefore(new RegistrationCompletionFilter(keycloakJwtTokenConverter, usuariosBL, clientUrl), BasicAuthenticationFilter.class)
                 .build();
     }
 }

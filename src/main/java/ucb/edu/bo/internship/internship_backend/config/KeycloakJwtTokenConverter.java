@@ -43,7 +43,14 @@ public class KeycloakJwtTokenConverter implements Converter<Jwt, AbstractAuthent
         Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
         Map<String, Object> resourceRoles = (Map<String, Object>) resourceAccess.get(properties.getResourceId());
         if (resourceRoles == null){
-            resourceRoles = (Map<String, Object>) resourceAccess.get("account");
+            //TODO: Update the path to the default resource roles to environment variable
+            resourceRoles = (Map<String, Object>) resourceAccess.get("internship_cliente");
+            // 
+            if (resourceRoles == null){
+                return (Collection<? extends GrantedAuthority>) Stream.empty().collect(Collectors.toSet());
+                
+            }
+
             Collection<String> roles = (Collection<String>) resourceRoles.get("roles");
             return roles.stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role))

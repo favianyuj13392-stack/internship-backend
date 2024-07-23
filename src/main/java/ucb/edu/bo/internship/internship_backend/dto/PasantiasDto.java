@@ -17,6 +17,8 @@ public class PasantiasDto {
     private Date fechaIngreso;
     private Boolean sinAplicantes;
 
+    private List<Integer> idCarreras;
+
     public PasantiasDto() {
     }
 
@@ -42,6 +44,28 @@ public class PasantiasDto {
         this.beneficios = pasantias.getBeneficios();
         this.fechaCierre = new Date(pasantias.getFechacierre().getTime());
         this.fechaIngreso = new Date(pasantias.getFechaingreso().getTime());
+    }
+
+    public PasantiasDto(Integer idPasantias, Object areas, String titulo, String descripcion, Object requisitos, Object funciones, Object beneficios, Date fechaCierre, Date fechaIngreso, Boolean sinAplicantes, List<Integer> idCarreras) {
+        this.idPasantias = idPasantias;
+        this.areas = areas;
+        this.titulo = titulo;
+        this.descripcion = descripcion;
+        this.requisitos = requisitos;
+        this.funciones = funciones;
+        this.beneficios = beneficios;
+        this.fechaCierre = fechaCierre;
+        this.fechaIngreso = fechaIngreso;
+        this.sinAplicantes = sinAplicantes;
+        this.idCarreras = idCarreras;
+    }
+
+    public List<Integer> getIdCarreras() {
+        return this.idCarreras;
+    }
+
+    public void setIdCarreras(List<Integer> idCarreras) {
+        this.idCarreras = idCarreras;
     }
 
     public Integer getIdPasantias() {

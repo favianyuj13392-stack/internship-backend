@@ -75,7 +75,6 @@ security-constraints:
             - /api/v1/pasantia/*
             - /api/v1/pasantia/*/relacionadas
             - /api/v1/usuario/*/empresa/aprobado
-            
           methods:
             - GET
           
@@ -105,10 +104,7 @@ security-constraints:
             - /api/v1/usuario/*/institucion/*
             - /api/v1/usuario/*/institucion
             - /api/v1/usuario/*/pasantia/*/detalle
-            - /api/v1/usuario/*/institucion/*/pasantias
-
-
-
+            - /api/v1/usuario/*/institucion/*/pasantias9
             - /api/v1/pasantia/carreras
           methods:
             - GET

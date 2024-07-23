@@ -40,8 +40,13 @@ public class InstitucionBl {
     private final PersonasDao personasDao;
 
     private final Logger logger = LoggerFactory.getLogger(InstitucionBl.class);
+    private final PasantiasCarrerasDao pasantiasCarrerasDao;
+    private final CarrerasDao carrerasDao;
+
     public InstitucionBl(InstitucionesDao institucionesDao, PasantiasDao pasantiasDao, UsuariosInstitucionesDao usuariosInstitucionesDao,UsuariosDao usuariosDao, UsuariosBL usuariosBL, AplicacionPasantiasDao aplicacionPasantiasDao, SeleccionAplicanteDao seleccionAplicanteDao,
-                         PersonasDao personasDao) {
+                         PersonasDao personasDao,
+                         PasantiasCarrerasDao pasantiasCarrerasDao,
+                         CarrerasDao carrerasDao) {
         this.institucionesDao = institucionesDao;
         this.pasantiasDao = pasantiasDao;
         this.usuariosInstitucionesDao = usuariosInstitucionesDao;
@@ -50,6 +55,8 @@ public class InstitucionBl {
         this.aplicacionPasantiasDao = aplicacionPasantiasDao;
         this.seleccionAplicanteDao = seleccionAplicanteDao;
         this.personasDao = personasDao;
+        this.pasantiasCarrerasDao = pasantiasCarrerasDao;
+        this.carrerasDao = carrerasDao;
     }
     /*@Transactional
     public UsuarioRegistroCompletoDto agregarInstitucionConUsuario(UsuariosInstitucionesDto usuariosInstitucionesDto){
@@ -305,13 +312,21 @@ public class InstitucionBl {
                 pasantias.setInstitucionesIdinstituciones(institucionesDao.findByIdinstitucionesAndActivo(institucionId, true));
                 pasantias.setUsuariosIdusuarios(usuariosDao.findByKcUuid(uuid));
                 pasantias.setFechaingreso(new Date());
-                
-                //pasantias.setFechacierre(new Date());
                 pasantias.setActivo(false);
                 pasantias.setIdpasantias(null);
                 
 
                 pasantias = pasantiasDao.save(pasantias);
+                for (Integer idCarrera : pasantiasDto.getIdCarreras()){
+                    logger.info("Carrera: "+idCarrera);
+                    Pasantiascarreras pasantiasCarreras = new Pasantiascarreras();
+                    Carreras carrera = carrerasDao.findById(idCarrera).orElse(null);
+                    if(carrera != null) {
+                        pasantiasCarreras.setCarrerasIdcarreras(carrera);
+                        pasantiasCarreras.setPasantiasIdpasantias(pasantias);
+                        pasantiasCarrerasDao.save(pasantiasCarreras);
+                    }
+                }
                 return PasantiasDto.fromEntity(pasantias);
             } else {
                 throw new UsuarioYaRelacionadoException("El usuario no esta relacionado con la institucion");

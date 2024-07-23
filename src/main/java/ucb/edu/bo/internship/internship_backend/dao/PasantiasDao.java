@@ -13,6 +13,7 @@ import ucb.edu.bo.internship.internship_backend.entity.Pasantias;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public interface PasantiasDao extends JpaRepository<Pasantias, Integer>{
 
@@ -214,4 +215,36 @@ WHERE
 """, nativeQuery = true)
 List<Pasantias> findPasantiasByInstitucionesIdinstitucionesUsuarioUUID(String uuid);
 
+    /*KPIS*/
+    //Cantidad de pasantias activas y pendientes
+    @Query("SELECT COUNT(p) FROM Pasantias p WHERE p.activo = ?1")
+    Optional<Long> countPasantiasActivo(Boolean activo);
+    //Cantidad de pasantias por carrera
+    @Query("SELECT COUNT(p) FROM Pasantias p JOIN Pasantiascarreras pc ON p.idpasantias = pc.pasantiasIdpasantias.idpasantias WHERE pc.carrerasIdcarreras.idcarreras = ?1")
+    Optional<Long> countPasantiasPorCarrera(Integer idCarrera);
+    //Cantidad de pasantias por empresa
+    @Query("SELECT COUNT(p) FROM Pasantias p WHERE p.institucionesIdinstituciones.idinstituciones = ?1")
+    Optional<Long> countPasantiasPorEmpresa(Integer idEmpresa);
+    //Cantidad de pasantias por sector
+    @Query(value = "" +
+            "select count (p)" +
+            "from Pasantias p " +
+            "inner join public.instituciones a on p.instituciones_idinstituciones = a.idinstituciones " +
+            "WHERE p.activo = true " +
+            "AND EXISTS(" +
+            "SELECT 1 FROM jsonb_array_elements_text(a.sectores) AS sector WHERE sector = ?1" +
+            ")",nativeQuery = true)
+    Optional<Long> countPasantiasPorSector(String sector);
+    //Cantidad de pasantias por area
+    @Query(value = "" +
+            "select count (p)" +
+            "from Pasantias p " +
+            "WHERE p.activo = true " +
+            "AND EXISTS(" +
+            "SELECT 1 FROM jsonb_array_elements_text(p.areas) AS area WHERE area = ?1" +
+            ")",nativeQuery = true)
+    Optional<Long> countPasantiasPorArea(String area);
+    @Query("SELECT COUNT(p) FROM Pasantias p WHERE p.sinaplicantes = true")
+    Optional<Long> countPasantiasQueNoAceptaronEstudiantes();
+    /*FIN KPIS*/
 }

@@ -75,8 +75,10 @@ security-constraints:
             - /api/v1/pasantia/*
             - /api/v1/pasantia/*/relacionadas
             - /api/v1/usuario/*/empresa/aprobado
+            
           methods:
             - GET
+          
 
     - auth-roles:
         - authenticated
@@ -87,6 +89,7 @@ security-constraints:
             - /api/v1/usuario
             - /api/v1/usuario/*/institucion/*/pasantia/*/noaplicante
             - /api/v1/usuario/persona
+            - /api/v1/usuario/institucion
           methods:
             - POST
 
@@ -103,6 +106,10 @@ security-constraints:
             - /api/v1/usuario/*/institucion
             - /api/v1/usuario/*/pasantia/*/detalle
             - /api/v1/usuario/*/institucion/*/pasantias
+
+
+
+            - /api/v1/pasantia/carreras
           methods:
             - GET
             - PUT

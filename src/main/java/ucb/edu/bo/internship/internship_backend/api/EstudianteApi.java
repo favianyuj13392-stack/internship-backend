@@ -1,13 +1,14 @@
 package ucb.edu.bo.internship.internship_backend.api;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ucb.edu.bo.internship.internship_backend.bl.EstudianteBl;
 import ucb.edu.bo.internship.internship_backend.dto.*;
-
 import java.util.List;
 
 @RestController
@@ -15,7 +16,6 @@ import java.util.List;
 public class EstudianteApi {
 
     private final EstudianteBl estudianteBl;
-
     public EstudianteApi(EstudianteBl estudianteBl) {
         this.estudianteBl = estudianteBl;
     }

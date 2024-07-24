@@ -57,7 +57,7 @@ public class Pasantias implements Serializable {
     @Column(name = "titulo")
     private String titulo;
     @Basic(optional = false)
-    @Column(name = "descripcion")
+    @Column(name = "descripcion" , length = 1000)
     private String descripcion;
     @Basic(optional = false)
     @JdbcTypeCode(SqlTypes.JSON)

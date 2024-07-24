@@ -14,4 +14,4 @@ RUN echo "Variables de entorno dentro del contenedor:"
 RUN env
 
 # Comando para ejecutar la aplicación al iniciar el contenedor
-CMD ["java", "-jar", "catofirmasBackend2024-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "internship-backend-0.0.1-SNAPSHOT.jar"]

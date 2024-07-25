@@ -21,6 +21,9 @@ public interface PasantiasDao extends JpaRepository<Pasantias, Integer>{
             Date fechacierre,
             Pageable pageable
     );
+    List<Pasantias> findAllByActivoIsTrueAndFechacierreAfter(
+            Date fechacierre
+    );
 
     Page<Pasantias> findAllByActivoIsTrueAndFechacierreAfterAndTituloContainingIgnoreCase(
             Date fechacierre,
@@ -188,7 +191,7 @@ public interface PasantiasDao extends JpaRepository<Pasantias, Integer>{
 
     //@Query("SELECT Pasantias FROM Pasantias p WHERE p.institucionesIdinstituciones.idinstituciones = ?1")
     List<Pasantias> findPasantiasByInstitucionesIdinstituciones(Instituciones idInstituciones);
-
+    List<Pasantias> findPasantiasByInstitucionesIdinstitucionesAndActivoIsTrue(Instituciones idInstituciones);
 
     Page<Pasantias> findAllByActivoIsFalseAndTituloContainingIgnoreCase(String search, Pageable pageable);
 

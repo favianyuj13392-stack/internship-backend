@@ -376,7 +376,7 @@ public class PasantiaBl {
     }
 
     public Set<String> obtenerAreas(){
-        List<PasantiasConInstitucionYCarrerasDto> pasantias = pasantiasDao.findAll().stream()
+        List<PasantiasConInstitucionYCarrerasDto> pasantias = pasantiasDao.findAllByActivoIsTrueAndFechacierreAfter(new Date()).stream()
                 .map(this::toPasantiasConInstitucionYCarrerasDto)
                 .toList();
 

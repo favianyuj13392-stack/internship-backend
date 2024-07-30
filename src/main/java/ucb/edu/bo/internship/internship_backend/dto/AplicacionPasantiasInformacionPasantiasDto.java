@@ -12,13 +12,14 @@ public class AplicacionPasantiasInformacionPasantiasDto {
     private Date fechaAplicacion;
     private Boolean activo;
     private String urlCurriculum;
+    private SeleccionAplicanteDto seleccionAplicante;
     private PasantiasConInstitucionDto pasantiasDto;
 
 
     public AplicacionPasantiasInformacionPasantiasDto() {
     }
 
-    public AplicacionPasantiasInformacionPasantiasDto(Integer idAplicacionPasantias, Integer idUsuarios, Integer idPasantias, Date fechaAplicacion,Boolean activo,String urlCurriculum, PasantiasConInstitucionDto pasantiasDto) {
+    public AplicacionPasantiasInformacionPasantiasDto(Integer idAplicacionPasantias, Integer idUsuarios, Integer idPasantias, Date fechaAplicacion,Boolean activo,String urlCurriculum, PasantiasConInstitucionDto pasantiasDto, SeleccionAplicanteDto seleccionAplicante) {
         this.idAplicacionPasantias = idAplicacionPasantias;
         this.idUsuarios = idUsuarios;
         this.idPasantias = idPasantias;
@@ -26,6 +27,7 @@ public class AplicacionPasantiasInformacionPasantiasDto {
         this.activo = activo;
         this.urlCurriculum = urlCurriculum;
         this.pasantiasDto = pasantiasDto;
+        this.seleccionAplicante = seleccionAplicante;
     }
 
 
@@ -89,6 +91,14 @@ public class AplicacionPasantiasInformacionPasantiasDto {
         this.urlCurriculum = urlCurriculum;
     }
 
+    public SeleccionAplicanteDto getSeleccionAplicante() {
+        return seleccionAplicante;
+    }
+
+    public void setSeleccionAplicante(SeleccionAplicanteDto seleccionAplicante) {
+        this.seleccionAplicante = seleccionAplicante;
+    }
+
     public static AplicacionPasantiasInformacionPasantiasDto fromEntity(Aplicacionespasantias aplicacionespasantias){
         AplicacionPasantiasInformacionPasantiasDto aplicacionPasantiasDto = new AplicacionPasantiasInformacionPasantiasDto();
         aplicacionPasantiasDto.setIdAplicacionPasantias(aplicacionespasantias.getIdaplicacionpasantias());
@@ -112,6 +122,9 @@ public class AplicacionPasantiasInformacionPasantiasDto {
         pasantiasConInstitucionDto.setFechaCierre(pasantiasDto.getFechaCierre());
         pasantiasConInstitucionDto.setFechaIngreso(pasantiasDto.getFechaIngreso());
         aplicacionPasantiasDto.setPasantiasDto(pasantiasConInstitucionDto);
+        if(aplicacionespasantias.getActivo()){
+            aplicacionPasantiasDto.setSeleccionAplicante(SeleccionAplicanteDto.fromEntityWithOutHora(aplicacionespasantias.getSeleccionaplicanteList().get(0)));
+        }
 
 
 

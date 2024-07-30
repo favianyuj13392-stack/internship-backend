@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface UsuariosDao extends JpaRepository<Usuarios, Integer>{
 
     Usuarios findByKcUuid(String kcUuid);
-    @Query("SELECT COUNT(u) from Usuarios u where u.activo = true and u.rolesIdroles.rol = 'ESTUDIANTE'")
+    @Query("SELECT COUNT(u) from Usuarios u where u.rolesIdroles.rol = 'ESTUDIANTE'")
     Long countAllByActivoAndRolesIdrolesRolEqualsESTUDIANTE();
 
     @Query("SELECT COUNT(u)>0 from Usuarios u where u.activo = true and u.kcUuid = ?1 and u.rolesIdroles.rol = ?2")
@@ -20,13 +20,13 @@ public interface UsuariosDao extends JpaRepository<Usuarios, Integer>{
 
     /*KPIS*/
     //Count estudiantes
-    @Query("SELECT COUNT(u) from Usuarios u where u.activo = true and u.rolesIdroles.rol = 'ESTUDIANTE'")
+    @Query("SELECT COUNT(u) from Usuarios u where  u.rolesIdroles.rol = 'ESTUDIANTE'")
     Optional<Long> countEstudiantes();
     //Count estudiantes por carrera
-    @Query("SELECT COUNT(u) from Usuarios u where u.activo = true and u.rolesIdroles.rol = 'ESTUDIANTE' and u.carrerasIdcarreras.idcarreras = ?1")
+    @Query("SELECT COUNT(u) from Usuarios u where u.rolesIdroles.rol = 'ESTUDIANTE' and u.carrerasIdcarreras.idcarreras = ?1")
     Optional<Long> countEstudiantesPorCarrera(Integer idcarreras);
     //Count estudiantes por fecha inicio y fin
-    @Query("SELECT COUNT(u) from Usuarios u where u.activo = true and u.rolesIdroles.rol = 'ESTUDIANTE' and u.fecharegistro BETWEEN :fechaInicio AND :fechaFin")
+    @Query("SELECT COUNT(u) from Usuarios u where u.rolesIdroles.rol = 'ESTUDIANTE' and u.fecharegistro BETWEEN :fechaInicio AND :fechaFin")
     Optional<Long> countEstudiantesPorFecha(@Param("fechaInicio") Date fechaInicio, @Param("fechaFin") Date fechaFin);
     //Count usuarios empresa
     @Query("SELECT COUNT(u) from Usuarios u where u.activo = true and u.rolesIdroles.rol = 'EMPRESA'")

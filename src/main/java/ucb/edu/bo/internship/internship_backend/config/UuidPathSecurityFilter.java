@@ -30,18 +30,18 @@ public class UuidPathSecurityFilter extends OncePerRequestFilter {
         String pathInfo = request.getRequestURI();
         String method = request.getMethod();
 
-        logger.info("Path Info: " + pathInfo + ", Method: " + method);
+        logger.info("Path Info: {}, Method: {}", pathInfo, method);
 
         // Verificar si la ruta es pública
         if (isPublicPath(pathInfo, method)) {
-            logger.info("Public path accessed: " + pathInfo);
+            logger.info("Public path accessed: {}", pathInfo);
             filterChain.doFilter(request, response);
             return;
         }
 
         // Verificar si la ruta protegida no contiene UUID en el path
         if (isProtectedPathWithoutUuid(pathInfo, method)) {
-            logger.info("Protected path without UUID accessed: " + pathInfo);
+            logger.info("Protected path without UUID accessed: {}", pathInfo);
             filterChain.doFilter(request, response);
             return;
         }
@@ -51,7 +51,7 @@ public class UuidPathSecurityFilter extends OncePerRequestFilter {
         String pathUuid = extractUuidFromPath(pathParts);
 
         if (pathUuid == null) {
-            logger.warn("UUID not found in path: " + pathInfo);
+            logger.warn("UUID not found in path: {}", pathInfo);
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -67,13 +67,13 @@ public class UuidPathSecurityFilter extends OncePerRequestFilter {
         Jwt jwt = (Jwt) authentication.getCredentials();
         String tokenUuid = jwt.getClaimAsString("sub");
 
-        logger.info("Path UUID: " + pathUuid);
-        logger.info("Token UUID: " + tokenUuid);
+        logger.info("Path UUID: {}", pathUuid);
+        logger.info("Token UUID: {}", tokenUuid);
 
         if (tokenUuid.equals(pathUuid)) {
             filterChain.doFilter(request, response);
         } else {
-            logger.warn("UUIDs do not match: Path UUID = " + pathUuid + ", Token UUID = " + tokenUuid);
+            logger.warn("UUIDs do not match: Path UUID = {}, Token UUID = {}", pathUuid, tokenUuid);
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
         }
     }

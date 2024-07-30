@@ -97,4 +97,5 @@ public class AplicacionPasantiasDto {
             ", activo='" + getActivo() + "'"+
             "}";
     }
+    
 }

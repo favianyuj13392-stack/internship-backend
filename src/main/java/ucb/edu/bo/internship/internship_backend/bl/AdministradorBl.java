@@ -30,7 +30,7 @@ public class AdministradorBl {
     private final EmailService emailService;
     private final RolesDao rolesDao;
 
-    public AdministradorBl(InstitucionesDao institucionesDao, UsuariosInstitucionesDao usuariosInstitucionesDao, PasantiasDao pasantiasDao, UsuariosDao usuariosDao, PersonasDao personasDao, AplicacionPasantiasDao aplicacionPasantiasDao, EmailService emailService, RolesDao rolesDao){
+    public AdministradorBl(InstitucionesDao institucionesDao, UsuariosInstitucionesDao usuariosInstitucionesDao, PasantiasDao pasantiasDao, UsuariosDao usuariosDao, PersonasDao personasDao, AplicacionPasantiasDao aplicacionPasantiasDao, EmailService emailService, RolesDao rolesDao, CurriculumsDao curriculumsDao){
         this.institucionesDao = institucionesDao;
         this.usuariosInstitucionesDao = usuariosInstitucionesDao;
         this.pasantiasDao = pasantiasDao;

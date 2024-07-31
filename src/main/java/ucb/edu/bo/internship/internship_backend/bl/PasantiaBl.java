@@ -378,6 +378,8 @@ public class PasantiaBl {
                             "<p>Le deseamos mucho éxito en sus futuras postulaciones y agradecemos su comprensión.</p>"
             );
 
+            emailService.enviarCorreo(emailRequest);
+
             //Eliminar la aplicación
             aplicacionPasantiasDao.delete(aplicacionespasantias);
             return new AplicacionPasantiasDto();

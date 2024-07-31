@@ -371,7 +371,7 @@ public class PasantiaBl {
             );
 
             emailRequest.setBody(
-                    "<p>Estimado/a"+ aplicacionespasantias.getUsuariosIdusuarios().getPersonasIdpersonas().getNombres() +", </p>" +
+                    "<p>Estimado/a "+ aplicacionespasantias.getUsuariosIdusuarios().getPersonasIdpersonas().getNombres() +", </p>" +
                             "<p>Lamentamos informarle que, después de una revisión exhaustiva, su solicitud para la pasantía titulada <strong>" +aplicacionespasantias.getPasantiasIdpasantias().getTitulo() + "</strong> no ha sido aceptada en esta ocasión.</p>" +
                             "<p>Entendemos que esta noticia puede ser decepcionante. Queremos agradecerle sinceramente su interés en la oportunidad de pasantía y su esfuerzo en el proceso de aplicación. Su perfil y habilidades son valiosos y le animamos a seguir buscando oportunidades que se ajusten a sus intereses y objetivos profesionales.</p>" +
                             "<p>Si desea recibir comentarios adicionales sobre su solicitud o necesita asistencia en su búsqueda de pasantías, no dude en ponerse en contacto con nosotros. Estamos aquí para apoyarle en su desarrollo profesional.</p>" +

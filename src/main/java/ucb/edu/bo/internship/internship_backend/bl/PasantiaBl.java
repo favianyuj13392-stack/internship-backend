@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import ucb.edu.bo.internship.internship_backend.dao.*;
 import ucb.edu.bo.internship.internship_backend.dto.*;
 import ucb.edu.bo.internship.internship_backend.entity.*;
+import ucb.edu.bo.internship.internship_backend.service.EmailService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,15 +27,17 @@ public class PasantiaBl {
     private final CarrerasDao carrerasDao;
 
     private final Logger logger = LoggerFactory.getLogger(PasantiaBl.class);
+    private final EmailService emailService;
 
-    public PasantiaBl(PasantiasDao pasantiasDao, PasantiasCarrerasDao pasantiasCarrerasDao,UsuariosDao usuariosDao, AplicacionPasantiasDao aplicacionPasantiasDao, SeleccionAplicanteDao seleccionAplicanteDao,
-                      CarrerasDao carrerasDao) {
+    public PasantiaBl(PasantiasDao pasantiasDao, PasantiasCarrerasDao pasantiasCarrerasDao, UsuariosDao usuariosDao, AplicacionPasantiasDao aplicacionPasantiasDao, SeleccionAplicanteDao seleccionAplicanteDao,
+                      CarrerasDao carrerasDao, EmailService emailService) {
         this.pasantiasDao = pasantiasDao;
         this.pasantiasCarrerasDao = pasantiasCarrerasDao;
         this.usuariosDao = usuariosDao;
         this.aplicacionPasantiasDao = aplicacionPasantiasDao;
         this.seleccionAplicanteDao = seleccionAplicanteDao;
         this.carrerasDao = carrerasDao;
+        this.emailService = emailService;
     }
 
     public Page<PasantiasConInstitucionYCarrerasDto> obtenerPasantiasPorFiltros(
@@ -316,6 +319,55 @@ public class PasantiaBl {
             seleccionaplicante.setHoraseleccion(new Date());
             seleccionaplicante.setAplicacionespasantiasIdaplicacionpasantias(aplicacionespasantias);
             seleccionaplicante.setUsuariosinstitucionesIdusuariosinstituciones(usuariosDao.findByKcUuid(uuid).getUsuariosinstitucionesList().get(0));
+
+            EmailRequest emailRequest = new EmailRequest();
+            emailRequest.setTo(
+                    aplicacionespasantias.getUsuariosIdusuarios().getCorreo()
+            );
+
+            emailRequest.setSubject(
+                    "¡Felicidades! Su postulación a la pasantía ha sido aceptada"
+            );
+
+            emailRequest.setBody(
+                    "<p>Estimado/a " + aplicacionespasantias.getUsuariosIdusuarios().getPersonasIdpersonas().getNombres() + ",</p>" +
+                            "<p>Nos complace informarle que su postulación a la pasantía titulada <strong>" + aplicacionespasantias.getPasantiasIdpasantias().getTitulo() + "</strong> ha sido aceptada.</p>" +
+                            "<p>Estamos emocionados de tenerlo/a como parte de nuestra comunidad y estamos seguros de que esta experiencia será invaluable para su desarrollo profesional.</p>" +
+                            "<p>Por favor, revise los detalles a continuación:</p>" +
+                            "<p><strong>Título de la Pasantía:</strong> " + aplicacionespasantias.getPasantiasIdpasantias().getTitulo() + "</p>" +
+                            "<p><strong>Fecha de Inicio:</strong> "+ aplicacionespasantias.getPasantiasIdpasantias().getFechaingreso() +"</p>" +
+                            "<p><strong>Contacto del Coordinador:</strong>"+ aplicacionespasantias.getPasantiasIdpasantias().getUsuariosIdusuarios().getPersonasIdpersonas().getNombres() + "-"+ aplicacionespasantias.getPasantiasIdpasantias().getUsuariosIdusuarios().getCorreo()+"</p>" +
+                            "<p>Si tiene alguna pregunta o necesita más detalles, no dude en ponerse en contacto con nosotros.</p>" +
+                            "<p>¡Felicitaciones y mucho éxito en su pasantía!</p>"
+            );
+
+           emailService.enviarCorreo(emailRequest);
+
+           Pasantias pasantias = aplicacionespasantias.getPasantiasIdpasantias();
+
+            Aplicacionespasantias finalAplicacionespasantias = aplicacionespasantias;
+            List<String> correosEstudiantesRechazados = pasantias.getAplicacionespasantiasList().stream()
+                    .map(aplicacionesPasantias -> aplicacionesPasantias.getUsuariosIdusuarios().getCorreo())
+                    .filter(correo -> !correo.equals(finalAplicacionespasantias.getUsuariosIdusuarios().getCorreo()))
+                    .toList();
+
+            EmailRequestMassive emailRequestMassive = new EmailRequestMassive();
+            emailRequestMassive.setTo(
+                    correosEstudiantesRechazados
+            );
+            emailRequestMassive.setSubject(
+                    "Su solicitud de pasantía no ha sido aceptada"
+            );
+            emailRequestMassive.setBody(
+                    "<p>Estimado/a estudiante, </p>" +
+                            "<p>Lamentamos informarle que, después de una revisión exhaustiva, su solicitud para la pasantía titulada <strong>" + pasantias.getTitulo() + "</strong> no ha sido aceptada en esta ocasión.</p>" +
+                            "<p>Entendemos que esta noticia puede ser decepcionante. Queremos agradecerle sinceramente su interés en la oportunidad de pasantía y su esfuerzo en el proceso de aplicación. Su perfil y habilidades son valiosos y le animamos a seguir buscando oportunidades que se ajusten a sus intereses y objetivos profesionales.</p>" +
+                            "<p>Si desea recibir comentarios adicionales sobre su solicitud o necesita asistencia en su búsqueda de pasantías, no dude en ponerse en contacto con nosotros. Estamos aquí para apoyarle en su desarrollo profesional.</p>" +
+                            "<p>Le deseamos mucho éxito en sus futuras postulaciones y agradecemos su comprensión.</p>"
+            );
+
+            emailService.enviarCorreoMasivo(emailRequestMassive);
+
             seleccionaplicante = seleccionAplicanteDao.save(seleccionaplicante);
             return SeleccionAplicanteDto.fromEntity(seleccionaplicante);
         }catch (RuntimeException e) {

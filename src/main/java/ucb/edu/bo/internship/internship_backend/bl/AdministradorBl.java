@@ -207,7 +207,6 @@ public class AdministradorBl {
                             "<p>Detalles de la pasantía:</p>" +
                             "<ul>" +
                             "    <li><strong>Título:</strong>"+ pasantias.getTitulo() +"</li>" +
-                            "    <li><strong>Descripción:</strong>"+ pasantias.getDescripcion() +"</li>" +
                             "    <li><strong>Empresa:</strong>"+pasantias.getInstitucionesIdinstituciones().getNombre()+"</li>" +
                             "    <li><strong>Fecha de inicio:</strong>"+pasantias.getFechaingreso()+"</li>" +
                             "    <li><strong>Fecha límite para postular:</strong>"+pasantias.getFechacierre()+"</li>" +

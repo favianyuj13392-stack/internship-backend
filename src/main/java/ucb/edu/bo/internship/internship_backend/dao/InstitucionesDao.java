@@ -11,10 +11,12 @@ import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
     @Query("SELECT i FROM Instituciones i WHERE i.activo = ?1")
     Page<Instituciones> findAllByActivo(Boolean activo, Pageable pageable);
+    List<Instituciones> findAllByActivoIsTrue();
     @Query("SELECT i FROM Instituciones i WHERE i.idinstituciones = ?1 AND i.activo = ?2")
     Instituciones findByIdinstitucionesAndActivo(Integer idinstituciones, Boolean activo);
     @Query("SELECT i FROM Instituciones i WHERE i.nombre ILIKE CONCAT('%', ?1, '%') AND i.activo = ?2")
@@ -57,7 +59,7 @@ public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
         LIMIT 4
     """, nativeQuery = true)
     List<Instituciones> findTop4InstitucionesBySectoresAndPasantias(Integer idInstitucion);
-    @Query("SELECT new ucb.edu.bo.internship.internship_backend.dto.InstitucionesConCOUNTPasantiasDto(i.idinstituciones,i.nombre, COUNT(p.idpasantias),i.logoempresa) FROM Instituciones i JOIN Pasantias p ON i.idinstituciones = p.institucionesIdinstituciones.idinstituciones WHERE i.activo = ?1 GROUP BY i.idinstituciones order by COUNT(p.idpasantias) DESC")
+    @Query("SELECT new ucb.edu.bo.internship.internship_backend.dto.InstitucionesConCOUNTPasantiasDto(i.idinstituciones,i.nombre, COUNT(p.idpasantias),i.logoempresa) FROM Instituciones i JOIN Pasantias p ON i.idinstituciones = p.institucionesIdinstituciones.idinstituciones WHERE i.activo = ?1 AND p.activo = true GROUP BY i.idinstituciones order by COUNT(p.idpasantias) DESC")
     Page<InstitucionesConCOUNTPasantiasDto> getAllNameAndCountPasantiasByActivo(boolean b, Pageable pageable);
     @Query("select count (*) from Instituciones i where i.activo = true")
     Long countAllByActivo();
@@ -125,5 +127,15 @@ public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
             Boolean activo,
             Pageable pageable
     );
-
+    //Funcion que devuelve un long con la cantidad de instituciones que tienen un sector especifico
+    @Query(value = """
+    SELECT COUNT(i.idinstituciones)
+    FROM instituciones i
+    WHERE EXISTS(
+        SELECT 1
+        FROM jsonb_array_elements_text(i.sectores) AS sector
+        WHERE lower(sector) = lower(?1)
+    )
+    """, nativeQuery = true)
+    Optional<Long> countAllBySector(String sector);
 }

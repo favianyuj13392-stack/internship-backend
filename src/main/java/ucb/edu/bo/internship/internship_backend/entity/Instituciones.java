@@ -53,7 +53,7 @@ public class Instituciones implements Serializable {
     @Column(name = "nombre")
     private String nombre;
     @Basic(optional = false)
-    @Column(name = "descripcion")
+    @Column(name = "descripcion", length = 1000)
     private String descripcion;
     @Basic(optional = false)
     @Column(name = "direccion")

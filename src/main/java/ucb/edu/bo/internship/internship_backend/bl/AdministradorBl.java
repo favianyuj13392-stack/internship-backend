@@ -3,6 +3,7 @@ package ucb.edu.bo.internship.internship_backend.bl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ucb.edu.bo.internship.internship_backend.dao.*;
 import ucb.edu.bo.internship.internship_backend.dto.*;
@@ -12,6 +13,9 @@ import ucb.edu.bo.internship.internship_backend.exception.institucion.Institucio
 import ucb.edu.bo.internship.internship_backend.exception.institucion.UsuarioYaRelacionadoException;
 import ucb.edu.bo.internship.internship_backend.service.EmailService;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -22,6 +26,7 @@ public class AdministradorBl {
     private final UsuariosDao usuariosDao;
     private final PersonasDao personasDao;
     private final AplicacionPasantiasDao aplicacionPasantiasDao;
+    private final CurriculumsDao curriculumsDao;
     private final EmailService emailService;
     private final RolesDao rolesDao;
 
@@ -34,6 +39,7 @@ public class AdministradorBl {
         this.aplicacionPasantiasDao = aplicacionPasantiasDao;
         this.emailService = emailService;
         this.rolesDao = rolesDao;
+        this.curriculumsDao = curriculumsDao;
     }
 
     public InstitucionesDto cambiarEstadoInstitucion(Integer idInstituciones, Boolean estado) {
@@ -297,6 +303,62 @@ public class AdministradorBl {
         }catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Error al obtener la informacion de la solicitud", e);
+        }
+    }
+    public KPISDto getAllKPIS(
+            //Estudiantes
+            Integer idCarreraEstudiante,
+            String fechaInicioEstudiante,
+            String fechaFinEstudiante,
+            //Pasantias
+            Integer idCarreraPasantia,
+            Integer idEmpresaPasantia,
+            String sectorPasantia,
+            String areaPasantia,
+            //Aplicaciones
+            Integer idCarreraAplicacion,
+            Integer idInstitucionAplicacion,
+            String sectorAplicacion,
+            String areaAplicacion,
+            //Instituciones
+            String sectorInstitucion,
+            //Usuarios
+            Integer idEmpresaUsuarios
+    ){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date parsedFechaInicio = null;
+        Date parsedFechaFin = null;
+        try {
+
+            parsedFechaInicio = format.parse(fechaInicioEstudiante);
+            parsedFechaFin = format.parse(fechaFinEstudiante);
+            return new KPISDto(
+                    usuariosDao.countEstudiantes().orElse(0L),//LISTO
+                    usuariosDao.countEstudiantesPorCarrera(idCarreraEstudiante).orElse(0L),//LISTO
+                    usuariosDao.countEstudiantesPorFecha(parsedFechaInicio,parsedFechaFin).orElse(0L),//LISTO
+                    pasantiasDao.countPasantiasActivo(true).orElse(0L),//LISTO
+                    pasantiasDao.countPasantiasActivo(false).orElse(0L),//LISTO
+                    pasantiasDao.countPasantiasPorCarrera(idCarreraPasantia).orElse(0L),// PENDIENTE
+                    pasantiasDao.countPasantiasPorEmpresa(idEmpresaPasantia).orElse(0L),//LISTO
+                    pasantiasDao.countPasantiasPorSector(sectorPasantia).orElse(0L),//LISTO
+                    pasantiasDao.countPasantiasPorArea(areaPasantia).orElse(0L),//LISTO
+                    aplicacionPasantiasDao.countByPasantiasIdpasantias().orElse(0L),//LISTO
+                    aplicacionPasantiasDao.countByPasantiasIdpasantiasByCarrera(idCarreraAplicacion).orElse(0L),//PENDIENTE
+                    aplicacionPasantiasDao.countByPasantiasIdpasantiasByEmpresa(idInstitucionAplicacion).orElse(0L),//LISTO
+                    aplicacionPasantiasDao.countByPasantiasIdpasantiasBySector(sectorAplicacion).orElse(0L),//LISTO
+                    aplicacionPasantiasDao.countByPasantiasIdpasantiasByArea(areaAplicacion).orElse(0L),//LISTO
+                    aplicacionPasantiasDao.countByActivo(true).orElse(0L),//LISTO
+                    pasantiasDao.countPasantiasQueNoAceptaronEstudiantes().orElse(0L),//LISTO
+                    curriculumsDao.count(),
+                    curriculumsDao.promedioCurriculumsPorEstudiante(1).orElse(0.0),//LISTO
+                    institucionesDao.countAllByActivo(),//Listo
+                    institucionesDao.countAllBySector(sectorInstitucion).orElse(0L),//Listo
+                    usuariosDao.countUsuariosEmpresa().orElse(0L),
+                    usuariosInstitucionesDao.countUsuariosPorEmpresa(idEmpresaUsuarios).orElse(0L)
+            );
+        }catch (Exception e) {
+            System.out.println(e);
+            throw new RuntimeException("Error al obtener los KPIs", e);
         }
     }
 }

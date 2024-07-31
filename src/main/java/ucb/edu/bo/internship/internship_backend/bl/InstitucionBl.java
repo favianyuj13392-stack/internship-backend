@@ -152,7 +152,7 @@ public class InstitucionBl {
             if (instituciones == null) {
                 throw new InstitucionNotFoundException("Institucion no encontrada");
             } else {
-                List<Pasantias> institucionPasantias = pasantiasDao.findPasantiasByInstitucionesIdinstituciones(instituciones);
+                List<Pasantias> institucionPasantias = pasantiasDao.findPasantiasByInstitucionesIdinstitucionesAndActivoIsTrue(instituciones);
                 List<PasantiasDto> pasantias = new ArrayList<>();
                 for (Pasantias pasantia : institucionPasantias) {
                     pasantias.add(PasantiasDto.fromEntity(pasantia));
@@ -570,7 +570,7 @@ public class InstitucionBl {
     }
 
     public Set<String> obtenerSectores(){
-        return institucionesDao.findAll().stream()
+        return institucionesDao.findAllByActivoIsTrue().stream()
                 .map(Instituciones::getSectores)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());

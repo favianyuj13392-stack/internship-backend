@@ -155,6 +155,64 @@ public class AdministradorApi {
     ) {
         return handleRequest(() -> administradorBl.rechazarPasantia(idPasantias));
     }
+    /* *
+        //Estudiantes
+        Integer idCarreraEstudiante,
+        String fechaInicioEstudiante,
+        String fechaFinEstudiante,
+        //Pasantias
+        Integer idCarreraPasantia,
+        Integer idEmpresaPasantia,
+        String sectorPasantia,
+        String areaPasantia,
+        //Aplicaciones
+        Integer idCarreraAplicacion,
+        Integer idInstitucionAplicacion,
+        String sectorAplicacion,
+        String areaAplicacion,
+        //Instituciones
+        String sectorInstitucion,
+        //Usuarios
+        Integer idEmpresaUsuarios
+    * */
+    @GetMapping("/dashboard/KPI")
+    public ResponseEntity<ResponseDto<KPISDto>> getKPI(
+            @PathVariable String uuid,
+            //Estudiantes
+            @RequestParam(defaultValue = "0",required = false) Integer idCarreraEstudiante,
+            @RequestParam(defaultValue = "",required = false) String fechaInicioEstudiante,
+            @RequestParam(defaultValue = "",required = false) String fechaFinEstudiante,
+            //Pasantias
+            @RequestParam(defaultValue = "0",required = false) Integer idCarreraPasantia,
+            @RequestParam(defaultValue = "0",required = false) Integer idEmpresaPasantia,
+            @RequestParam(defaultValue = "",required = false) String sectorPasantia,
+            @RequestParam(defaultValue = "",required = false) String areaPasantia,
+            //Aplicaciones
+            @RequestParam(defaultValue = "0",required = false) Integer idCarreraAplicacion,
+            @RequestParam(defaultValue = "0",required = false) Integer idInstitucionAplicacion,
+            @RequestParam(defaultValue = "",required = false) String sectorAplicacion,
+            @RequestParam(defaultValue = "",required = false) String areaAplicacion,
+            //Instituciones
+            @RequestParam(defaultValue = "",required = false) String sectorInstitucion,
+            //Usuarios
+            @RequestParam(defaultValue = "0",required = false) Integer idEmpresaUsuarios
+    ) {
+        return handleRequest(() -> administradorBl.getAllKPIS(
+                idCarreraEstudiante,
+                fechaInicioEstudiante,
+                fechaFinEstudiante,
+                idCarreraPasantia,
+                idEmpresaPasantia,
+                sectorPasantia,
+                areaPasantia,
+                idCarreraAplicacion,
+                idInstitucionAplicacion,
+                sectorAplicacion,
+                areaAplicacion,
+                sectorInstitucion,
+                idEmpresaUsuarios
+        ));
+    }
 
     private <T> ResponseEntity<ResponseDto<T>> handleRequest(Supplier<T> supplier) {
         ResponseDto<T> responseDto = new ResponseDto<>();

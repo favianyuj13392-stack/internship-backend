@@ -3,6 +3,8 @@ package ucb.edu.bo.internship.internship_backend.bl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ucb.edu.bo.internship.internship_backend.dao.*;
@@ -33,6 +35,7 @@ public class AdministradorBl {
 
     private final EmailService emailService;
     private final RolesDao rolesDao;
+    private final Logger logger = LoggerFactory.getLogger(AdministradorBl.class);
 
     public AdministradorBl(InstitucionesDao institucionesDao, UsuariosInstitucionesDao usuariosInstitucionesDao, PasantiasDao pasantiasDao, UsuariosDao usuariosDao, PersonasDao personasDao, AplicacionPasantiasDao aplicacionPasantiasDao, EmailService emailService, RolesDao rolesDao, CurriculumsDao curriculumsDao, KeycloakServiceImpl keycloakService) {
         this.institucionesDao = institucionesDao;
@@ -109,6 +112,7 @@ public class AdministradorBl {
                         "<p>Estimado/a "+usuarios.getPersonasIdpersonas().getNombres()+",</p>" +
                                 "<p>Lamentamos informarle que su solicitud para registrar la empresa <strong>"+instituciones.getNombre()+"</strong> en nuestro sistema de pasantías no ha sido aceptada.</p>" +
                                 "<p>Le agradecemos por su interés en colaborar con nosotros. Le invitamos a volver a postularse en el futuro o a ponerse en contacto con nosotros para discutir cualquier inquietud.</p>" +
+                                "<p>Su cuenta sera eliminada totalmente</p>" +
                                 "<p>Si tiene preguntas o desea más detalles sobre esta decisión, no dude en comunicarse con nuestro equipo de soporte.</p>"
                 );
 
@@ -139,7 +143,7 @@ public class AdministradorBl {
             );
 
             emailRequest.setBody(
-                    "<p>Estimado/a {{nombre_contacto}},</p>" +
+                    "<p>Estimado/a "+usuariosInstituciones.getUsuariosIdusuarios().getPersonasIdpersonas().getNombres()+",</p>" +
                             "<p>Nos complace informarle que su solicitud para registrar la empresa <strong>"+usuariosInstituciones.getInstitucionesIdinstituciones().getNombre()+"</strong> en nuestro sistema de pasantías ha sido aceptada.</p>" +
                             "<p>A partir de ahora, puede acceder a nuestra plataforma y comenzar a publicar oportunidades de pasantía. Estamos entusiasmados de colaborar con usted y de ofrecer a nuestros estudiantes valiosas experiencias laborales en su empresa.</p>" +
                             "<p>Si tiene alguna pregunta o necesita asistencia adicional, no dude en ponerse en contacto con nuestro equipo de soporte.</p>"
@@ -170,7 +174,7 @@ public class AdministradorBl {
                     "Su solicitud de publicación de una pasantía ha sido aceptada"
             );
             emailRequest.setBody(
-                    "<p>Estimado/a"+pasantias.getUsuariosIdusuarios().getPersonasIdpersonas().getNombres()+",</p>" +
+                    "<p>Estimado/a "+pasantias.getUsuariosIdusuarios().getPersonasIdpersonas().getNombres()+",</p>" +
                             "<p>Nos complace informarle que su solicitud de publicación para la pasantía titulada <strong>" + pasantias.getTitulo() + "</strong> ha sido aceptada.</p>" +
                             "<p>Agradecemos tu interés en contribuir a la formación profesional de nuestros estudiantes. Si tienes alguna pregunta o necesitas más detalles, no dudes en ponerte en contacto con nosotros.</p>"+
                             "<p>Para más información, visita nuestro sitio web o ponte en contacto con nuestro equipo.</p>"+
@@ -185,8 +189,14 @@ public class AdministradorBl {
                             Pasantiascarreras::getCarrerasIdcarreras
                     ).toList()
             );
+
+
+
             List<String> correosEstudiantes = estudiantes.stream().map(
-                    Usuarios::getCorreo
+                    usuarios -> {
+                        logger.info(usuarios.getCorreo());
+                        return usuarios.getCorreo();
+                    }
             ).toList();
 
             emailRequestMassive.setTo(correosEstudiantes);

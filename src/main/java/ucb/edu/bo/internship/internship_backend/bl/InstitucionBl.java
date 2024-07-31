@@ -22,6 +22,7 @@ import ucb.edu.bo.internship.internship_backend.entity.*;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionNotFoundException;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionServiceExcepcion;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.UsuarioYaRelacionadoException;
+import ucb.edu.bo.internship.internship_backend.service.EmailService;
 
 import java.sql.Time;
 import java.util.*;
@@ -42,11 +43,12 @@ public class InstitucionBl {
     private final Logger logger = LoggerFactory.getLogger(InstitucionBl.class);
     private final PasantiasCarrerasDao pasantiasCarrerasDao;
     private final CarrerasDao carrerasDao;
+    private final EmailService emailService;
 
-    public InstitucionBl(InstitucionesDao institucionesDao, PasantiasDao pasantiasDao, UsuariosInstitucionesDao usuariosInstitucionesDao,UsuariosDao usuariosDao, UsuariosBL usuariosBL, AplicacionPasantiasDao aplicacionPasantiasDao, SeleccionAplicanteDao seleccionAplicanteDao,
+    public InstitucionBl(InstitucionesDao institucionesDao, PasantiasDao pasantiasDao, UsuariosInstitucionesDao usuariosInstitucionesDao, UsuariosDao usuariosDao, UsuariosBL usuariosBL, AplicacionPasantiasDao aplicacionPasantiasDao, SeleccionAplicanteDao seleccionAplicanteDao,
                          PersonasDao personasDao,
                          PasantiasCarrerasDao pasantiasCarrerasDao,
-                         CarrerasDao carrerasDao) {
+                         CarrerasDao carrerasDao, EmailService emailService) {
         this.institucionesDao = institucionesDao;
         this.pasantiasDao = pasantiasDao;
         this.usuariosInstitucionesDao = usuariosInstitucionesDao;
@@ -57,6 +59,7 @@ public class InstitucionBl {
         this.personasDao = personasDao;
         this.pasantiasCarrerasDao = pasantiasCarrerasDao;
         this.carrerasDao = carrerasDao;
+        this.emailService = emailService;
     }
     /*@Transactional
     public UsuarioRegistroCompletoDto agregarInstitucionConUsuario(UsuariosInstitucionesDto usuariosInstitucionesDto){
@@ -417,6 +420,49 @@ public class InstitucionBl {
                             seleccionaplicante.setComentarios("");
                             seleccionaplicante.setActivo(false);
                             seleccionAplicanteDao.save(seleccionaplicante);
+
+                            EmailRequest emailRequest = new EmailRequest();
+                            emailRequest.setTo(
+                                    usuarios.getCorreo()
+                            );
+                            emailRequest.setSubject(
+                                    "¡Felicidades! Su postulación a la pasantía ha sido aceptada"
+                            );
+                            emailRequest.setBody(
+                                    "<p>Estimado/a " + usuarios.getPersonasIdpersonas().getNombres() + ",</p>" +
+                                            "<p>Nos complace informarle que su postulación a la pasantía titulada <strong>" + pasantias.getTitulo() + "</strong> ha sido aceptada.</p>" +
+                                            "<p>Estamos emocionados de tenerlo/a como parte de nuestra comunidad y estamos seguros de que esta experiencia será invaluable para su desarrollo profesional.</p>" +
+                                            "<p>Por favor, revise los detalles a continuación:</p>" +
+                                            "<p><strong>Título de la Pasantía:</strong> " + pasantias.getTitulo() + "</p>" +
+                                            "<p><strong>Fecha de Inicio:</strong> "+pasantias.getFechaingreso()+"</p>" +
+                                            "<p><strong>Contacto del Coordinador:</strong>"+ pasantias.getUsuariosIdusuarios().getPersonasIdpersonas().getNombres() + "-"+ pasantias.getUsuariosIdusuarios().getCorreo()+"</p>" +
+                                            "<p>Si tiene alguna pregunta o necesita más detalles, no dude en ponerse en contacto con nosotros.</p>" +
+                                            "<p>¡Felicitaciones y mucho éxito en su pasantía!</p>"
+                            );
+                            emailService.enviarCorreo(emailRequest);
+
+                            List<String> correosEstudiantesRechazados = pasantias.getAplicacionespasantiasList().stream()
+                                    .map(aplicacionesPasantias -> aplicacionesPasantias.getUsuariosIdusuarios().getCorreo())
+                                    .filter(correo -> !correo.equals(usuarios.getCorreo()))
+                                    .toList();
+
+                            EmailRequestMassive emailRequestMassive = new EmailRequestMassive();
+                            emailRequestMassive.setTo(
+                                    correosEstudiantesRechazados
+                            );
+                            emailRequestMassive.setSubject(
+                                    "Su solicitud de pasantía no ha sido aceptada"
+                            );
+                            emailRequestMassive.setBody(
+                                    "<p>Estimado/a estudiante, </p>" +
+                                            "<p>Lamentamos informarle que, después de una revisión exhaustiva, su solicitud para la pasantía titulada <strong>" + pasantias.getTitulo() + "</strong> no ha sido aceptada en esta ocasión.</p>" +
+                                            "<p>Entendemos que esta noticia puede ser decepcionante. Queremos agradecerle sinceramente su interés en la oportunidad de pasantía y su esfuerzo en el proceso de aplicación. Su perfil y habilidades son valiosos y le animamos a seguir buscando oportunidades que se ajusten a sus intereses y objetivos profesionales.</p>" +
+                                            "<p>Si desea recibir comentarios adicionales sobre su solicitud o necesita asistencia en su búsqueda de pasantías, no dude en ponerse en contacto con nosotros. Estamos aquí para apoyarle en su desarrollo profesional.</p>" +
+                                            "<p>Le deseamos mucho éxito en sus futuras postulaciones y agradecemos su comprensión.</p>"
+                            );
+
+                            emailService.enviarCorreoMasivo(emailRequestMassive);
+
                             return true;
                         } else {
                             throw new InstitucionNotFoundException("Aplicante no encontrado");
@@ -454,6 +500,27 @@ public class InstitucionBl {
                     seleccionaplicante.setComentarios("");
                     seleccionaplicante.setActivo(false);
                     seleccionAplicanteDao.save(seleccionaplicante);
+
+                    List<String> correosEstudiantesRechazados = pasantias.getAplicacionespasantiasList().stream()
+                            .map(aplicacionesPasantias -> aplicacionesPasantias.getUsuariosIdusuarios().getCorreo())
+                            .toList();
+
+                    EmailRequestMassive emailRequestMassive = new EmailRequestMassive();
+                    emailRequestMassive.setTo(
+                            correosEstudiantesRechazados
+                    );
+                    emailRequestMassive.setSubject(
+                            "Su solicitud de pasantía no ha sido aceptada"
+                    );
+                    emailRequestMassive.setBody(
+                            "<p>Estimado/a estudiante, </p>" +
+                                    "<p>Lamentamos informarle que, después de una revisión exhaustiva, su solicitud para la pasantía titulada <strong>" + pasantias.getTitulo() + "</strong> no ha sido aceptada en esta ocasión.</p>" +
+                                    "<p>Entendemos que esta noticia puede ser decepcionante. Queremos agradecerle sinceramente su interés en la oportunidad de pasantía y su esfuerzo en el proceso de aplicación. Su perfil y habilidades son valiosos y le animamos a seguir buscando oportunidades que se ajusten a sus intereses y objetivos profesionales.</p>" +
+                                    "<p>Si desea recibir comentarios adicionales sobre su solicitud o necesita asistencia en su búsqueda de pasantías, no dude en ponerse en contacto con nosotros. Estamos aquí para apoyarle en su desarrollo profesional.</p>" +
+                                    "<p>Le deseamos mucho éxito en sus futuras postulaciones y agradecemos su comprensión.</p>"
+                    );
+
+
                     return true;
                 } else {
                     throw new InstitucionNotFoundException("Pasantia no encontrada");

@@ -11,6 +11,7 @@ import ucb.edu.bo.internship.internship_backend.entity.*;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionNotFoundException;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionServiceExcepcion;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.UsuarioYaRelacionadoException;
+import ucb.edu.bo.internship.internship_backend.service.impl.KeycloakServiceImpl;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,7 +27,8 @@ public class AdministradorBl {
     private final PersonasDao personasDao;
     private final AplicacionPasantiasDao aplicacionPasantiasDao;
     private final CurriculumsDao curriculumsDao;
-    public AdministradorBl(InstitucionesDao institucionesDao, UsuariosInstitucionesDao usuariosInstitucionesDao, PasantiasDao pasantiasDao, UsuariosDao usuariosDao, PersonasDao personasDao,AplicacionPasantiasDao aplicacionPasantiasDao, CurriculumsDao curriculumsDao){
+    private final KeycloakServiceImpl keycloakService;
+    public AdministradorBl(InstitucionesDao institucionesDao, UsuariosInstitucionesDao usuariosInstitucionesDao, PasantiasDao pasantiasDao, UsuariosDao usuariosDao, PersonasDao personasDao,AplicacionPasantiasDao aplicacionPasantiasDao, CurriculumsDao curriculumsDao, KeycloakServiceImpl keycloakService) {
         this.institucionesDao = institucionesDao;
         this.usuariosInstitucionesDao = usuariosInstitucionesDao;
         this.pasantiasDao = pasantiasDao;
@@ -34,6 +36,7 @@ public class AdministradorBl {
         this.personasDao = personasDao;
         this.aplicacionPasantiasDao = aplicacionPasantiasDao;
         this.curriculumsDao = curriculumsDao;
+        this.keycloakService = keycloakService;
     }
 
     public InstitucionesDto cambiarEstadoInstitucion(Integer idInstituciones, Boolean estado) {
@@ -85,6 +88,9 @@ public class AdministradorBl {
                 }
                 usuariosDao.delete(usuarios);
                 personasDao.delete(personas);
+
+                keycloakService.deleteUser(usuarios.getKcUuid());    
+
                 return new UsuarioConCorreoYNombreCompletoYFotoDto();
             }
             //Aceptar la relacion

@@ -184,13 +184,11 @@ public class AdministradorBl {
 
             EmailRequestMassive emailRequestMassive = new EmailRequestMassive();
             Roles rol = rolesDao.findByRol("ESTUDIANTE");
-            List<Usuarios> estudiantes = usuariosDao.findAllByActivoIsTrueAndRolesIdrolesAndCarrerasIdcarrerasIn(
+            List<Usuarios> estudiantes = usuariosDao.findAllByRolesIdrolesAndCarrerasIdcarrerasIn(
                     rol, pasantias.getPasantiascarrerasList().stream().map(
                             Pasantiascarreras::getCarrerasIdcarreras
                     ).toList()
             );
-
-
 
             List<String> correosEstudiantes = estudiantes.stream().map(
                     usuarios -> {

@@ -24,7 +24,8 @@ public interface UsuariosDao extends JpaRepository<Usuarios, Integer>{
     @Query("SELECT COUNT(u)>0 from Usuarios u where u.activo = true and u.kcUuid = ?1 and u.rolesIdroles.rol = ?2")
     Boolean userIs(String kcUuid,String role);
 
-    List<Usuarios> findAllByActivoIsTrueAndRolesIdrolesAndCarrerasIdcarrerasIn(
+
+    List<Usuarios> findAllByRolesIdrolesAndCarrerasIdcarrerasIn(
             Roles rol,
             List<Carreras> carreras);
     /*KPIS*/

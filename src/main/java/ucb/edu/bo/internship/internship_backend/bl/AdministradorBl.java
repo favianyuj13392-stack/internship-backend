@@ -10,6 +10,7 @@ import ucb.edu.bo.internship.internship_backend.entity.*;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionNotFoundException;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.InstitucionServiceExcepcion;
 import ucb.edu.bo.internship.internship_backend.exception.institucion.UsuarioYaRelacionadoException;
+import ucb.edu.bo.internship.internship_backend.service.EmailService;
 
 import java.util.List;
 
@@ -21,13 +22,18 @@ public class AdministradorBl {
     private final UsuariosDao usuariosDao;
     private final PersonasDao personasDao;
     private final AplicacionPasantiasDao aplicacionPasantiasDao;
-    public AdministradorBl(InstitucionesDao institucionesDao, UsuariosInstitucionesDao usuariosInstitucionesDao, PasantiasDao pasantiasDao, UsuariosDao usuariosDao, PersonasDao personasDao,AplicacionPasantiasDao aplicacionPasantiasDao){
+    private final EmailService emailService;
+    private final RolesDao rolesDao;
+
+    public AdministradorBl(InstitucionesDao institucionesDao, UsuariosInstitucionesDao usuariosInstitucionesDao, PasantiasDao pasantiasDao, UsuariosDao usuariosDao, PersonasDao personasDao, AplicacionPasantiasDao aplicacionPasantiasDao, EmailService emailService, RolesDao rolesDao){
         this.institucionesDao = institucionesDao;
         this.usuariosInstitucionesDao = usuariosInstitucionesDao;
         this.pasantiasDao = pasantiasDao;
         this.usuariosDao = usuariosDao;
         this.personasDao = personasDao;
         this.aplicacionPasantiasDao = aplicacionPasantiasDao;
+        this.emailService = emailService;
+        this.rolesDao = rolesDao;
     }
 
     public InstitucionesDto cambiarEstadoInstitucion(Integer idInstituciones, Boolean estado) {
@@ -77,8 +83,31 @@ public class AdministradorBl {
                 if(!instituciones.getActivo()){
                     institucionesDao.delete(instituciones);
                 }
+
+                EmailRequest emailRequest = new EmailRequest();
+
+                emailRequest.setTo(
+                        usuariosInstituciones.getUsuariosIdusuarios().getCorreo()
+                );
+
+                emailRequest.setSubject(
+                        "Rechazo de su solicitud de cuenta de empresa en nuestro sistema de pasantías"
+                );
+
+                emailRequest.setBody(
+                        "<p>Estimado/a "+usuarios.getPersonasIdpersonas().getNombres()+",</p>" +
+                                "<p>Lamentamos informarle que su solicitud para registrar la empresa <strong>"+instituciones.getNombre()+"</strong> en nuestro sistema de pasantías no ha sido aceptada.</p>" +
+                                "<p>Le agradecemos por su interés en colaborar con nosotros. Le invitamos a volver a postularse en el futuro o a ponerse en contacto con nosotros para discutir cualquier inquietud.</p>" +
+                                "<p>Si tiene preguntas o desea más detalles sobre esta decisión, no dude en comunicarse con nuestro equipo de soporte.</p>"
+                );
+
+                emailService.enviarCorreo(emailRequest);
+
                 usuariosDao.delete(usuarios);
                 personasDao.delete(personas);
+
+
+
                 return new UsuarioConCorreoYNombreCompletoYFotoDto();
             }
             //Aceptar la relacion
@@ -86,6 +115,26 @@ public class AdministradorBl {
             usuariosInstituciones.getInstitucionesIdinstituciones().setActivo(true);
             usuariosInstituciones.setActivo(true);
             usuariosInstituciones = usuariosInstitucionesDao.save(usuariosInstituciones);
+
+            EmailRequest emailRequest = new EmailRequest();
+
+            emailRequest.setTo(
+                    usuariosInstituciones.getUsuariosIdusuarios().getCorreo()
+            );
+
+            emailRequest.setSubject(
+                    "Aceptación de su cuenta de empresa en nuestro sistema de pasantías"
+            );
+
+            emailRequest.setBody(
+                    "<p>Estimado/a {{nombre_contacto}},</p>" +
+                            "<p>Nos complace informarle que su solicitud para registrar la empresa <strong>"+usuariosInstituciones.getInstitucionesIdinstituciones().getNombre()+"</strong> en nuestro sistema de pasantías ha sido aceptada.</p>" +
+                            "<p>A partir de ahora, puede acceder a nuestra plataforma y comenzar a publicar oportunidades de pasantía. Estamos entusiasmados de colaborar con usted y de ofrecer a nuestros estudiantes valiosas experiencias laborales en su empresa.</p>" +
+                            "<p>Si tiene alguna pregunta o necesita asistencia adicional, no dude en ponerse en contacto con nuestro equipo de soporte.</p>"
+            );
+
+            emailService.enviarCorreo(emailRequest);
+
             return new UsuarioConCorreoYNombreCompletoYFotoDto(usuariosInstituciones);
         }catch (InstitucionNotFoundException | UsuarioYaRelacionadoException e){
             throw e;
@@ -101,6 +150,54 @@ public class AdministradorBl {
                 throw new UsuarioYaRelacionadoException("No se puede aceptar una pasantia activa");
             }
             pasantias.setActivo(true);
+            EmailRequest emailRequest = new EmailRequest();
+            emailRequest.setTo(
+                    pasantias.getUsuariosIdusuarios().getCorreo()
+            );
+            emailRequest.setSubject(
+                    "Su solicitud de publicación de una pasantía ha sido aceptada"
+            );
+            emailRequest.setBody(
+                    "<p>Estimado/a"+pasantias.getUsuariosIdusuarios().getPersonasIdpersonas().getNombres()+",</p>" +
+                            "<p>Nos complace informarle que su solicitud de publicación para la pasantía titulada <strong>" + pasantias.getTitulo() + "</strong> ha sido aceptada.</p>" +
+                            "<p>Agradecemos tu interés en contribuir a la formación profesional de nuestros estudiantes. Si tienes alguna pregunta o necesitas más detalles, no dudes en ponerte en contacto con nosotros.</p>"+
+                            "<p>Para más información, visita nuestro sitio web o ponte en contacto con nuestro equipo.</p>"+
+                            "<p>¡Felicitaciones y mucho éxito!</p>"
+            );
+            emailService.enviarCorreo(emailRequest);
+
+            EmailRequestMassive emailRequestMassive = new EmailRequestMassive();
+            Roles rol = rolesDao.findByRol("ESTUDIANTE");
+            List<Usuarios> estudiantes = usuariosDao.findAllByActivoIsTrueAndRolesIdrolesAndCarrerasIdcarrerasIn(
+                    rol, pasantias.getPasantiascarrerasList().stream().map(
+                            Pasantiascarreras::getCarrerasIdcarreras
+                    ).toList()
+            );
+            List<String> correosEstudiantes = estudiantes.stream().map(
+                    Usuarios::getCorreo
+            ).toList();
+
+            emailRequestMassive.setTo(correosEstudiantes);
+            emailRequestMassive.setSubject(
+                    "Nueva oportunidad de pasantía relacionada con tu carrera"
+            );
+            emailRequestMassive.setBody(
+                    "<p>Estimado/a estudiante,</p>" +
+                            "<p>Nos complace anunciar que hemos publicado una nueva oportunidad de pasantía relacionada con tu carrera. Esta es una excelente oportunidad para aplicar tus conocimientos y adquirir experiencia práctica en tu área de estudio.</p>" +
+                            "<p>Detalles de la pasantía:</p>" +
+                            "<ul>" +
+                            "    <li><strong>Título:</strong>"+ pasantias.getTitulo() +"</li>" +
+                            "    <li><strong>Descripción:</strong>"+ pasantias.getDescripcion() +"</li>" +
+                            "    <li><strong>Empresa:</strong>"+pasantias.getInstitucionesIdinstituciones().getNombre()+"</li>" +
+                            "    <li><strong>Fecha de inicio:</strong>"+pasantias.getFechaingreso()+"</li>" +
+                            "    <li><strong>Fecha límite para postular:</strong>"+pasantias.getFechacierre()+"</li>" +
+                            "</ul>" +
+                            "<p>Si estás interesado/a en esta oportunidad, te invitamos a postularte a través de nuestro sistema de pasantías. No pierdas la oportunidad de enriquecer tu formación profesional y abrir puertas a futuras oportunidades laborales.</p>" +
+                            "<p>Para más información y para postularte, visita nuestro sitio web o contacta a nuestro equipo de pasantías.</p>"
+            );
+
+            emailService.enviarCorreoMasivo(emailRequestMassive);
+
             pasantias = pasantiasDao.save(pasantias);
             return new PasantiasDto(pasantias);
         }catch (InstitucionNotFoundException | UsuarioYaRelacionadoException e ){
@@ -116,6 +213,20 @@ public class AdministradorBl {
             if(pasantias.getActivo()){
                 throw new UsuarioYaRelacionadoException("No se puede eliminar una pasantia activa");
             }
+            EmailRequest emailRequest = new EmailRequest();
+            emailRequest.setTo(
+                    pasantias.getUsuariosIdusuarios().getCorreo()
+            );
+            emailRequest.setSubject(
+                    "Su solicitud de publicación de una pasantía ha sido rechazada"
+            );
+            emailRequest.setBody(
+                    "<p>Estimado/a " + pasantias.getUsuariosIdusuarios().getPersonasIdpersonas().getNombres() + ",</p>" +
+                            "<p>Lamentablemente, debemos informarle que su solicitud de publicación para la pasantía titulada <strong>" + pasantias.getTitulo() + "</strong> ha sido rechazada.</p>" +
+                            "<p>Agradecemos su interés en contribuir a la formación profesional de nuestros estudiantes. Aunque esta vez no hemos podido aceptar su solicitud, le animamos a seguir participando en futuras oportunidades.</p>" +
+                            "<p>Si tiene alguna pregunta o necesita más detalles, no dude en ponerse en contacto con nosotros.</p>"
+            );
+            emailService.enviarCorreo(emailRequest);
             pasantiasDao.delete(pasantias);
             return new PasantiasDto();
         }catch (InstitucionNotFoundException | UsuarioYaRelacionadoException e ){

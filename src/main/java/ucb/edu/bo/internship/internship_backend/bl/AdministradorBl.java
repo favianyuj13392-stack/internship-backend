@@ -19,6 +19,7 @@ import ucb.edu.bo.internship.internship_backend.service.EmailService;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -318,60 +319,65 @@ public class AdministradorBl {
             throw new RuntimeException("Error al obtener la informacion de la solicitud", e);
         }
     }
-    public KPISDto getAllKPIS(
-            //Estudiantes
-            Integer idCarreraEstudiante,
-            String fechaInicioEstudiante,
-            String fechaFinEstudiante,
-            //Pasantias
-            Integer idCarreraPasantia,
-            Integer idEmpresaPasantia,
-            String sectorPasantia,
-            String areaPasantia,
-            //Aplicaciones
-            Integer idCarreraAplicacion,
-            Integer idInstitucionAplicacion,
-            String sectorAplicacion,
-            String areaAplicacion,
-            //Instituciones
-            String sectorInstitucion,
-            //Usuarios
-            Integer idEmpresaUsuarios
-    ){
+    //getAllKPISWithoutParams
+    public List<KPIDto> getAllKPISWithoutParams() {
+        List<KPIDto> kpis = new ArrayList<>();
+        kpis.add(new KPIDto("Total Estudiantes", usuariosDao.countEstudiantes().orElse(0L)));
+        kpis.add(new KPIDto("Total Pasantías Activas", pasantiasDao.countPasantiasActivo(true).orElse(0L)));
+        kpis.add(new KPIDto("Total Pasantías Inactivas", pasantiasDao.countPasantiasActivo(false).orElse(0L)));
+        kpis.add(new KPIDto("Total Aplicaciones", aplicacionPasantiasDao.countByPasantiasIdpasantias().orElse(0L)));
+        kpis.add(new KPIDto("Total Aplicaciones Activas", aplicacionPasantiasDao.countByActivo(true).orElse(0L)));
+        kpis.add(new KPIDto("Pasantías que no aceptaron estudiantes", pasantiasDao.countPasantiasQueNoAceptaronEstudiantes().orElse(0L)));
+        kpis.add(new KPIDto("Total Currículums", curriculumsDao.count()));
+        kpis.add(new KPIDto("Promedio Currículums Por Estudiante", Math.round(curriculumsDao.promedioCurriculumsPorEstudiante(1).orElse(0.0))));
+        kpis.add(new KPIDto("Total Instituciones Activas", institucionesDao.countAllByActivo()));
+        kpis.add(new KPIDto("Total Usuarios con Empresa", usuariosDao.countUsuariosEmpresa().orElse(0L)));
+        return kpis;
+    }
+    //getAllKPISWithCareerParams
+    public List<KPIDto> getAllKPISWithCareerParams(Integer idCarrera) {
+        List<KPIDto> kpis = new ArrayList<>();
+        kpis.add(new KPIDto("Estudiantes por Carrera", usuariosDao.countEstudiantesPorCarrera(idCarrera).orElse(0L)));
+        kpis.add(new KPIDto("Pasantías por Carrera", pasantiasDao.countPasantiasPorCarrera(idCarrera).orElse(0L)));
+        kpis.add(new KPIDto("Aplicaciones por Carrera", aplicacionPasantiasDao.countByPasantiasIdpasantiasByCarrera(idCarrera).orElse(0L)));
+        return kpis;
+    }
+    //getAllKPISWithDateParams
+    public List<KPIDto> getAllKPISWithDateParams(String fechaInicio, String fechaFin){
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Date parsedFechaInicio = null;
         Date parsedFechaFin = null;
+        List<KPIDto> kpis = new ArrayList<>();
         try {
-
-            parsedFechaInicio = format.parse(fechaInicioEstudiante);
-            parsedFechaFin = format.parse(fechaFinEstudiante);
-            return new KPISDto(
-                    usuariosDao.countEstudiantes().orElse(0L),//LISTO
-                    usuariosDao.countEstudiantesPorCarrera(idCarreraEstudiante).orElse(0L),//LISTO
-                    usuariosDao.countEstudiantesPorFecha(parsedFechaInicio,parsedFechaFin).orElse(0L),//LISTO
-                    pasantiasDao.countPasantiasActivo(true).orElse(0L),//LISTO
-                    pasantiasDao.countPasantiasActivo(false).orElse(0L),//LISTO
-                    pasantiasDao.countPasantiasPorCarrera(idCarreraPasantia).orElse(0L),// PENDIENTE
-                    pasantiasDao.countPasantiasPorEmpresa(idEmpresaPasantia).orElse(0L),//LISTO
-                    pasantiasDao.countPasantiasPorSector(sectorPasantia).orElse(0L),//LISTO
-                    pasantiasDao.countPasantiasPorArea(areaPasantia).orElse(0L),//LISTO
-                    aplicacionPasantiasDao.countByPasantiasIdpasantias().orElse(0L),//LISTO
-                    aplicacionPasantiasDao.countByPasantiasIdpasantiasByCarrera(idCarreraAplicacion).orElse(0L),//PENDIENTE
-                    aplicacionPasantiasDao.countByPasantiasIdpasantiasByEmpresa(idInstitucionAplicacion).orElse(0L),//LISTO
-                    aplicacionPasantiasDao.countByPasantiasIdpasantiasBySector(sectorAplicacion).orElse(0L),//LISTO
-                    aplicacionPasantiasDao.countByPasantiasIdpasantiasByArea(areaAplicacion).orElse(0L),//LISTO
-                    aplicacionPasantiasDao.countByActivo(true).orElse(0L),//LISTO
-                    pasantiasDao.countPasantiasQueNoAceptaronEstudiantes().orElse(0L),//LISTO
-                    curriculumsDao.count(),
-                    curriculumsDao.promedioCurriculumsPorEstudiante(1).orElse(0.0),//LISTO
-                    institucionesDao.countAllByActivo(),//Listo
-                    institucionesDao.countAllBySector(sectorInstitucion).orElse(0L),//Listo
-                    usuariosDao.countUsuariosEmpresa().orElse(0L),
-                    usuariosInstitucionesDao.countUsuariosPorEmpresa(idEmpresaUsuarios).orElse(0L)
-            );
-        }catch (Exception e) {
-            System.out.println(e);
+            parsedFechaInicio = format.parse(fechaInicio);
+            parsedFechaFin = format.parse(fechaFin);
+            kpis.add(new KPIDto("Estudiantes registrados por Fecha", usuariosDao.countEstudiantesPorFecha(parsedFechaInicio,parsedFechaFin).orElse(0L)));
+            return kpis;
+        }catch (ParseException e){
             throw new RuntimeException("Error al obtener los KPIs", e);
         }
+    }
+    //getAllKPISWithEmpresaParams
+    public List<KPIDto> getAllKPISWithEmpresaParams(Integer idEmpresa){
+        List<KPIDto> kpis = new ArrayList<>();
+        kpis.add(new KPIDto("Pasantías por Empresa", pasantiasDao.countPasantiasPorEmpresa(idEmpresa).orElse(0L)));
+        kpis.add(new KPIDto("Aplicaciones por Empresa", aplicacionPasantiasDao.countByPasantiasIdpasantiasByEmpresa(idEmpresa).orElse(0L)));
+        kpis.add(new KPIDto("Usuarios por Empresa", usuariosInstitucionesDao.countUsuariosPorEmpresa(idEmpresa).orElse(0L)));
+        return kpis;
+    }
+    //getAllKPISWithSectorParams
+    public List<KPIDto> getAllKPISWithSectorParams(String sector){
+        List<KPIDto> kpis = new ArrayList<>();
+        kpis.add(new KPIDto("Pasantías por Sector", pasantiasDao.countPasantiasPorSector(sector).orElse(0L)));
+        kpis.add(new KPIDto("Aplicaciones por Sector", aplicacionPasantiasDao.countByPasantiasIdpasantiasBySector(sector).orElse(0L)));
+        kpis.add(new KPIDto("Instituciones por Sector", institucionesDao.countAllBySector(sector).orElse(0L)));
+        return kpis;
+    }
+    //getAllKPISWithAreaParams
+    public List<KPIDto> getAllKPISWithAreaParams(String area){
+        List<KPIDto> kpis = new ArrayList<>();
+        kpis.add(new KPIDto("Pasantías por Area", pasantiasDao.countPasantiasPorArea(area).orElse(0L)));
+        kpis.add(new KPIDto("Aplicaciones por Area", aplicacionPasantiasDao.countByPasantiasIdpasantiasByArea(area).orElse(0L)));
+        return kpis;
     }
 }

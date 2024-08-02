@@ -116,6 +116,17 @@ public class AdministradorApi {
     ) {
         return handleRequest(() -> pasantiaBl.obtenerPasantias(page, size, search, sort,active));
     }
+    //Obtener todas las pasantías marcadas como sin aplicantes
+    @GetMapping("/pasantia/sinaplicantes")
+    public ResponseEntity<ResponseDto<Page<PasantiaConNombreYLogoEmpresaDto>>> getPasantiasSinAplicantes(
+            @PathVariable String uuid,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "12") Integer size,
+            @RequestParam(defaultValue = "", required = false) String search,
+            @RequestParam(defaultValue = "idpasantias", required = false) String sort
+    ) {
+        return handleRequest(() -> pasantiaBl.obtenerPasantiasSinAplicantes(page, size, search, sort));
+    }
     @GetMapping("/pasantia/{idPasantia}")
     public ResponseEntity<ResponseDto<PasantiaConEmpresaYPostulantes>> getPasantia(
             @PathVariable String uuid,

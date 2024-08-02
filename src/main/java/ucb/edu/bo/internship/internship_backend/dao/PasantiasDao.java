@@ -3,6 +3,7 @@ package ucb.edu.bo.internship.internship_backend.dao;
 import aj.org.objectweb.asm.commons.Remapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Range;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.jpa.repository.Query;
@@ -30,6 +31,7 @@ public interface PasantiasDao extends JpaRepository<Pasantias, Integer>{
             String titulo,
             Pageable pageable
     );
+    @Query("SELECT p FROM Pasantias p WHERE p.activo = true AND LOWER(p.titulo) LIKE LOWER(CONCAT('%', :titulo, '%')) AND (p.sinaplicantes IS NULL OR p.sinaplicantes = false)")
     Page<Pasantias> findAllByActivoIsTrueAndTituloContainingIgnoreCase(
             String titulo,
             Pageable pageable
@@ -192,9 +194,9 @@ public interface PasantiasDao extends JpaRepository<Pasantias, Integer>{
     //@Query("SELECT Pasantias FROM Pasantias p WHERE p.institucionesIdinstituciones.idinstituciones = ?1")
     List<Pasantias> findPasantiasByInstitucionesIdinstituciones(Instituciones idInstituciones);
     List<Pasantias> findPasantiasByInstitucionesIdinstitucionesAndActivoIsTrue(Instituciones idInstituciones);
-
+    @Query("SELECT p FROM Pasantias p WHERE p.activo = false AND LOWER(p.titulo) LIKE LOWER(CONCAT('%', :search, '%')) AND (p.sinaplicantes IS NULL OR p.sinaplicantes = false)")
     Page<Pasantias> findAllByActivoIsFalseAndTituloContainingIgnoreCase(String search, Pageable pageable);
-
+    @Query("SELECT p FROM Pasantias p WHERE LOWER(p.titulo) LIKE LOWER(CONCAT('%', :search, '%')) AND (p.sinaplicantes IS NULL OR p.sinaplicantes = false)")
     Page<Pasantias> findAllByTituloContainingIgnoreCase(String search, Pageable pageable);
 
 
@@ -250,5 +252,7 @@ List<Pasantias> findPasantiasByInstitucionesIdinstitucionesUsuarioUUID(String uu
     Optional<Long> countPasantiasPorArea(String area);
     @Query("SELECT COUNT(p) FROM Pasantias p WHERE p.sinaplicantes = true")
     Optional<Long> countPasantiasQueNoAceptaronEstudiantes();
+
+    Page<Pasantias> findAllByActivoIsTrueAndSinaplicantesIsTrueAndTituloContainingIgnoreCase(String search, Pageable pageable);
     /*FIN KPIS*/
 }

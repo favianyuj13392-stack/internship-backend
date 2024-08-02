@@ -455,4 +455,12 @@ public class PasantiaBl {
         return Objects.equals(institucionUsuario.getIdinstituciones(), institucionPasantia.getIdinstituciones());
     }
 
+    public Page<PasantiaConNombreYLogoEmpresaDto> obtenerPasantiasSinAplicantes(Integer page, Integer size, String search, String sort) {
+        try {
+            Pageable pageable = buildPageable(page, size, sort);
+            return pasantiasDao.findAllByActivoIsTrueAndSinaplicantesIsTrueAndTituloContainingIgnoreCase(search, pageable).map(PasantiaConNombreYLogoEmpresaDto::fromEntity);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al obtener las pasantias sin aplicantes");
+        }
+    }
 }

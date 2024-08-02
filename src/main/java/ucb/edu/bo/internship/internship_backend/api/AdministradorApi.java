@@ -36,7 +36,7 @@ public class AdministradorApi {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "12") Integer size,
             @RequestParam(defaultValue = "", required = false) String search,
-            @RequestParam(defaultValue = "idinstituciones", required = false) String sort,
+            @RequestParam(defaultValue = "nombre", required = false) String sort,
             @RequestParam(defaultValue = "", required = false) String active,
             @RequestParam(required = false) String sector
             ) {

@@ -4,6 +4,7 @@ import jakarta.ws.rs.core.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ucb.edu.bo.internship.internship_backend.bl.PasantiaBl;
@@ -32,7 +33,7 @@ public class PasantiaApi {
         @RequestParam(required = false) Integer idCarrera
     ) {
         ResponseDto<Page<PasantiasConInstitucionYCarrerasDto>> response = new ResponseDto<>();
-        Pageable pageable = PageRequest.of(pagina, tamanio);
+        Pageable pageable = PageRequest.of(pagina, tamanio, Sort.by("idpasantias").descending());
         Page<PasantiasConInstitucionYCarrerasDto> pasantias;
         try {
 //            if(terminoDeBusqueda != null){

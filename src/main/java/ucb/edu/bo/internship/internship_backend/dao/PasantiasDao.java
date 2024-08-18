@@ -162,7 +162,7 @@ public interface PasantiasDao extends JpaRepository<Pasantias, Integer>{
     SELECT p.*
     FROM pasantias p
     JOIN pasantias_comunes pc ON p.idpasantias = pc.pasantias_idpasantias
-    WHERE p.activo = true
+    WHERE p.activo = true and p.sinaplicantes is not true
     ORDER BY (SELECT COUNT(*) FROM aplicacionespasantias ap WHERE ap.pasantias_idpasantias = p.idpasantias) DESC
     LIMIT 3;
 """, nativeQuery = true)
@@ -173,6 +173,11 @@ public interface PasantiasDao extends JpaRepository<Pasantias, Integer>{
     Pasantias findByIdpasantiasAndActivoIsTrue(Integer idpasantias);
     @Query("select count (*) from Pasantias p where p.activo = true")
     Long countAllByActivo();
+    @Query(value = "" +
+            "select count (*) from Pasantias p " +
+            "where p.activo = true " +
+            "AND p.sinaplicantes is not true", nativeQuery = true)
+    Long countAllByActivoAndSinaplicantesIsNotTrue();
 
     Page<Pasantias> findAllByInstitucionesIdinstitucionesAndTituloContainingIgnoreCase(
             Instituciones instituciones,
@@ -194,6 +199,16 @@ public interface PasantiasDao extends JpaRepository<Pasantias, Integer>{
     //@Query("SELECT Pasantias FROM Pasantias p WHERE p.institucionesIdinstituciones.idinstituciones = ?1")
     List<Pasantias> findPasantiasByInstitucionesIdinstituciones(Instituciones idInstituciones);
     List<Pasantias> findPasantiasByInstitucionesIdinstitucionesAndActivoIsTrue(Instituciones idInstituciones);
+    //Obtener todas las pasantias activas y con sinaplicates diferentes de true por id de institucion
+    @Query( value = """
+            SELECT p
+            FROM Pasantias p
+            WHERE p.institucionesIdinstituciones.idinstituciones = ?1
+            AND p.activo = true
+            AND (p.sinaplicantes IS NULL OR p.sinaplicantes = false)
+            """ )
+    List<Pasantias> findPasantiasByInstitucionesIdinstitucionesAndActivoIsTrueAndSinaplicantesIsNotTrue(Integer idInstituciones);
+
     @Query("SELECT p FROM Pasantias p WHERE p.activo = false AND LOWER(p.titulo) LIKE LOWER(CONCAT('%', :search, '%')) AND (p.sinaplicantes IS NULL OR p.sinaplicantes = false)")
     Page<Pasantias> findAllByActivoIsFalseAndTituloContainingIgnoreCase(String search, Pageable pageable);
     @Query("SELECT p FROM Pasantias p WHERE LOWER(p.titulo) LIKE LOWER(CONCAT('%', :search, '%')) AND (p.sinaplicantes IS NULL OR p.sinaplicantes = false)")
@@ -222,13 +237,13 @@ List<Pasantias> findPasantiasByInstitucionesIdinstitucionesUsuarioUUID(String uu
 
     /*KPIS*/
     //Cantidad de pasantias activas y pendientes
-    @Query("SELECT COUNT(p) FROM Pasantias p WHERE p.activo = ?1")
+    @Query("SELECT COUNT(p) FROM Pasantias p WHERE p.activo = ?1 AND p.sinaplicantes = false")
     Optional<Long> countPasantiasActivo(Boolean activo);
     //Cantidad de pasantias por carrera
-    @Query("SELECT COUNT(p) FROM Pasantias p JOIN Pasantiascarreras pc ON p.idpasantias = pc.pasantiasIdpasantias.idpasantias WHERE pc.carrerasIdcarreras.idcarreras = ?1")
+    @Query("SELECT COUNT(p) FROM Pasantias p JOIN Pasantiascarreras pc ON p.idpasantias = pc.pasantiasIdpasantias.idpasantias WHERE pc.carrerasIdcarreras.idcarreras = ?1 AND p.activo = true AND p.sinaplicantes = false")
     Optional<Long> countPasantiasPorCarrera(Integer idCarrera);
     //Cantidad de pasantias por empresa
-    @Query("SELECT COUNT(p) FROM Pasantias p WHERE p.institucionesIdinstituciones.idinstituciones = ?1")
+    @Query("SELECT COUNT(p) FROM Pasantias p WHERE p.institucionesIdinstituciones.idinstituciones = ?1 AND p.activo = true AND p.sinaplicantes = false")
     Optional<Long> countPasantiasPorEmpresa(Integer idEmpresa);
     //Cantidad de pasantias por sector
     @Query(value = "" +
@@ -246,6 +261,7 @@ List<Pasantias> findPasantiasByInstitucionesIdinstitucionesUsuarioUUID(String uu
             "select count (p)" +
             "from Pasantias p " +
             "WHERE p.activo = true " +
+            "AND p.sinaplicantes is not true " +
             "AND EXISTS(" +
             "SELECT 1 FROM jsonb_array_elements_text(p.areas) AS area WHERE area = ?1" +
             ")",nativeQuery = true)

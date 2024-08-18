@@ -94,13 +94,6 @@ public class InstitucionBl {
             Pageable pageable = buildPageable(page, size, sort);
             if(Objects.equals(active, ""))
             {
-                //Obtener todas las instituciones sin diferenciar si estan activas o no
-//                if(search != null && !search.isEmpty()) {
-//                    instituciones = institucionesDao.findAllWithCountPasantiasAndNombreContaining(search, pageable);
-//                } else {
-//                    instituciones = institucionesDao.findAllWithCountPasantias(pageable);
-//                }
-                //if to retrieve instituciones considering sector and search value
                 if (search == null && sector == null) {
                     instituciones = institucionesDao.findAllWithCountPasantias(pageable);
                 } else if (search == null && sector!=null) {
@@ -152,7 +145,7 @@ public class InstitucionBl {
             if (instituciones == null) {
                 throw new InstitucionNotFoundException("Institucion no encontrada");
             } else {
-                List<Pasantias> institucionPasantias = pasantiasDao.findPasantiasByInstitucionesIdinstitucionesAndActivoIsTrue(instituciones);
+                List<Pasantias> institucionPasantias = pasantiasDao.findPasantiasByInstitucionesIdinstitucionesAndActivoIsTrueAndSinaplicantesIsNotTrue(id);
                 List<PasantiasDto> pasantias = new ArrayList<>();
                 for (Pasantias pasantia : institucionPasantias) {
                     pasantias.add(PasantiasDto.fromEntity(pasantia));
@@ -317,7 +310,7 @@ public class InstitucionBl {
                 pasantias.setFechaingreso(new Date());
                 pasantias.setActivo(false);
                 pasantias.setIdpasantias(null);
-                
+                pasantias.setSinaplicantes(false);
 
                 pasantias = pasantiasDao.save(pasantias);
                 for (Integer idCarrera : pasantiasDto.getIdCarreras()){

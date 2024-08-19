@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ucb.edu.bo.internship.internship_backend.dto.*;
 import ucb.edu.bo.internship.internship_backend.entity.Instituciones;
 
@@ -27,14 +28,14 @@ public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
     @Query("select new ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto(i,COUNT(p.idpasantias)) from Instituciones i left join Pasantias p on i.idinstituciones = p.institucionesIdinstituciones.idinstituciones where i.activo = ?1 group by i.idinstituciones")
     Page<InstitucionesDto> findAllByActivoWithCountPasantias(Boolean activo, Pageable pageable);
 
-    @Query("select new ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto(i,COUNT(p.idpasantias)) from Instituciones i left join Pasantias p on i.idinstituciones = p.institucionesIdinstituciones.idinstituciones where i.nombre ILIKE CONCAT('%', ?1, '%') and i.activo = ?2 group by i.idinstituciones")
+    @Query("select new ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto(i,COUNT(p.idpasantias)) from Instituciones i left join Pasantias p on i.idinstituciones = p.institucionesIdinstituciones.idinstituciones where i.nombre ILIKE CONCAT('%', ?1, '%') and i.activo = ?2 and p.activo=true and p.sinaplicantes=false group by i.idinstituciones")
     Page<InstitucionesDto> findAllWithCountPasantiasAndNombreContainingAndActivo(String search,Boolean active, Pageable pageable);
 
     @Query("select new ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto(i,COUNT(p.idpasantias)) from Instituciones i left join Pasantias p on i.idinstituciones = p.institucionesIdinstituciones.idinstituciones where i.nombre ILIKE CONCAT('%', ?1, '%') group by i.idinstituciones")
     Page<InstitucionesDto> findAllWithCountPasantiasAndNombreContaining(String search, Pageable pageable);
-    @Query("select new ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto(i,COUNT(p.idpasantias)) from Instituciones i left join Pasantias p on i.idinstituciones = p.institucionesIdinstituciones.idinstituciones group by i.idinstituciones")
+    @Query("select new ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto(i,COUNT(p.idpasantias)) from Instituciones i left join Pasantias p on i.idinstituciones = p.institucionesIdinstituciones.idinstituciones where i.activo=true and p.activo=true and p.sinaplicantes=false group by i.idinstituciones")
     Page<InstitucionesDto> findAllWithCountPasantias(Pageable pageable);
-    @Query("select new ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto(i,COUNT(p.idpasantias)) from Instituciones i left join Pasantias p on i.idinstituciones = p.institucionesIdinstituciones.idinstituciones where i.activo = ?1 group by i.idinstituciones")
+    @Query("select new ucb.edu.bo.internship.internship_backend.dto.InstitucionesDto(i,COUNT(p.idpasantias)) from Instituciones i left join Pasantias p on i.idinstituciones = p.institucionesIdinstituciones.idinstituciones where i.activo = ?1 and p.activo=true and p.sinaplicantes=false group by i.idinstituciones")
     Page<InstitucionesDto> findAllWithCountPasantiasAndActivo(Boolean activo,Pageable pageable);
 
     @Query("SELECT new ucb.edu.bo.internship.internship_backend.dto.InstitucionNombreDto(i.idinstituciones, i.nombre,i.logoempresa) FROM Instituciones i WHERE i.activo = ?1")
@@ -59,7 +60,7 @@ public interface InstitucionesDao extends JpaRepository<Instituciones, Integer>{
         LIMIT 4
     """, nativeQuery = true)
     List<Instituciones> findTop4InstitucionesBySectoresAndPasantias(Integer idInstitucion);
-    @Query("SELECT new ucb.edu.bo.internship.internship_backend.dto.InstitucionesConCOUNTPasantiasDto(i.idinstituciones,i.nombre, COUNT(p.idpasantias),i.logoempresa) FROM Instituciones i JOIN Pasantias p ON i.idinstituciones = p.institucionesIdinstituciones.idinstituciones WHERE i.activo = ?1 AND p.activo = true GROUP BY i.idinstituciones order by COUNT(p.idpasantias) DESC")
+    @Query("SELECT new ucb.edu.bo.internship.internship_backend.dto.InstitucionesConCOUNTPasantiasDto(i.idinstituciones,i.nombre, COUNT(p.idpasantias),i.logoempresa) FROM Instituciones i JOIN Pasantias p ON i.idinstituciones = p.institucionesIdinstituciones.idinstituciones WHERE i.activo = ?1 AND p.activo = true AND p.sinaplicantes=false GROUP BY i.idinstituciones order by COUNT(p.idpasantias) DESC")
     Page<InstitucionesConCOUNTPasantiasDto> getAllNameAndCountPasantiasByActivo(boolean b, Pageable pageable);
     @Query("select count (*) from Instituciones i where i.activo = true")
     Long countAllByActivo();

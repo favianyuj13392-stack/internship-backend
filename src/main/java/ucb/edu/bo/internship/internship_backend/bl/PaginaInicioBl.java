@@ -22,7 +22,10 @@ public class PaginaInicioBl {
     //Obtener el recuento de instituciones, estudiantes y pasantias
     public RecuentoPaginaInicioDto obtenerRecuentoInstituciones(){
         try{
-            return new RecuentoPaginaInicioDto(institucionesDao.countAllByActivo(), usuariosDao.countAllByActivoAndRolesIdrolesRolEqualsESTUDIANTE(), pasantiasDao.countAllByActivo());
+            return new RecuentoPaginaInicioDto(
+                    institucionesDao.countAllByActivo(),
+                    usuariosDao.countAllByActivoAndRolesIdrolesRolEqualsESTUDIANTE(),
+                    pasantiasDao.countAllByActivoAndSinaplicantesIsNotTrue());
         }catch (Exception e){
             throw new InstitucionServiceExcepcion("Error al obtener el recuento",e);
         }

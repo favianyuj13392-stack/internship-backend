@@ -32,7 +32,7 @@ public class InstitucionApi {
             @RequestParam(defaultValue = "nombre", required = false) String sort,
             @RequestParam(required = false) String sector
             ) {
-        return handleRequest(() -> institucionBl.obtenerInstituciones(page, size, search, sort,"false", sector));
+        return handleRequest(() -> institucionBl.obtenerInstituciones(page, size, search, sort,"true", sector));
     }
 
     // Obtener todos los id y nombre de las instituciones activas

@@ -83,7 +83,7 @@ public class EstudianteBl {
         return personaDto;
     }
 
-    public Boolean agregarCurriculum(String uuid, MultipartFile curriculum,String fullUrl) {
+    public CurriculumsDto agregarCurriculum(String uuid, MultipartFile curriculum,String fullUrl) {
         try {
             System.out.println("subiendo pdf");
             Usuarios usuario = usuariosDao.findByKcUuid(uuid);
@@ -96,9 +96,9 @@ public class EstudianteBl {
             curriculumEntity.setTitulo(curriculum.getOriginalFilename());
             curriculumEntity.setPdfcurriculum(downloadUrl);
             curriculumEntity.setUsuariosIdusuarios(usuario);
-            curriculumsDao.save(curriculumEntity);
-
-            return true;
+            Curriculums curriculumReturn=curriculumsDao.save(curriculumEntity);
+            CurriculumsDto curriculumDto = CurriculumsDto.fromEntity(curriculumReturn);
+            return curriculumDto;
         } catch (Exception e) {
             System.out.println(e);
             throw new RuntimeException("Error al subir el curriculum", e);

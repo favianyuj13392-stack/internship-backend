@@ -54,7 +54,7 @@ public class EstudianteApi {
     }
 
     @PostMapping("/{uuid}/curriculum")
-    public ResponseDto<Boolean> addCurriculum(
+    public ResponseDto<CurriculumsDto> addCurriculum(
             @PathVariable String uuid,
             @RequestParam("file") MultipartFile curriculum,
             HttpServletRequest request
@@ -68,7 +68,7 @@ public class EstudianteApi {
         }
         //recortar la url a solo la base quitando el endpoint
         fullUrl = fullUrl.substring(0, fullUrl.indexOf("/api/v1/estudiante/"));
-        ResponseDto<Boolean> response = new ResponseDto<>();
+        ResponseDto<CurriculumsDto> response = new ResponseDto<>();
         try {
             response.setResponse(estudianteBl.agregarCurriculum(uuid, curriculum,fullUrl));
             response.setCode("200");

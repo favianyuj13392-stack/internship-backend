@@ -58,7 +58,7 @@ public class EstudianteBl {
                  PersonasDto.fromEntity(usuario.getPersonasIdpersonas()), CarrerasDto.fromEntity(usuario.getCarrerasIdcarreras()));
     }
 
-    public Boolean actualizarEstudianteByUuid(String uuid, PersonasDto personasDto) {
+    public PersonasDto actualizarEstudianteByUuid(String uuid, PersonasDto personasDto) {
         Usuarios usuario = usuariosDao.findByKcUuid(uuid);
         if(!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE")) throw new RuntimeException("El usuario no es un estudiante");
 
@@ -77,8 +77,10 @@ public class EstudianteBl {
         persona.setHabilidadesseleccionadas(personasDto.getHabilidadesSeleccionada());
         persona.setExperiencia(personasDto.getExperiencia());
         persona.setRedessociales(personasDto.getRedesSociales());
-        personasDao.save(persona);
-        return true;
+        Personas personaRetunr = personasDao.save(persona);
+        PersonasDto personaDto = PersonasDto.fromEntity(personaRetunr);
+
+        return personaDto;
     }
 
     public Boolean agregarCurriculum(String uuid, MultipartFile curriculum,String fullUrl) {

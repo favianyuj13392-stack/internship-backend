@@ -37,11 +37,11 @@ public class EstudianteApi {
     }
 
     @PutMapping("/{uuid}")
-    public ResponseDto<Boolean> updateEstudianteByUuid(
+    public ResponseDto<PersonasDto> updateEstudianteByUuid(
             @PathVariable String uuid,
             @RequestBody PersonasDto personasDto
             ) {
-        ResponseDto<Boolean> response = new ResponseDto<>();
+        ResponseDto<PersonasDto> response = new ResponseDto<>();
         try {
             response.setResponse(estudianteBl.actualizarEstudianteByUuid(uuid, personasDto));
             response.setCode("200");

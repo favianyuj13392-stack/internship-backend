@@ -18,7 +18,7 @@ public class InternshipBackendApplication {
 		return new WebMvcConfigurer(){
 			@Override
 				public void addCorsMappings(CorsRegistry registry){
-					registry.addMapping("/**").allowedOrigins("*","http://localhost:5173","https://internship.serverbb.online")
+					registry.addMapping("/**").allowedOrigins("*","http://localhost:5173","https://internship.sis-ucb.online")
 					.allowedMethods("GET","POST","PUT","DELETE")
 					.allowedHeaders("*");
 			}

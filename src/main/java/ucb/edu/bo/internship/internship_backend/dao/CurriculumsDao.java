@@ -12,6 +12,7 @@ import java.util.Optional;
 
 public interface CurriculumsDao extends JpaRepository<Curriculums, Integer>{
     Curriculums findByTitulo(String titulo);
+    Curriculums findByTituloAndUsuariosIdusuarios(String titulo, Usuarios usuario);
     List<Curriculums> findByUsuariosIdusuarios(Usuarios usuario);
     @Query(value = "SELECT AVG(curriculum_count) " +
             "FROM (SELECT COUNT(*) AS curriculum_count " +

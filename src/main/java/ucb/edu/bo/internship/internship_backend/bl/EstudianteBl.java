@@ -110,9 +110,10 @@ public class EstudianteBl {
 
     public String obtenerCurriculum(String uuid, String curriculumPdf) {
         Usuarios usuario = usuariosDao.findByKcUuid(uuid);
-        if(!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE")) throw new RuntimeException("El usuario no es un estudiante");
-        Curriculums curriculum = curriculumsDao.findByTitulo(curriculumPdf);
-        if(curriculum == null) throw new RuntimeException("Curriculum no encontrado");
+        if (usuario == null) throw new RuntimeException("Usuario no encontrado");
+        if (!Objects.equals(usuario.getRolesIdroles().getRol(), "ESTUDIANTE")) throw new RuntimeException("El usuario no es un estudiante");
+        Curriculums curriculum = curriculumsDao.findByTituloAndUsuariosIdusuarios(curriculumPdf, usuario);
+        if (curriculum == null) throw new RuntimeException("Curriculum no encontrado");
         return curriculum.getPdfcurriculum();
     }
 

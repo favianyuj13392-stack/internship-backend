@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,20 +42,23 @@ public class KeycloakJwtTokenConverter implements Converter<Jwt, AbstractAuthent
 
     private Collection<? extends GrantedAuthority> extractResourceRoles(Jwt jwt){
         Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
+        if (resourceAccess == null) {
+            return Collections.emptySet();
+        }
         Map<String, Object> resourceRoles = (Map<String, Object>) resourceAccess.get(properties.getResourceId());
         if (resourceRoles == null){
-            //TODO: Update the path to the default resource roles to environment variable
-            resourceRoles = (Map<String, Object>) resourceAccess.get("internship_cliente");
+            resourceRoles = (Map<String, Object>) resourceAccess.get("internship-cliente");
+            if (resourceRoles == null){
+                resourceRoles = (Map<String, Object>) resourceAccess.get("internship_cliente");
+            }
             if (resourceRoles == null){
                 return Stream.of(new SimpleGrantedAuthority("ROLE_NOT_FOUND")).collect(Collectors.toSet());
             }
-
-            Collection<String> roles = (Collection<String>) resourceRoles.get("roles");
-            return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                .collect(Collectors.toSet());
         }
         Collection<String> roles = (Collection<String>) resourceRoles.get("roles");
+        if (roles == null) {
+            return Collections.emptySet();
+        }
         return roles.stream()
             .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
             .collect(Collectors.toSet());

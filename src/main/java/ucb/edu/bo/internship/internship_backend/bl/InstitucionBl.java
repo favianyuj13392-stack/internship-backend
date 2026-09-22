@@ -281,7 +281,7 @@ public class InstitucionBl {
             if (validarRelacionUsuarioInstitucion(uuid, institucionId)) {
                 Pasantias pasantias = pasantiasDao.findById(pasantiaId).orElse(null);
                 if(pasantias != null){
-                    if(pasantias.getInstitucionesIdinstituciones().getIdinstituciones() != institucionId){
+                    if(!Objects.equals(pasantias.getInstitucionesIdinstituciones().getIdinstituciones(), institucionId)){
                         throw new InstitucionNotFoundException("Pasantia no encontrada");
                     }
                     pasantias.setActivo(false);
@@ -339,7 +339,7 @@ public class InstitucionBl {
             if (validarRelacionUsuarioInstitucion(uuid, institucionId)) {
                 Pasantias pasantias = pasantiasDao.findById(pasantiaId).orElse(null);
                 if(pasantias != null){
-                    if(pasantias.getInstitucionesIdinstituciones().getIdinstituciones() != institucionId){
+                    if(!Objects.equals(pasantias.getInstitucionesIdinstituciones().getIdinstituciones(), institucionId)){
                         throw new InstitucionNotFoundException("Pasantia no encontrada");
                     }
                     pasantias.setTitulo(pasantiasDto.getTitulo());
@@ -371,7 +371,7 @@ public class InstitucionBl {
                 Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
                 Pasantias pasantias = pasantiasDao.findById(pasantiaId).orElse(null);
                 if(pasantias != null){
-                    if(pasantias.getInstitucionesIdinstituciones().getIdinstituciones() != institucionId){
+                    if(!Objects.equals(pasantias.getInstitucionesIdinstituciones().getIdinstituciones(), institucionId)){
                         throw new InstitucionNotFoundException("Pasantia no encontrada");
                     }
                     return aplicacionPasantiasDao.findAllByPasantiasIdpasantias(pasantias, pageable).
@@ -398,7 +398,7 @@ public class InstitucionBl {
             if (validarRelacionUsuarioInstitucion(uuid, institucionId)) {
                 Pasantias pasantias = pasantiasDao.findById(pasantiaId).orElse(null);
                 if(pasantias != null){
-                    if(pasantias.getInstitucionesIdinstituciones().getIdinstituciones() != institucionId){
+                    if(!Objects.equals(pasantias.getInstitucionesIdinstituciones().getIdinstituciones(), institucionId)){
                         throw new InstitucionNotFoundException("Pasantia no encontrada");
                     }
                     Usuarios usuarios = usuariosDao.findById(aplicanteId).orElse(null);
@@ -412,6 +412,7 @@ public class InstitucionBl {
                             seleccionaplicante.setHoraseleccion(new Time(new Date().getTime()));
                             seleccionaplicante.setComentarios("");
                             seleccionaplicante.setActivo(false);
+                            seleccionAplicanteDao.save(seleccionaplicante);
                             return true;
                         } else {
                             throw new InstitucionNotFoundException("Aplicante no encontrado");
@@ -438,7 +439,7 @@ public class InstitucionBl {
             if (validarRelacionUsuarioInstitucion(uuid, institucionId)) {
                 Pasantias pasantias = pasantiasDao.findById(pasantiaId).orElse(null);
                 if(pasantias != null){
-                    if(pasantias.getInstitucionesIdinstituciones().getIdinstituciones() != institucionId){
+                    if(!Objects.equals(pasantias.getInstitucionesIdinstituciones().getIdinstituciones(), institucionId)){
                         throw new InstitucionNotFoundException("Pasantia no encontrada");
                     }
                     Seleccionaplicante seleccionaplicante = new Seleccionaplicante();
@@ -448,6 +449,7 @@ public class InstitucionBl {
                     seleccionaplicante.setHoraseleccion(new Time(new Date().getTime()));
                     seleccionaplicante.setComentarios("");
                     seleccionaplicante.setActivo(false);
+                    seleccionAplicanteDao.save(seleccionaplicante);
                     return true;
                 } else {
                     throw new InstitucionNotFoundException("Pasantia no encontrada");

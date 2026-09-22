@@ -14,6 +14,11 @@ import ucb.edu.bo.internship.internship_backend.entity.Usuarios;
 import ucb.edu.bo.internship.internship_backend.entity.Usuariosinstituciones;
 import ucb.edu.bo.internship.internship_backend.service.IKeycloakService;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+
 import java.sql.Date;
 import java.sql.Time;
 import java.util.ArrayList;
@@ -74,13 +79,41 @@ public class UsuariosBL {
        return PersonasDto.fromEntity(personasDao.save(personasDto.toEntity()));
     }
 
-    public UsuariosDto agregarUsuario(UsuariosDto usuariosDto){
-        Roles roles = rolesDao.findById(usuariosDto.getIdRoles()).orElse(null);
-        if(roles != null){
-            List<String> rolesList = new ArrayList<>();
-            rolesList.add(roles.getRol());
-            keycloakService.addRealmRoleToUser(usuariosDto.getKc_UUID(),rolesList.get(0) );
+    private String getAuthenticatedKcUuid() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            if (authentication.getPrincipal() instanceof Jwt jwt) {
+                return jwt.getSubject();
+            } else if (authentication instanceof JwtAuthenticationToken jwtAuth) {
+                return jwtAuth.getToken().getSubject();
+            }
         }
+        return null;
+    }
+
+    public UsuariosDto agregarUsuario(UsuariosDto usuariosDto){
+        String authUuid = getAuthenticatedKcUuid();
+        if (authUuid != null && !authUuid.isBlank()) {
+            usuariosDto.setKc_UUID(authUuid);
+        }
+
+        Roles roles = null;
+        if (usuariosDto.getIdRoles() != null) {
+            roles = rolesDao.findById(usuariosDto.getIdRoles()).orElse(null);
+            if (roles != null && "ADMIN".equalsIgnoreCase(roles.getRol())) {
+                logger.warn("Attempt to register with ADMIN role blocked for user {}", usuariosDto.getKc_UUID());
+                roles = rolesDao.findByRol("ESTUDIANTE");
+            }
+        }
+        if (roles == null) {
+            roles = rolesDao.findByRol("ESTUDIANTE");
+        }
+
+        if (roles != null && usuariosDto.getKc_UUID() != null) {
+            keycloakService.addRealmRoleToUser(usuariosDto.getKc_UUID(), roles.getRol());
+            usuariosDto.setIdRoles(roles.getIdroles());
+        }
+
         Date date = new Date(System.currentTimeMillis());
         usuariosDto.setFechaRegistro(date);
         Time time = new Time(System.currentTimeMillis());
@@ -93,14 +126,20 @@ public class UsuariosBL {
 
         return UsuariosDto.fromEntity(usuariosDao.save(usuario));
     }
+
     private UsuariosDto agregarUsuarioInstitucion(UsuariosDto usuariosDto)
     {
-        Roles roles = rolesDao.findById(usuariosDto.getIdRoles()).orElse(null);
-        if(roles != null){
-            List<String> rolesList = new ArrayList<>();
-            rolesList.add(roles.getRol());
-            keycloakService.addRealmRoleToUser(usuariosDto.getKc_UUID(),rolesList.get(0) );
+        String authUuid = getAuthenticatedKcUuid();
+        if (authUuid != null && !authUuid.isBlank()) {
+            usuariosDto.setKc_UUID(authUuid);
         }
+
+        Roles roles = rolesDao.findByRol("EMPRESA");
+        if (roles != null && usuariosDto.getKc_UUID() != null) {
+            keycloakService.addRealmRoleToUser(usuariosDto.getKc_UUID(), roles.getRol());
+            usuariosDto.setIdRoles(roles.getIdroles());
+        }
+
         Date date = new Date(System.currentTimeMillis());
         usuariosDto.setFechaRegistro(date);
         Time time = new Time(System.currentTimeMillis());
@@ -114,7 +153,9 @@ public class UsuariosBL {
 
     public UsuariosInstitucionesDto agregarUsuarioInstitucion(String kcUuid, Integer idInstitucion, String cargo){
     try {
-        Usuarios usuario = usuariosDao.findByKcUuid(kcUuid);
+        String authUuid = getAuthenticatedKcUuid();
+        String targetUuid = (authUuid != null && !authUuid.isBlank()) ? authUuid : kcUuid;
+        Usuarios usuario = usuariosDao.findByKcUuid(targetUuid);
         Instituciones institucion = institucionesDao.findById(idInstitucion).orElse(null);
         if(usuario != null && institucion != null){
             Usuariosinstituciones usuariosinstituciones = new Usuariosinstituciones();
@@ -122,7 +163,6 @@ public class UsuariosBL {
             usuariosinstituciones.setInstitucionesIdinstituciones(institucion);
             usuariosinstituciones.setCargo(cargo);
             usuariosinstituciones.setActivo(false);
-            System.out.println(usuariosinstituciones);
             usuariosinstituciones = usuariosInstitucionesDao.save(usuariosinstituciones);
             return UsuariosInstitucionesDto.fromEntity(usuariosinstituciones);
         }
@@ -134,6 +174,11 @@ public class UsuariosBL {
     }
 
     public UsuarioRegistroCompletoDto agregarUsuarioCompleto(UsuarioRegistroCompletoDto usuarioRegistroCompletoDto){
+        String authUuid = getAuthenticatedKcUuid();
+        if (authUuid != null && !authUuid.isBlank()) {
+            usuarioRegistroCompletoDto.setKc_UUID(authUuid);
+        }
+
         PersonasDto persona_aux = usuarioRegistroCompletoDto.getPersona();
         persona_aux.setHabilidades(persona_aux.getHabilidades().toString());
         persona_aux.setHabilidadesSeleccionada(persona_aux.getHabilidadesSeleccionada().toString());
@@ -144,33 +189,34 @@ public class UsuariosBL {
         usuarioRegistroCompletoDto.setPersona(personaAgregada);      
         usuarioRegistroCompletoDto.setIdPersonas(personaAgregada.getIdPersona());
 
+        InstitucionesDto institucion = usuarioRegistroCompletoDto.getInstitucion();
+        Roles targetRole = (institucion == null) ? rolesDao.findByRol("ESTUDIANTE") : rolesDao.findByRol("EMPRESA");
+        if (targetRole != null) {
+            usuarioRegistroCompletoDto.setIdRoles(targetRole.getIdroles());
+        }
+
         UsuariosDto usuarioAgregado = agregarUsuario(usuarioRegistroCompletoDto);
 
-        InstitucionesDto institucion = usuarioRegistroCompletoDto.getInstitucion();
-
         if(institucion == null){
-            Roles roles = rolesDao.findByRol("ESTUDIANTE");
-            usuarioRegistroCompletoDto.setIdRoles(
-                    roles.getIdroles()
-            );
             return new UsuarioRegistroCompletoDto(usuarioAgregado, personaAgregada, null, null);
         }else{
-            usuarioRegistroCompletoDto.setIdRoles(
-                    rolesDao.findByRol("EMPRESA").getIdroles()
-            );
             Instituciones instituciones = institucionesDao.findByNombre(institucion.getNombre());
             if(instituciones == null){
                 instituciones = institucionesDao.save(institucion.toEntity());
             }
             UsuariosInstitucionesDto usuarioInstitucionAgregado = agregarUsuarioInstitucion(usuarioRegistroCompletoDto.getKc_UUID(), instituciones.getIdinstituciones(), usuarioRegistroCompletoDto.getCargo());
-            return new UsuarioRegistroCompletoDto(usuarioAgregado, personaAgregada, institucion, usuarioInstitucionAgregado.getCargo());
+            return new UsuarioRegistroCompletoDto(usuarioAgregado, personaAgregada, institucion, usuarioInstitucionAgregado != null ? usuarioInstitucionAgregado.getCargo() : null);
         }
-
-
     }
+
     @Transactional
     public UsuarioRegistroCompletoDto agregarUsuarioCompletoInstitucion(UsuarioRegistroCompletoDto usuarioRegistroCompletoDto) {
         try {
+            String authUuid = getAuthenticatedKcUuid();
+            if (authUuid != null && !authUuid.isBlank()) {
+                usuarioRegistroCompletoDto.setKc_UUID(authUuid);
+            }
+
             PersonasDto persona_aux = usuarioRegistroCompletoDto.getPersona();
             persona_aux.setHabilidades(persona_aux.getHabilidades().toString());
             persona_aux.setHabilidadesSeleccionada(persona_aux.getHabilidadesSeleccionada().toString());
@@ -183,12 +229,12 @@ public class UsuariosBL {
             usuarioRegistroCompletoDto.setIdPersonas(usuarioRegistroCompletoDto.getPersona().getIdPersona());
             //Agregar Usuario
             usuarioRegistroCompletoDto.setCargo(usuarioRegistroCompletoDto.getCargo());
-            usuarioRegistroCompletoDto.setIdRoles(rolesDao.findByRol("EMPRESA").getIdroles());
+            Roles roleEmpresa = rolesDao.findByRol("EMPRESA");
+            if (roleEmpresa != null) {
+                usuarioRegistroCompletoDto.setIdRoles(roleEmpresa.getIdroles());
+            }
             usuarioRegistroCompletoDto = new UsuarioRegistroCompletoDto(agregarUsuarioInstitucion(usuarioRegistroCompletoDto), usuarioRegistroCompletoDto.getPersona(), usuarioRegistroCompletoDto.getInstitucion(), usuarioRegistroCompletoDto.getCargo());
             //Agregar Institucion
-
-
-
 
             InstitucionesDto institucionesDto = usuarioRegistroCompletoDto.getInstitucion();
             Instituciones instituciones = new Instituciones();
@@ -198,13 +244,11 @@ public class UsuariosBL {
                 instituciones = institucionesDao.save(instituciones1);
             }else{
                 instituciones = institucionesDao.findById(institucionesDto.getIdInstituciones()).orElse(null);
-            
             }
 
             if(instituciones == null){
                 instituciones = institucionesDao.save(institucionesDto.toEntity());
             }           
-
 
             institucionesDto = InstitucionesDto.fromEntity(instituciones);
             usuarioRegistroCompletoDto.setInstitucion(institucionesDto);
@@ -214,13 +258,10 @@ public class UsuariosBL {
                     usuarioRegistroCompletoDto.getInstitucion().getIdInstituciones(),
                     usuarioRegistroCompletoDto.getCargo()
             );
-           
 
-            usuarioRegistroCompletoDto.setCargo(usuariosInstitucionesDto.getCargo());
-
-           
-
-
+            if (usuariosInstitucionesDto != null) {
+                usuarioRegistroCompletoDto.setCargo(usuariosInstitucionesDto.getCargo());
+            }
 
             return usuarioRegistroCompletoDto;
         }catch (Exception e){

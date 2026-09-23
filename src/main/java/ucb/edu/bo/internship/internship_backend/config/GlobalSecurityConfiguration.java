@@ -28,10 +28,11 @@ public class GlobalSecurityConfiguration {
     private final SecurityConstraintsProperties securityConstraintsProperties;
     private final UsuariosBL usuariosBL;
     private final UuidPathSecurityFilter uuidPathSecurityFilter;
+    private final RosterSecurityFilter rosterSecurityFilter;
 
     @Value("${FRONTEND_URL}")
     private String clientUrl;
-    public GlobalSecurityConfiguration(TokenConverterProperties properties, SecurityConstraintsProperties securityConstraintsProperties, UsuariosBL usuariosBL, UuidPathSecurityFilter uuidPathSecurityFilter) {
+    public GlobalSecurityConfiguration(TokenConverterProperties properties, SecurityConstraintsProperties securityConstraintsProperties, UsuariosBL usuariosBL, UuidPathSecurityFilter uuidPathSecurityFilter, RosterSecurityFilter rosterSecurityFilter) {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter
                 = new JwtGrantedAuthoritiesConverter();
         this.keycloakJwtTokenConverter
@@ -41,6 +42,7 @@ public class GlobalSecurityConfiguration {
         this.securityConstraintsProperties = securityConstraintsProperties;
         this.usuariosBL = usuariosBL;
         this.uuidPathSecurityFilter = uuidPathSecurityFilter;
+        this.rosterSecurityFilter = rosterSecurityFilter;
     }
 
     @Bean
@@ -171,6 +173,7 @@ public class GlobalSecurityConfiguration {
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(uuidPathSecurityFilter, BasicAuthenticationFilter.class)
+                .addFilterAfter(rosterSecurityFilter, BasicAuthenticationFilter.class)
 //                .addFilterBefore(new RegistrationCompletionFilter(keycloakJwtTokenConverter, usuariosBL, clientUrl), BasicAuthenticationFilter.class)
                 .build();
     }

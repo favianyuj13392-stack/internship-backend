@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ucb.edu.bo.internship.internship_backend.bl.ActividadTrackingService;
 import ucb.edu.bo.internship.internship_backend.dao.PadronEstudianteDao;
 import ucb.edu.bo.internship.internship_backend.dao.UsuariosDao;
 import ucb.edu.bo.internship.internship_backend.dto.ResponseDto;
@@ -33,11 +34,15 @@ public class RosterSecurityFilter extends OncePerRequestFilter {
     private static final Pattern UCB_EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9-]+\\.)?ucb\\.edu\\.bo$");
     private final PadronEstudianteDao padronEstudianteDao;
     private final UsuariosDao usuariosDao;
+    private final ActividadTrackingService actividadTrackingService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public RosterSecurityFilter(PadronEstudianteDao padronEstudianteDao, UsuariosDao usuariosDao) {
+    public RosterSecurityFilter(PadronEstudianteDao padronEstudianteDao,
+                                UsuariosDao usuariosDao,
+                                ActividadTrackingService actividadTrackingService) {
         this.padronEstudianteDao = padronEstudianteDao;
         this.usuariosDao = usuariosDao;
+        this.actividadTrackingService = actividadTrackingService;
     }
 
     @Override
@@ -105,24 +110,14 @@ public class RosterSecurityFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Enlace automático en primer login y actualización de último acceso
-        Date now = new Date();
-
-        if (estudiante.getKcUuid() == null) {
-            estudiante.setKcUuid(kcUuid);
-            estudiante.setPrimerAcceso(now);
+        // Registro de acceso y vinculación automática
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isBlank()) {
+            ip = request.getRemoteAddr();
+        } else if (ip.contains(",")) {
+            ip = ip.split(",")[0].trim();
         }
-
-        estudiante.setUltimoAcceso(now);
-
-        if (estudiante.getUsuariosIdusuarios() == null && kcUuid != null) {
-            Usuarios usuario = usuariosDao.findByKcUuid(kcUuid);
-            if (usuario != null) {
-                estudiante.setUsuariosIdusuarios(usuario);
-            }
-        }
-
-        padronEstudianteDao.save(estudiante);
+        actividadTrackingService.registrarAcceso(email, kcUuid, "PORTAL", ip);
 
         filterChain.doFilter(request, response);
     }

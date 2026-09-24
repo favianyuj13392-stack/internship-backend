@@ -25,4 +25,6 @@ public interface EventoAccesoDao extends JpaRepository<EventoAcceso, Integer> {
 
     @Query("SELECT COUNT(DISTINCT e.padronEstudiante.idpadron) FROM EventoAcceso e WHERE e.padronEstudiante.carrerasIdcarreras.idcarreras = :carreraId")
     Long countEstudiantesDistintosConAccesoPorCarrera(@Param("carreraId") Integer carreraId);
+
+    Long countByPadronEstudiante(PadronEstudiante padronEstudiante);
 }

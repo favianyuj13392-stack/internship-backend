@@ -7,6 +7,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import ucb.edu.bo.internship.internship_backend.bl.ActividadTrackingService;
 import ucb.edu.bo.internship.internship_backend.bl.PasantiaBl;
 import ucb.edu.bo.internship.internship_backend.dto.*;
 
@@ -17,10 +22,12 @@ import java.util.Set;
 @RequestMapping("/api/v1/pasantia")
 public class PasantiaApi {
 
-    private PasantiaBl pasantiaBl;
+    private final PasantiaBl pasantiaBl;
+    private final ActividadTrackingService actividadTrackingService;
 
-    public PasantiaApi(PasantiaBl pasantiaBl) {
+    public PasantiaApi(PasantiaBl pasantiaBl, ActividadTrackingService actividadTrackingService) {
         this.pasantiaBl = pasantiaBl;
+        this.actividadTrackingService = actividadTrackingService;
     }
 
     //Endpoint to get all internships
@@ -77,12 +84,40 @@ public class PasantiaApi {
 
     @GetMapping("/{id}")
     public ResponseDto<PasantiasDto> obtenerPasantiaPorId(
-            @PathVariable Integer id
+            @PathVariable Integer id,
+            @RequestParam(value = "ref", required = false) String ref
     ){
         ResponseDto<PasantiasDto> response = new ResponseDto<>();
         PasantiasDto pasantia;
         try {
             pasantia = pasantiaBl.obtenerPasantiaPorId(id);
+
+            // Registro de métrica de visualización si quien consulta es un estudiante
+            try {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                if (auth != null && auth.isAuthenticated()) {
+                    boolean isStudent = auth.getAuthorities().stream()
+                            .anyMatch(a -> a.getAuthority().equals("ROLE_ESTUDIANTE"));
+                    if (isStudent) {
+                        String email = null;
+                        String kcUuid = null;
+                        if (auth instanceof JwtAuthenticationToken jwtAuth) {
+                            email = jwtAuth.getToken().getClaimAsString("email");
+                            kcUuid = jwtAuth.getToken().getSubject();
+                        } else if (auth.getPrincipal() instanceof Jwt jwt) {
+                            email = jwt.getClaimAsString("email");
+                            kcUuid = jwt.getSubject();
+                        }
+                        String idEstudiante = email != null ? email : kcUuid;
+                        if (idEstudiante != null) {
+                            actividadTrackingService.registrarVistaPasantia(idEstudiante, id, ref);
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                // El tracking nunca debe romper la visualización de la pasantía
+            }
+
             response.setCode("200");
             response.setResponse(pasantia);
             response.setErrorMessage(null);

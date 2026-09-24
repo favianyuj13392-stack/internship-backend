@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ucb.edu.bo.internship.internship_backend.entity.Aplicacionespasantias;
 import ucb.edu.bo.internship.internship_backend.entity.Curriculums;
 import ucb.edu.bo.internship.internship_backend.entity.Pasantias;
@@ -22,6 +23,9 @@ public interface AplicacionPasantiasDao extends JpaRepository<Aplicacionespasant
     List<Aplicacionespasantias> findByUsuariosIdusuariosAndPasantiasIdpasantias(Usuarios usuario, Pasantias pasantia);
 
     List<Aplicacionespasantias> findByCurriculumsIdcurriculums(Curriculums curriculum);
+
+    @Query("SELECT COUNT(a) FROM Aplicacionespasantias a WHERE a.pasantiasIdpasantias.idpasantias = :idPasantia")
+    Long countPorPasantia(@Param("idPasantia") Integer idPasantia);
 
     List<Aplicacionespasantias> findByUsuariosIdusuarios(Usuarios usuario);
     /*KPIS*/

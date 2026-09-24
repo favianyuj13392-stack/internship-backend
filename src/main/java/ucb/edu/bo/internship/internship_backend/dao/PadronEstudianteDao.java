@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ucb.edu.bo.internship.internship_backend.entity.PadronEstudiante;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PadronEstudianteDao extends JpaRepository<PadronEstudiante, Integer> {
@@ -33,4 +34,9 @@ public interface PadronEstudianteDao extends JpaRepository<PadronEstudiante, Int
             @Param("search") String search,
             Pageable pageable
     );
+
+    List<PadronEstudiante> findByPrimerAccesoIsNullOrderByApellidosAsc();
+
+    @Query("SELECT COUNT(p) FROM PadronEstudiante p WHERE p.carrerasIdcarreras.idcarreras = :carreraId")
+    Long countPorCarrera(@Param("carreraId") Integer carreraId);
 }

@@ -106,23 +106,29 @@ public class AplicacionPasantiasInformacionPasantiasDto {
         aplicacionPasantiasDto.setIdPasantias(aplicacionespasantias.getPasantiasIdpasantias().getIdpasantias());
         aplicacionPasantiasDto.setFechaAplicacion(aplicacionespasantias.getFechaaplicacion());
         aplicacionPasantiasDto.setActivo(aplicacionespasantias.getActivo());
-        aplicacionPasantiasDto.setUrlCurriculum(aplicacionespasantias.getCurriculumsIdcurriculums().getPdfcurriculum());
+        if (aplicacionespasantias.getCurriculumsIdcurriculums() != null) {
+            aplicacionPasantiasDto.setUrlCurriculum(aplicacionespasantias.getCurriculumsIdcurriculums().getPdfcurriculum());
+        }
         PasantiasDto pasantiasDto = PasantiasConInstitucionDto.fromEntity(aplicacionespasantias.getPasantiasIdpasantias());
 
         PasantiasConInstitucionDto pasantiasConInstitucionDto = new PasantiasConInstitucionDto();
-        InstitucionesDto institucionesDto = InstitucionesDto.fromEntity(aplicacionespasantias.getPasantiasIdpasantias().getInstitucionesIdinstituciones());
-        pasantiasConInstitucionDto.setInstitucion(institucionesDto);
-        pasantiasConInstitucionDto.setIdPasantias(pasantiasDto.getIdPasantias());
-        pasantiasConInstitucionDto.setAreas(pasantiasDto.getAreas());
-        pasantiasConInstitucionDto.setTitulo(pasantiasDto.getTitulo());
-        pasantiasConInstitucionDto.setDescripcion(pasantiasDto.getDescripcion());
-        pasantiasConInstitucionDto.setRequisitos(pasantiasDto.getRequisitos());
-        pasantiasConInstitucionDto.setFunciones(pasantiasDto.getFunciones());
-        pasantiasConInstitucionDto.setBeneficios(pasantiasDto.getBeneficios());
-        pasantiasConInstitucionDto.setFechaCierre(pasantiasDto.getFechaCierre());
-        pasantiasConInstitucionDto.setFechaIngreso(pasantiasDto.getFechaIngreso());
+        if (aplicacionespasantias.getPasantiasIdpasantias() != null && aplicacionespasantias.getPasantiasIdpasantias().getInstitucionesIdinstituciones() != null) {
+            InstitucionesDto institucionesDto = InstitucionesDto.fromEntity(aplicacionespasantias.getPasantiasIdpasantias().getInstitucionesIdinstituciones());
+            pasantiasConInstitucionDto.setInstitucion(institucionesDto);
+        }
+        if (pasantiasDto != null) {
+            pasantiasConInstitucionDto.setIdPasantias(pasantiasDto.getIdPasantias());
+            pasantiasConInstitucionDto.setAreas(pasantiasDto.getAreas());
+            pasantiasConInstitucionDto.setTitulo(pasantiasDto.getTitulo());
+            pasantiasConInstitucionDto.setDescripcion(pasantiasDto.getDescripcion());
+            pasantiasConInstitucionDto.setRequisitos(pasantiasDto.getRequisitos());
+            pasantiasConInstitucionDto.setFunciones(pasantiasDto.getFunciones());
+            pasantiasConInstitucionDto.setBeneficios(pasantiasDto.getBeneficios());
+            pasantiasConInstitucionDto.setFechaCierre(pasantiasDto.getFechaCierre());
+            pasantiasConInstitucionDto.setFechaIngreso(pasantiasDto.getFechaIngreso());
+        }
         aplicacionPasantiasDto.setPasantiasDto(pasantiasConInstitucionDto);
-        if(aplicacionespasantias.getActivo()){
+        if(Boolean.TRUE.equals(aplicacionespasantias.getActivo()) && aplicacionespasantias.getSeleccionaplicanteList() != null && !aplicacionespasantias.getSeleccionaplicanteList().isEmpty()){
             aplicacionPasantiasDto.setSeleccionAplicante(SeleccionAplicanteDto.fromEntityWithOutHora(aplicacionespasantias.getSeleccionaplicanteList().get(0)));
         }
 

@@ -36,9 +36,10 @@ public class AdministradorBl {
 
     private final EmailService emailService;
     private final RolesDao rolesDao;
+    private final NotificacionPasantiaService notificacionPasantiaService;
     private final Logger logger = LoggerFactory.getLogger(AdministradorBl.class);
 
-    public AdministradorBl(InstitucionesDao institucionesDao, UsuariosInstitucionesDao usuariosInstitucionesDao, PasantiasDao pasantiasDao, UsuariosDao usuariosDao, PersonasDao personasDao, AplicacionPasantiasDao aplicacionPasantiasDao, EmailService emailService, RolesDao rolesDao, CurriculumsDao curriculumsDao, KeycloakServiceImpl keycloakService) {
+    public AdministradorBl(InstitucionesDao institucionesDao, UsuariosInstitucionesDao usuariosInstitucionesDao, PasantiasDao pasantiasDao, UsuariosDao usuariosDao, PersonasDao personasDao, AplicacionPasantiasDao aplicacionPasantiasDao, EmailService emailService, RolesDao rolesDao, CurriculumsDao curriculumsDao, KeycloakServiceImpl keycloakService, NotificacionPasantiaService notificacionPasantiaService) {
         this.institucionesDao = institucionesDao;
         this.usuariosInstitucionesDao = usuariosInstitucionesDao;
         this.pasantiasDao = pasantiasDao;
@@ -49,6 +50,7 @@ public class AdministradorBl {
         this.rolesDao = rolesDao;
         this.curriculumsDao = curriculumsDao;
         this.keycloakService = keycloakService;
+        this.notificacionPasantiaService = notificacionPasantiaService;
     }
 
     public InstitucionesDto cambiarEstadoInstitucion(Integer idInstituciones, Boolean estado) {
@@ -163,67 +165,42 @@ public class AdministradorBl {
     public PasantiasDto aceptarPasantia(Integer idPasantias) {
         try {
             Pasantias pasantias = pasantiasDao.findById(idPasantias).orElseThrow(() -> new InstitucionNotFoundException("Pasantia no encontrada"));
-            if(pasantias.getActivo()){
+            if (Boolean.TRUE.equals(pasantias.getActivo())) {
                 throw new UsuarioYaRelacionadoException("No se puede aceptar una pasantia activa");
             }
+            // 1. Activar y persistir primero (corrige B6: el guardado en BD es previo al despacho)
             pasantias.setActivo(true);
-            EmailRequest emailRequest = new EmailRequest();
-            emailRequest.setTo(
-                    pasantias.getUsuariosIdusuarios().getCorreo()
-            );
-            emailRequest.setSubject(
-                    "Su solicitud de publicación de una pasantía ha sido aceptada"
-            );
-            emailRequest.setBody(
-                    "<p>Estimado/a "+pasantias.getUsuariosIdusuarios().getPersonasIdpersonas().getNombres()+",</p>" +
-                            "<p>Nos complace informarle que su solicitud de publicación para la pasantía titulada <strong>" + pasantias.getTitulo() + "</strong> ha sido aceptada.</p>" +
-                            "<p>Agradecemos tu interés en contribuir a la formación profesional de nuestros estudiantes. Si tienes alguna pregunta o necesitas más detalles, no dudes en ponerte en contacto con nosotros.</p>"+
-                            "<p>Para más información, visita nuestro sitio web o ponte en contacto con nuestro equipo.</p>"+
-                            "<p>¡Felicitaciones y mucho éxito!</p>"
-            );
-            emailService.enviarCorreo(emailRequest);
-
-            EmailRequestMassive emailRequestMassive = new EmailRequestMassive();
-            Roles rol = rolesDao.findByRol("ESTUDIANTE");
-            List<Usuarios> estudiantes = usuariosDao.findAllByRolesIdrolesAndCarrerasIdcarrerasIn(
-                    rol, pasantias.getPasantiascarrerasList().stream().map(
-                            Pasantiascarreras::getCarrerasIdcarreras
-                    ).toList()
-            );
-
-            List<String> correosEstudiantes = estudiantes.stream().map(
-                    usuarios -> {
-                        logger.info(usuarios.getCorreo());
-                        return usuarios.getCorreo();
-                    }
-            ).toList();
-
-            emailRequestMassive.setTo(correosEstudiantes);
-            emailRequestMassive.setSubject(
-                    "Nueva oportunidad de pasantía relacionada con tu carrera"
-            );
-            emailRequestMassive.setBody(
-                    "<p>Estimado/a estudiante,</p>" +
-                            "<p>Nos complace anunciar que hemos publicado una nueva oportunidad de pasantía relacionada con tu carrera. Esta es una excelente oportunidad para aplicar tus conocimientos y adquirir experiencia práctica en tu área de estudio.</p>" +
-                            "<p>Detalles de la pasantía:</p>" +
-                            "<ul>" +
-                            "    <li><strong>Título:</strong>"+ pasantias.getTitulo() +"</li>" +
-                            "    <li><strong>Empresa:</strong>"+pasantias.getInstitucionesIdinstituciones().getNombre()+"</li>" +
-                            "    <li><strong>Fecha de inicio:</strong>"+pasantias.getFechaingreso()+"</li>" +
-                            "    <li><strong>Fecha límite para postular:</strong>"+pasantias.getFechacierre()+"</li>" +
-                            "</ul>" +
-                            "<p>Si estás interesado/a en esta oportunidad, te invitamos a postularte a través de nuestro sistema de pasantías. No pierdas la oportunidad de enriquecer tu formación profesional y abrir puertas a futuras oportunidades laborales.</p>" +
-                            "<p>Para más información y para postularte, visita nuestro sitio web o contacta a nuestro equipo de pasantías.</p>"
-            );
-
-            emailService.enviarCorreoMasivo(emailRequestMassive);
-
             pasantias = pasantiasDao.save(pasantias);
+
+            // 2. Notificación individual al empleador/empresa
+            try {
+                if (pasantias.getUsuariosIdusuarios() != null && pasantias.getUsuariosIdusuarios().getCorreo() != null) {
+                    EmailRequest emailRequest = new EmailRequest();
+                    emailRequest.setTo(pasantias.getUsuariosIdusuarios().getCorreo());
+                    emailRequest.setSubject("Su solicitud de publicación de una pasantía ha sido aceptada");
+                    String nombreContacto = pasantias.getUsuariosIdusuarios().getPersonasIdpersonas() != null
+                            ? pasantias.getUsuariosIdusuarios().getPersonasIdpersonas().getNombres()
+                            : "representante";
+                    emailRequest.setBody(
+                            "<p>Estimado/a " + nombreContacto + ",</p>" +
+                            "<p>Nos complace informarle que su solicitud de publicación para la pasantía titulada <strong>" + pasantias.getTitulo() + "</strong> ha sido aceptada.</p>" +
+                            "<p>Agradecemos tu interés en contribuir a la formación profesional de nuestros estudiantes. La convocatoria ya se encuentra activa en el portal.</p>" +
+                            "<p>¡Felicitaciones y mucho éxito!</p>"
+                    );
+                    emailService.enviarCorreo(emailRequest);
+                }
+            } catch (Exception ex) {
+                logger.error("Error al notificar al empleador sobre aceptación de pasantía ID {}: {}", idPasantias, ex.getMessage());
+            }
+
+            // 3. Notificación asíncrona y auditada a los estudiantes habilitados del padrón oficial
+            notificacionPasantiaService.notificarEstudiantesPorCarrera(pasantias.getIdpasantias());
+
             return new PasantiasDto(pasantias);
-        }catch (InstitucionNotFoundException | UsuarioYaRelacionadoException e ){
+        } catch (InstitucionNotFoundException | UsuarioYaRelacionadoException e) {
             throw e;
-        }catch (Exception e){
-            throw new RuntimeException("Error al aceptar la pasantia",e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al aceptar la pasantia", e);
         }
     }
 

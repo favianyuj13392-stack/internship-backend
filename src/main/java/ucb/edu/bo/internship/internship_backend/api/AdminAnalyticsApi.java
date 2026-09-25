@@ -83,4 +83,23 @@ public class AdminAnalyticsApi {
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(excelBytes);
     }
+
+    @PostMapping({"/pasantia/{idPasantia}/notificar", "/analytics/pasantia/{idPasantia}/notificar"})
+    public ResponseEntity<ResponseDto<String>> notificarEstudiantesPasantia(
+            @PathVariable String uuid,
+            @PathVariable Integer idPasantia
+    ) {
+        ResponseDto<String> response = new ResponseDto<>();
+        try {
+            adminAnalyticsBl.notificarEstudiantesPasantia(idPasantia);
+            response.setCode("200");
+            response.setErrorMessage("");
+            response.setResponse("Proceso de notificación iniciado exitosamente.");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setCode("500");
+            response.setErrorMessage("Error al iniciar notificación de pasantía: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 }

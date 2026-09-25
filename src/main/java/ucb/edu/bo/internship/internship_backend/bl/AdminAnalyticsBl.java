@@ -24,19 +24,25 @@ public class AdminAnalyticsBl {
     private final PasantiasDao pasantiasDao;
     private final AplicacionPasantiasDao aplicacionPasantiasDao;
     private final CarrerasDao carrerasDao;
+    private final EnvioCorreoPasantiaDao envioCorreoPasantiaDao;
+    private final NotificacionPasantiaService notificacionPasantiaService;
 
     public AdminAnalyticsBl(PadronEstudianteDao padronEstudianteDao,
                             EventoAccesoDao eventoAccesoDao,
                             VistaPasantiaDao vistaPasantiaDao,
                             PasantiasDao pasantiasDao,
                             AplicacionPasantiasDao aplicacionPasantiasDao,
-                            CarrerasDao carrerasDao) {
+                            CarrerasDao carrerasDao,
+                            EnvioCorreoPasantiaDao envioCorreoPasantiaDao,
+                            NotificacionPasantiaService notificacionPasantiaService) {
         this.padronEstudianteDao = padronEstudianteDao;
         this.eventoAccesoDao = eventoAccesoDao;
         this.vistaPasantiaDao = vistaPasantiaDao;
         this.pasantiasDao = pasantiasDao;
         this.aplicacionPasantiasDao = aplicacionPasantiasDao;
         this.carrerasDao = carrerasDao;
+        this.envioCorreoPasantiaDao = envioCorreoPasantiaDao;
+        this.notificacionPasantiaService = notificacionPasantiaService;
     }
 
     @Transactional(readOnly = true)
@@ -73,6 +79,8 @@ public class AdminAnalyticsBl {
         Long totalPostulaciones = aplicacionPasantiasDao.countPorPasantia(idPasantia);
         Long vistasCorreo = vistaPasantiaDao.countVistasPorOrigenCorreo(idPasantia);
         Long vistasWeb = vistaPasantiaDao.countVistasPorOrigenWeb(idPasantia);
+        Long correosEnviados = envioCorreoPasantiaDao.countCorreosEnviados(idPasantia);
+        Long correosFallidos = envioCorreoPasantiaDao.countCorreosFallidos(idPasantia);
 
         return new PasantiaAlcanceDto(
                 idPasantia,
@@ -81,8 +89,14 @@ public class AdminAnalyticsBl {
                 totalVistas,
                 totalPostulaciones,
                 vistasCorreo,
-                vistasWeb
+                vistasWeb,
+                correosEnviados,
+                correosFallidos
         );
+    }
+
+    public void notificarEstudiantesPasantia(Integer idPasantia) {
+        notificacionPasantiaService.notificarEstudiantesPorCarrera(idPasantia);
     }
 
     @Transactional(readOnly = true)

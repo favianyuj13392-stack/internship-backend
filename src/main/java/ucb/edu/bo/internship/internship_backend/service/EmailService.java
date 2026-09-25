@@ -37,8 +37,7 @@ public class EmailService {
 
     @Async
     public CompletableFuture<String> enviarCorreo(EmailRequest emailRequest) {
-        logger.info("Enviando Correo");
-        logger.info("To: " + emailRequest.getTo());
+        logger.debug("Enviando correo individual");
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");

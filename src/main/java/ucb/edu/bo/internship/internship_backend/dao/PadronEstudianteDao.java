@@ -39,4 +39,7 @@ public interface PadronEstudianteDao extends JpaRepository<PadronEstudiante, Int
 
     @Query("SELECT COUNT(p) FROM PadronEstudiante p WHERE p.carrerasIdcarreras.idcarreras = :carreraId")
     Long countPorCarrera(@Param("carreraId") Integer carreraId);
+
+    @Query("SELECT p FROM PadronEstudiante p WHERE p.carrerasIdcarreras.idcarreras IN :carreraIds AND UPPER(p.estado) = 'ACTIVO'")
+    List<PadronEstudiante> findEstudiantesActivosPorCarreras(@Param("carreraIds") List<Integer> carreraIds);
 }

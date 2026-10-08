@@ -60,6 +60,7 @@ security-constraints:
             - /api/v1/pasantia/areas
             - /api/v1/inicio/recuento
             - /api/v1/institucion/sectores
+            - /api/v1/institucion/destacadas
             - /api/v1/public/files/download/*
             - /api/v1/usuario/*/existencia
             - /error

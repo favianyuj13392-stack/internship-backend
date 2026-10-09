@@ -62,6 +62,7 @@ security-constraints:
             - /api/v1/institucion/sectores
             - /api/v1/institucion/destacadas
             - /api/v1/public/files/download/*
+            - /api/v1/estudiante/public/files/download/*
             - /api/v1/usuario/*/existencia
             - /error
             - /v3/api-docs/**
@@ -82,7 +83,6 @@ security-constraints:
             - /api/v1/institucion/*
             - /api/v1/institucion/*/relacionadas
             - /api/v1/usuario/*/empresa/aprobado
-            - /api/v1/estudiante/public/files/download/*
           methods:
             - GET
           

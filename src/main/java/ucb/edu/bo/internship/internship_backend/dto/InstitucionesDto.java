@@ -223,15 +223,15 @@ public class InstitucionesDto {
         Instituciones institucion = new Instituciones();
         institucion.setIdinstituciones(this.idInstituciones);
         institucion.setNombre(this.nombre);
-        institucion.setDescripcion(this.descripcion);
+        institucion.setDescripcion(this.descripcion != null ? this.descripcion : "");
         institucion.setDireccion(this.direccion);
-        institucion.setFotoinstitucion(this.fotoInstitucion);
+        institucion.setFotoinstitucion(this.fotoInstitucion != null ? this.fotoInstitucion : "");
         institucion.setCorreo(this.correo);
-        institucion.setSectores(this.sectores);
-        institucion.setLogoempresa(this.logoEmpresa);
-        institucion.setFotos(this.fotos);
-        institucion.setRedessociales(this.redesSociales);
-        institucion.setActivo(this.activo);
+        institucion.setSectores(this.sectores != null ? this.sectores : new java.util.ArrayList<>());
+        institucion.setLogoempresa(this.logoEmpresa != null ? this.logoEmpresa : "");
+        institucion.setFotos(this.fotos != null ? this.fotos : new java.util.ArrayList<>());
+        institucion.setRedessociales(this.redesSociales != null ? this.redesSociales : new LinkedHashMap<>());
+        institucion.setActivo(this.activo != null ? this.activo : false);
         return institucion;
     }
     

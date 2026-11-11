@@ -47,6 +47,23 @@ public class AdministradorApi {
     public ResponseEntity<ResponseDto<InstitucionConPasantiasDto>> getInstitucionById(@PathVariable String uuid,@PathVariable Integer id) {
         return handleRequest(() -> institucionBl.obtenerInstitucionById(id));
     }
+    // Actualizar datos de una institución (Admin USEI)
+    @PutMapping("/instituciones/{id}")
+    public ResponseEntity<ResponseDto<InstitucionesDto>> actualizarInstitucion(
+            @PathVariable String uuid,
+            @PathVariable Integer id,
+            @RequestBody InstitucionesDto institucionesDto
+    ) {
+        return handleRequest(() -> institucionBl.actualizarInstitucionAdmin(institucionesDto, id));
+    }
+    // Dar de baja una institución (Admin USEI - baja lógica)
+    @DeleteMapping("/instituciones/{id}")
+    public ResponseEntity<ResponseDto<Boolean>> darDeBajaInstitucion(
+            @PathVariable String uuid,
+            @PathVariable Integer id
+    ) {
+        return handleRequest(() -> institucionBl.darDeBajaInstitucionAdmin(id));
+    }
     @PutMapping("/instituciones/{idInstituciones}/estado")
     public ResponseEntity<ResponseDto<InstitucionesDto>> cambiarEstadoInstitucion(@PathVariable Integer idInstituciones, @RequestBody ChangeEstadoDto estado, @PathVariable String uuid){
         return handleRequest(() -> administradorBl.cambiarEstadoInstitucion(idInstituciones, estado.getEstado()));
@@ -165,6 +182,25 @@ public class AdministradorApi {
             @PathVariable Integer idPasantias
     ) {
         return handleRequest(() -> administradorBl.rechazarPasantia(idPasantias));
+    }
+
+    // Actualizar pasantía (Admin USEI)
+    @PutMapping("/pasantia/{idPasantia}")
+    public ResponseEntity<ResponseDto<PasantiasDto>> actualizarPasantia(
+            @PathVariable String uuid,
+            @PathVariable Integer idPasantia,
+            @RequestBody PasantiasDto pasantiasDto
+    ) {
+        return handleRequest(() -> institucionBl.actualizarPasantiaAdmin(pasantiasDto, idPasantia));
+    }
+
+    // Dar de baja / Eliminar pasantía (Admin USEI - soft delete)
+    @DeleteMapping("/pasantia/{idPasantia}")
+    public ResponseEntity<ResponseDto<Boolean>> eliminarPasantia(
+            @PathVariable String uuid,
+            @PathVariable Integer idPasantia
+    ) {
+        return handleRequest(() -> institucionBl.eliminarPasantiaAdmin(idPasantia));
     }
     @GetMapping("/dashboard/KPI")
     public ResponseEntity<ResponseDto<List<KPIDto>>> getKPIWithoutParams(@PathVariable String uuid) {

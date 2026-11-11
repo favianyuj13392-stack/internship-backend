@@ -193,6 +193,36 @@ public class InstitucionBl {
             throw new InstitucionServiceExcepcion("Error al obtener las instituciones destacadas", e);
         }
     }
+    private void actualizarCamposInstitucion(Instituciones instituciones, InstitucionesDto institucionesDto) {
+        if (institucionesDto.getCorreo() != null) {
+            instituciones.setCorreo(institucionesDto.getCorreo());
+        }
+        if (institucionesDto.getDescripcion() != null) {
+            instituciones.setDescripcion(institucionesDto.getDescripcion());
+        }
+        if (institucionesDto.getDireccion() != null) {
+            instituciones.setDireccion(institucionesDto.getDireccion());
+        }
+        if (institucionesDto.getFotoInstitucion() != null) {
+            instituciones.setFotoinstitucion(institucionesDto.getFotoInstitucion());
+        }
+        if (institucionesDto.getFotos() != null) {
+            instituciones.setFotos(institucionesDto.getFotos());
+        }
+        if (institucionesDto.getLogoEmpresa() != null) {
+            instituciones.setLogoempresa(institucionesDto.getLogoEmpresa());
+        }
+        if (institucionesDto.getNombre() != null) {
+            instituciones.setNombre(institucionesDto.getNombre());
+        }
+        if (institucionesDto.getRedesSociales() != null) {
+            instituciones.setRedessociales(institucionesDto.getRedesSociales());
+        }
+        if (institucionesDto.getSectores() != null) {
+            instituciones.setSectores(institucionesDto.getSectores());
+        }
+    }
+
     @Transactional
     public InstitucionesDto actualizarInstitucion(String uuid,InstitucionesDto institucionesDto, Integer id) {
         try {
@@ -201,15 +231,7 @@ public class InstitucionBl {
             }
             Instituciones instituciones = institucionesDao.findByIdinstitucionesAndActivo(id, true);
             if (instituciones != null) {
-                instituciones.setCorreo(institucionesDto.getCorreo());
-                instituciones.setDescripcion(institucionesDto.getDescripcion());
-                instituciones.setDireccion(institucionesDto.getDireccion());
-                instituciones.setFotoinstitucion(institucionesDto.getFotoInstitucion());
-                instituciones.setFotos(institucionesDto.getFotos());
-                instituciones.setLogoempresa(institucionesDto.getLogoEmpresa());
-                instituciones.setNombre(institucionesDto.getNombre());
-                instituciones.setRedessociales(institucionesDto.getRedesSociales());
-                instituciones.setSectores(institucionesDto.getSectores());
+                actualizarCamposInstitucion(instituciones, institucionesDto);
                 instituciones = institucionesDao.save(instituciones);
                 return new InstitucionesDto(instituciones);
             } else {
@@ -219,6 +241,49 @@ public class InstitucionBl {
             throw e;
         } catch (Exception e) {
             throw new InstitucionServiceExcepcion("Error al actualizar la institucion", e);
+        }
+    }
+
+    @Transactional
+    public InstitucionesDto actualizarInstitucionAdmin(InstitucionesDto institucionesDto, Integer id) {
+        try {
+            Instituciones instituciones = institucionesDao.findById(id).orElse(null);
+            if (instituciones != null) {
+                actualizarCamposInstitucion(instituciones, institucionesDto);
+                instituciones = institucionesDao.save(instituciones);
+                return new InstitucionesDto(instituciones);
+            } else {
+                throw new InstitucionNotFoundException("Institucion no encontrada");
+            }
+        } catch (InstitucionNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new InstitucionServiceExcepcion("Error al actualizar la institucion por administrador", e);
+        }
+    }
+
+    @Transactional
+    public Boolean darDeBajaInstitucionAdmin(Integer id) {
+        try {
+            Instituciones instituciones = institucionesDao.findById(id).orElse(null);
+            if (instituciones != null) {
+                instituciones.setActivo(false);
+                institucionesDao.save(instituciones);
+                List<Pasantias> pasantias = pasantiasDao.findPasantiasByInstitucionesIdinstitucionesAndActivoIsTrue(instituciones);
+                if (pasantias != null && !pasantias.isEmpty()) {
+                    for (Pasantias p : pasantias) {
+                        p.setActivo(false);
+                    }
+                    pasantiasDao.saveAll(pasantias);
+                }
+                return true;
+            } else {
+                throw new InstitucionNotFoundException("Institucion no encontrada");
+            }
+        } catch (InstitucionNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new InstitucionServiceExcepcion("Error al dar de baja la institucion", e);
         }
     }
     @Transactional
@@ -334,6 +399,7 @@ public class InstitucionBl {
         }
     }
 
+    @Transactional
     public PasantiasDto actualizarPasantia(String uuid, Integer institucionId, Integer pasantiaId, PasantiasDto pasantiasDto) {
         try {
             if (validarRelacionUsuarioInstitucion(uuid, institucionId)) {
@@ -351,6 +417,23 @@ public class InstitucionBl {
                     pasantias.setFunciones( (List<String>)  pasantiasDto.getFunciones());
                     pasantias.setBeneficios( (List<String>)  pasantiasDto.getBeneficios());
                     pasantias = pasantiasDao.save(pasantias);
+
+                    if (pasantiasDto.getIdCarreras() != null) {
+                        List<Pasantiascarreras> actuales = pasantiasCarrerasDao.findAllByPasantiasIdpasantias(pasantias);
+                        if (actuales != null && !actuales.isEmpty()) {
+                            pasantiasCarrerasDao.deleteAll(actuales);
+                        }
+                        for (Integer idCarrera : pasantiasDto.getIdCarreras()) {
+                            Carreras carrera = carrerasDao.findById(idCarrera).orElse(null);
+                            if (carrera != null) {
+                                Pasantiascarreras pc = new Pasantiascarreras();
+                                pc.setCarrerasIdcarreras(carrera);
+                                pc.setPasantiasIdpasantias(pasantias);
+                                pasantiasCarrerasDao.save(pc);
+                            }
+                        }
+                    }
+
                     return PasantiasDto.fromEntity(pasantias);
                 } else {
                     throw new InstitucionNotFoundException("Pasantia no encontrada");
@@ -362,6 +445,65 @@ public class InstitucionBl {
             throw e;
         } catch (Exception e) {
             throw new InstitucionServiceExcepcion("Error al actualizar la pasantia", e);
+        }
+    }
+
+    @Transactional
+    public PasantiasDto actualizarPasantiaAdmin(PasantiasDto pasantiasDto, Integer pasantiaId) {
+        try {
+            Pasantias pasantias = pasantiasDao.findById(pasantiaId).orElse(null);
+            if (pasantias != null) {
+                if (pasantiasDto.getTitulo() != null) pasantias.setTitulo(pasantiasDto.getTitulo());
+                if (pasantiasDto.getDescripcion() != null) pasantias.setDescripcion(pasantiasDto.getDescripcion());
+                if (pasantiasDto.getFechaIngreso() != null) pasantias.setFechaingreso(pasantiasDto.getFechaIngreso());
+                if (pasantiasDto.getFechaCierre() != null) pasantias.setFechacierre(pasantiasDto.getFechaCierre());
+                if (pasantiasDto.getRequisitos() != null) pasantias.setRequisitos((List<String>) pasantiasDto.getRequisitos());
+                if (pasantiasDto.getAreas() != null) pasantias.setAreas((List<String>) pasantiasDto.getAreas());
+                if (pasantiasDto.getFunciones() != null) pasantias.setFunciones((List<String>) pasantiasDto.getFunciones());
+                if (pasantiasDto.getBeneficios() != null) pasantias.setBeneficios((List<String>) pasantiasDto.getBeneficios());
+                pasantias = pasantiasDao.save(pasantias);
+
+                if (pasantiasDto.getIdCarreras() != null) {
+                    List<Pasantiascarreras> actuales = pasantiasCarrerasDao.findAllByPasantiasIdpasantias(pasantias);
+                    if (actuales != null && !actuales.isEmpty()) {
+                        pasantiasCarrerasDao.deleteAll(actuales);
+                    }
+                    for (Integer idCarrera : pasantiasDto.getIdCarreras()) {
+                        Carreras carrera = carrerasDao.findById(idCarrera).orElse(null);
+                        if (carrera != null) {
+                            Pasantiascarreras pc = new Pasantiascarreras();
+                            pc.setCarrerasIdcarreras(carrera);
+                            pc.setPasantiasIdpasantias(pasantias);
+                            pasantiasCarrerasDao.save(pc);
+                        }
+                    }
+                }
+                return PasantiasDto.fromEntity(pasantias);
+            } else {
+                throw new InstitucionNotFoundException("Pasantia no encontrada");
+            }
+        } catch (InstitucionNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new InstitucionServiceExcepcion("Error al actualizar la pasantia por administrador", e);
+        }
+    }
+
+    @Transactional
+    public Boolean eliminarPasantiaAdmin(Integer pasantiaId) {
+        try {
+            Pasantias pasantias = pasantiasDao.findById(pasantiaId).orElse(null);
+            if (pasantias != null) {
+                pasantias.setActivo(false);
+                pasantiasDao.save(pasantias);
+                return true;
+            } else {
+                throw new InstitucionNotFoundException("Pasantia no encontrada");
+            }
+        } catch (InstitucionNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new InstitucionServiceExcepcion("Error al eliminar la pasantia por administrador", e);
         }
     }
 
